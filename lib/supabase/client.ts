@@ -5,14 +5,15 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 /**
  * Supabase tarayıcı istemcisi.
  *
- * Ortam değişkenleri `.env.local` dosyasından okunur. Değerler boşsa veya
- * şablondaki örnek metin olduğu gibi bırakılmışsa uygulama Supabase'siz,
- * `content/` altındaki yerel içerikle çalışmaya devam eder.
+ * createClient yalnızca proje kök URL'sini alır
+ * (`https://<ref>.supabase.co`). `/rest/v1` eklenmez; supabase-js bu yolu
+ * kendisi birleştirir. Ortam değişkenine REST yolu yapıştırılırsa çift
+ * `/rest/v1/rest/v1` isteği ve 404 oluşur.
  *
  * Yeni format anahtarlar (`sb_publishable_...`) JWT değildir. Bunları
- * Authorization: Bearer ile göndermek PostgREST'te "Invalid JWT" üretir ve
- * tüm tablolar okunamaz. Bu istemci anahtarı yalnızca `apikey` başlığında
- * gönderir; Bearer yalnızca gerçek oturum JWT'si varsa eklenir.
+ * Authorization: Bearer ile göndermek PostgREST'te "Invalid JWT" üretir.
+ * Anahtar yalnızca `apikey` başlığında gider; Bearer yalnızca gerçek
+ * oturum JWT'si varsa eklenir.
  */
 
 const PLACEHOLDERS = [
@@ -26,11 +27,32 @@ function clean(value: string | undefined): string {
   return (value ?? "").trim().replace(/^["']|["']$/g, "");
 }
 
+/**
+ * Proje kök URL'si. Path, query ve `/rest/v1` soneki atılır.
+ * createClient bu değere tekrar `rest/v1` ekleyeceği için path bırakılmaz.
+ */
+function normalizeProjectUrl(value: string | undefined): string {
+  const trimmed = clean(value);
+  if (!trimmed) return "";
+  try {
+    const parsed = new URL(trimmed);
+    return parsed.origin;
+  } catch {
+    return trimmed
+      .replace(/\/+$/, "")
+      .replace(/\/rest\/v1$/i, "")
+      .replace(/\/+$/, "");
+  }
+}
+
 function isUsableUrl(value: string): boolean {
   if (!value || PLACEHOLDERS.includes(value.toLowerCase())) return false;
   try {
     const parsed = new URL(value);
-    return parsed.protocol === "https:" || parsed.protocol === "http:";
+    return (
+      (parsed.protocol === "https:" || parsed.protocol === "http:") &&
+      parsed.pathname === "/"
+    );
   } catch {
     return false;
   }
@@ -44,7 +66,7 @@ function isNewApiKey(value: string): boolean {
   return value.startsWith("sb_publishable_") || value.startsWith("sb_secret_");
 }
 
-const url = clean(process.env.NEXT_PUBLIC_SUPABASE_URL);
+const url = normalizeProjectUrl(process.env.NEXT_PUBLIC_SUPABASE_URL);
 const anonKey = clean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
 export const isSupabaseConfigured = isUsableUrl(url) && isUsableKey(anonKey);
@@ -52,7 +74,7 @@ export const isSupabaseConfigured = isUsableUrl(url) && isUsableKey(anonKey);
 let cached: SupabaseClient | null = null;
 let creationFailed = false;
 
-function withSafeAuthHeaders(input: RequestInfo | URL, init?: RequestInit): RequestInit {
+function withSafeAuthHeaders(_input: RequestInfo | URL, init?: RequestInit): RequestInit {
   const headers = new Headers(init?.headers);
   if (!headers.has("apikey") && anonKey) {
     headers.set("apikey", anonKey);
