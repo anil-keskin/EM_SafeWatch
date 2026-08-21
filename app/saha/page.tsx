@@ -24,7 +24,6 @@ export default function SahaPage() {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
   const [filterOpen, setFilterOpen] = useState(false);
-  const [openZone, setOpenZone] = useState<string | null>(null);
 
   const total = scenarios.length || 30;
   const done = completedCount(progress);
@@ -41,9 +40,18 @@ export default function SahaPage() {
         const completed = list.filter((s) => progress[s.slug]).length;
         if (filter === "done") return completed > 0;
         if (filter === "open") return completed < list.length;
-        return true;
+        return list.length > 0;
       });
   }, [zones, scenarios, progress, query, filter]);
+
+  const ungrouped = useMemo(() => {
+    const known = new Set(zones.map((z) => z.id));
+    const q = query.trim().toLocaleLowerCase("tr");
+    return scenarios
+      .filter((s) => !known.has(s.zone_id))
+      .filter((s) => (q ? s.title.toLocaleLowerCase("tr").includes(q) : true))
+      .sort((a, b) => a.order_index - b.order_index);
+  }, [zones, scenarios, query]);
 
   return (
     <PageShell>
@@ -105,24 +113,35 @@ export default function SahaPage() {
         </div>
       </div>
 
-      <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-5 space-y-4">
         {visibleZones.map((zone) => {
           const zoneScenarios = scenariosOfZone(scenarios, zone.id);
-          const isOpen = openZone === zone.id;
+          if (zoneScenarios.length === 0) return null;
           return (
             <ZoneCard
               key={zone.id}
               zone={zone}
               scenarios={zoneScenarios}
               progress={progress}
-              open={isOpen}
-              onToggle={() => setOpenZone(isOpen ? null : zone.id)}
             />
           );
         })}
+        {ungrouped.length > 0 && (
+          <ZoneCard
+            zone={{
+              id: "diger",
+              name: "Diğer senaryolar",
+              icon: "",
+              description: "",
+              order_index: 99,
+            }}
+            scenarios={ungrouped}
+            progress={progress}
+          />
+        )}
       </div>
 
-      {visibleZones.length === 0 && (
+      {visibleZones.length === 0 && ungrouped.length === 0 && (
         <p className="mt-8 text-center text-sm text-erd-gray">
           Aramanıza uyan saha bölgesi bulunamadı.
         </p>
@@ -183,76 +202,49 @@ function ZoneCard({
   zone,
   scenarios,
   progress,
-  open,
-  onToggle,
 }: {
   zone: Zone;
   scenarios: Scenario[];
   progress: ProgressMap;
-  open: boolean;
-  onToggle: () => void;
 }) {
   return (
-    <div className="overflow-hidden rounded-2xl border border-erd-line bg-white">
-      <button
-        type="button"
-        onClick={onToggle}
-        className="flex w-full items-center gap-3 p-3.5 text-left hover:bg-erd-light/60"
-        aria-expanded={open}
-      >
+    <section className="overflow-hidden rounded-2xl border border-erd-line bg-white">
+      <header className="flex items-center gap-3 border-b border-erd-line bg-erd-light/40 p-3.5">
         <ZoneIcon zoneId={zone.id} />
-        <span className="min-w-0 flex-1">
-          <span className="block text-sm font-bold text-erd-charcoal">{zone.name}</span>
-          <span className="mt-0.5 block text-xs text-erd-gray">
-            {scenarios.length} senaryo
-          </span>
-          <span className="mt-1.5 flex flex-wrap gap-1">
-            {scenarios.map((scenario) => (
-              <span
-                key={scenario.slug}
-                title={scenario.title}
-                className={`h-2 w-2 rounded-full ${
-                  progress[scenario.slug] ? "bg-erd-red" : "bg-erd-line"
-                }`}
-              />
-            ))}
-          </span>
-        </span>
-        <ChevronRight
-          size={18}
-          className={`shrink-0 text-erd-gray transition-transform ${open ? "rotate-90" : ""}`}
-        />
-      </button>
+        <div className="min-w-0 flex-1">
+          <h2 className="text-sm font-bold text-erd-charcoal">{zone.name}</h2>
+          <p className="mt-0.5 text-xs text-erd-gray">{scenarios.length} senaryo</p>
+        </div>
+      </header>
 
-      {open && (
-        <ul className="border-t border-erd-line">
-          {scenarios.map((scenario) => {
-            const entry = progress[scenario.slug];
-            return (
-              <li key={scenario.slug}>
-                <Link
-                  href={`/senaryo/${scenario.slug}`}
-                  className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-erd-light"
-                >
-                  <span
-                    className={`h-2 w-2 rounded-full ${
-                      entry ? "bg-erd-red" : "border border-erd-gray/40"
-                    }`}
-                  />
-                  <span className="min-w-0 flex-1 truncate font-medium text-erd-charcoal">
-                    {scenario.title}
+      <ul>
+        {scenarios.map((scenario) => {
+          const entry = progress[scenario.slug];
+          return (
+            <li key={scenario.slug} className="border-b border-erd-line last:border-b-0">
+              <Link
+                href={`/senaryo/${scenario.slug}`}
+                className="flex items-center gap-3 px-4 py-3 text-sm hover:bg-erd-light"
+              >
+                <span
+                  className={`h-2.5 w-2.5 shrink-0 rounded-full ${
+                    entry ? "bg-erd-red" : "border border-erd-gray/40 bg-white"
+                  }`}
+                />
+                <span className="min-w-0 flex-1 font-medium text-erd-charcoal">
+                  {scenario.title}
+                </span>
+                {entry && (
+                  <span className="text-[11px] font-semibold tabular-nums text-erd-gray">
+                    {entry.best_technical}/{entry.best_behavior}
                   </span>
-                  {entry && (
-                    <span className="text-[11px] font-semibold tabular-nums text-erd-gray">
-                      {entry.best_technical}/{entry.best_behavior}
-                    </span>
-                  )}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      )}
-    </div>
+                )}
+                <ChevronRight size={16} className="shrink-0 text-erd-red" />
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
   );
 }

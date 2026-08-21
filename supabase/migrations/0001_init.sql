@@ -152,3 +152,12 @@ create policy "competency_summary_update_own" on competency_summary
 drop policy if exists "competency_summary_delete_own" on competency_summary;
 create policy "competency_summary_delete_own" on competency_summary
   for delete to authenticated using (auth.uid() = user_id);
+
+-- Data API okuma hakları (anon misafir dahil)
+grant usage on schema public to anon, authenticated;
+grant select on table public.zones to anon, authenticated;
+grant select on table public.equipment_categories to anon, authenticated;
+grant select on table public.equipment_items to anon, authenticated;
+grant select on table public.scenarios to anon, authenticated;
+grant select, insert, update, delete on table public.user_progress to authenticated;
+grant select, insert, update, delete on table public.competency_summary to authenticated;

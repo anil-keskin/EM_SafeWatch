@@ -46,6 +46,14 @@ export default function BriefingCard({
           {briefing.gorev && (
             <Field label="Göreviniz" value={briefing.gorev} emphasis />
           )}
+          {!briefing.gorev &&
+            !briefing.isletme_faaliyeti &&
+            !briefing.yuklenici_faaliyeti && (
+              <p className="rounded-xl bg-erd-light px-3.5 py-3 text-sm leading-snug text-erd-gray">
+                Bu senaryonun görev metni henüz doldurulmamış. Sahaya çıkıp
+                mevcut kartlarla antrenmana devam edebilirsiniz.
+              </p>
+            )}
           {briefing.isletme_faaliyeti && (
             <Field
               label="İşletme ne yapıyor?"

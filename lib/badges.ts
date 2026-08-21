@@ -115,7 +115,7 @@ export function evaluateBadges(
   const maxAttempts = Math.max(0, ...completed.map(([, e]) => e.attempts));
   const hintFreeRuns = completed.filter(([, e]) => e.hints_used === 0).length;
 
-  const playable = scenarios.filter((s) => !s.is_draft);
+  const playable = scenarios;
   const playableDone = playable.filter((s) => completedSlugs.has(s.slug)).length;
 
   const values: Record<string, number> = {

@@ -9,7 +9,7 @@ const MESSAGES: Record<
   local: {
     dot: "bg-erd-gray",
     title: "Veri kaynağı: yerel içerik",
-    body: "Supabase bağlı değil. İlerlemeniz yalnızca bu tarayıcıda saklanıyor. Bağlamak için .env.local dosyasına Project URL ve anon key değerlerini girip sunucuyu yeniden başlatın.",
+    body: "Supabase bağlı değil. İlerlemeniz yalnızca bu tarayıcıda saklanıyor.",
   },
   loading: {
     dot: "bg-erd-red animate-pulse",
@@ -19,17 +19,22 @@ const MESSAGES: Record<
   database: {
     dot: "bg-emerald-500",
     title: "Veri kaynağı: Supabase",
-    body: "Bölgeler, ekipman kartları ve senaryolar veritabanından okunuyor. Giriş yaparsanız ilerlemeniz hesabınıza da kaydedilir.",
+    body: "Bölgeler, ekipman kartları ve senaryolar veritabanından okunuyor.",
   },
   error: {
     dot: "bg-erd-red",
-    title: "Supabase'e ulaşılamadı",
-    body: "Anahtarlar tanımlı ancak veri okunamadı. Uygulama yerel içerikle çalışmaya devam ediyor. SQL Editor'da önce 0001_init.sql, sonra seed.sql dosyalarını çalıştırdığınızdan ve anahtarların doğru olduğundan emin olun.",
+    title: "Supabase okunamadı, yerel içerik kullanılıyor",
+    body: "Anahtarlar tanımlı ancak tablolar okunamadı. SQL Editor'da 0001_init.sql, seed.sql ve 0003_api_grants.sql dosyalarını çalıştırın.",
   },
 };
 
-/** Kurulumun doğru yapılıp yapılmadığını gösteren durum satırı. */
-export default function DataSourceNote({ source }: { source: DataSource }) {
+export default function DataSourceNote({
+  source,
+  detail,
+}: {
+  source: DataSource;
+  detail?: string;
+}) {
   const message = MESSAGES[source];
 
   return (
@@ -45,6 +50,11 @@ export default function DataSourceNote({ source }: { source: DataSource }) {
         <p className="mt-0.5 text-xs leading-snug text-erd-gray">
           {message.body}
         </p>
+        {source === "error" && detail && (
+          <p className="mt-1 break-all text-[11px] leading-snug text-erd-red/80">
+            {detail}
+          </p>
+        )}
       </div>
     </div>
   );

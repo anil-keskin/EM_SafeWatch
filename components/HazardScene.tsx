@@ -30,6 +30,13 @@ export default function HazardScene({
     <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl border border-erd-line bg-erd-charcoal">
       <SceneBackdrop zoneId={zoneId} />
 
+      {hazards.length === 0 && (
+        <p className="absolute inset-0 z-10 flex items-center justify-center px-6 text-center text-sm text-white/80">
+          Bu senaryo için risk noktaları henüz tanımlanmadı. Karar paneline geçerek
+          donanım ve müdahale seçimlerini çalışabilirsiniz.
+        </p>
+      )}
+
       {hazards.map((hazard) => {
         const isSelected = selectedSet.has(hazard.code);
         const showTruth = revealed;

@@ -9,7 +9,7 @@ import type { Scenario } from "@/lib/types";
  * sonradan doldurulabilir.
  */
 
-const draft = (
+const openScenario = (
   slug: string,
   zone_id: string,
   order_index: number,
@@ -1139,56 +1139,56 @@ export const SCENARIOS: Scenario[] = [
   },
 
   // =========================================================================
-  // TASLAKLAR — içerikleri sonradan doldurulacak
+  // Kalan senaryolar — tamamı açık ve oynanabilir
   // =========================================================================
   // Yüksek Fırın (toplam 5)
-  draft("yf-tapa-makinesi", "yuksek_firin", 2, "Tapa Makinesi Bakım Denetimi"),
-  draft("yf-cruf-granulasyon", "yuksek_firin", 3, "Cüruf Granülasyon Hattı Turu"),
-  draft("yf-sarj-kati", "yuksek_firin", 4, "Şarj Katı Malzeme Besleme"),
-  draft("yf-toz-tutma", "yuksek_firin", 5, "Toz Tutma Ünitesi Bakımı"),
+  openScenario("yf-tapa-makinesi", "yuksek_firin", 2, "Tapa Makinesi Bakım Denetimi"),
+  openScenario("yf-cruf-granulasyon", "yuksek_firin", 3, "Cüruf Granülasyon Hattı Turu"),
+  openScenario("yf-sarj-kati", "yuksek_firin", 4, "Şarj Katı Malzeme Besleme"),
+  openScenario("yf-toz-tutma", "yuksek_firin", 5, "Toz Tutma Ünitesi Bakımı"),
 
   // Çelikhane (toplam 5)
-  draft("ch-pota-ocagi", "celikhane", 3, "Pota Ocağı Elektrot Değişimi"),
-  draft("ch-konvertor-refrakter", "celikhane", 4, "Konvertör Refrakter Örümü"),
-  draft("ch-surekli-dokum", "celikhane", 5, "Sürekli Döküm Segment Değişimi"),
+  openScenario("ch-pota-ocagi", "celikhane", 3, "Pota Ocağı Elektrot Değişimi"),
+  openScenario("ch-konvertor-refrakter", "celikhane", 4, "Konvertör Refrakter Örümü"),
+  openScenario("ch-surekli-dokum", "celikhane", 5, "Sürekli Döküm Segment Değişimi"),
 
   // Kok Fabrikası (toplam 3)
-  draft("kk-batarya-ustu", "kok_fabrikasi", 1, "Kok Bataryası Üstü Turu"),
-  draft("kk-sondurme-kulesi", "kok_fabrikasi", 2, "Söndürme Kulesi İncelemesi"),
-  draft("kk-gaz-arindirma", "kok_fabrikasi", 3, "Gaz Arıtma Ünitesi Bakımı"),
+  openScenario("kk-batarya-ustu", "kok_fabrikasi", 1, "Kok Bataryası Üstü Turu"),
+  openScenario("kk-sondurme-kulesi", "kok_fabrikasi", 2, "Söndürme Kulesi İncelemesi"),
+  openScenario("kk-gaz-arindirma", "kok_fabrikasi", 3, "Gaz Arıtma Ünitesi Bakımı"),
 
   // Sinter (toplam 2)
-  draft("sn-eleme-hatti", "sinter", 1, "Eleme Hattı Toz Kontrolü"),
-  draft("sn-konveyor-bakim", "sinter", 2, "Konveyör Bant Bakımı"),
+  openScenario("sn-eleme-hatti", "sinter", 1, "Eleme Hattı Toz Kontrolü"),
+  openScenario("sn-konveyor-bakim", "sinter", 2, "Konveyör Bant Bakımı"),
 
   // Haddehane (toplam 4)
-  draft("hd-sicak-serit", "haddehane", 1, "Sıcak Şerit Hattı Gözlemi"),
-  draft("hd-merdane-degisimi", "haddehane", 2, "Merdane Değişimi Denetimi"),
-  draft("hd-hidrolik-unite", "haddehane", 3, "Hidrolik Ünite Bakımı"),
-  draft("hd-tav-firini", "haddehane", 4, "Tav Fırını Bakım Denetimi"),
+  openScenario("hd-sicak-serit", "haddehane", 1, "Sıcak Şerit Hattı Gözlemi"),
+  openScenario("hd-merdane-degisimi", "haddehane", 2, "Merdane Değişimi Denetimi"),
+  openScenario("hd-hidrolik-unite", "haddehane", 3, "Hidrolik Ünite Bakımı"),
+  openScenario("hd-tav-firini", "haddehane", 4, "Tav Fırını Bakım Denetimi"),
 
   // Enerji Merkezi (toplam 2)
-  draft("en-salt-sahasi", "enerji_elektrik", 1, "Şalt Sahası Yaklaşma Mesafesi"),
-  draft("en-trafo-binasi", "enerji_elektrik", 2, "Trafo Binası Bakım Denetimi"),
+  openScenario("en-salt-sahasi", "enerji_elektrik", 1, "Şalt Sahası Yaklaşma Mesafesi"),
+  openScenario("en-trafo-binasi", "enerji_elektrik", 2, "Trafo Binası Bakım Denetimi"),
 
   // Gaz Hatları (toplam 3)
-  draft("gh-vana-istasyonu", "gaz_hatlari", 2, "Vana İstasyonu Devreye Alma"),
-  draft("gh-kacak-mudahale", "gaz_hatlari", 3, "Gaz Kaçağı İhbarına Müdahale"),
+  openScenario("gh-vana-istasyonu", "gaz_hatlari", 2, "Vana İstasyonu Devreye Alma"),
+  openScenario("gh-kacak-mudahale", "gaz_hatlari", 3, "Gaz Kaçağı İhbarına Müdahale"),
 
   // Liman (toplam 2)
-  draft("lm-gemi-bosaltma", "liman_stok", 1, "Gemi Boşaltma Operasyonu"),
-  draft("lm-stok-sahasi-trafik", "liman_stok", 2, "Stok Sahası Araç Trafiği"),
+  openScenario("lm-gemi-bosaltma", "liman_stok", 1, "Gemi Boşaltma Operasyonu"),
+  openScenario("lm-stok-sahasi-trafik", "liman_stok", 2, "Stok Sahası Araç Trafiği"),
 
   // Yüksekte/İskele (toplam 2)
-  draft("yi-cati-calismasi", "yuksekte_iskele", 2, "Çatı Üzeri Sac Yenileme"),
+  openScenario("yi-cati-calismasi", "yuksekte_iskele", 2, "Çatı Üzeri Sac Yenileme"),
 
   // Kapalı Alan (toplam 1)
-  draft("ka-tank-girisi", "kapali_alan", 1, "Gaz Tankı İçi Kapalı Hacim Girişi"),
+  openScenario("ka-tank-girisi", "kapali_alan", 1, "Gaz Tankı İçi Kapalı Hacim Girişi"),
 ];
 
 export const SCENARIO_BY_SLUG = new Map(SCENARIOS.map((s) => [s.slug, s]));
 
-export const PLAYABLE_SCENARIOS = SCENARIOS.filter((s) => !s.is_draft);
+export const PLAYABLE_SCENARIOS = SCENARIOS;
 
 /** Yetkinlik kodlarının okunabilir Türkçe karşılıkları (Gelişim Raporu için). */
 export const COMPETENCY_LABELS: Record<string, string> = {

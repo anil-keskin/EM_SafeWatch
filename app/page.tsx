@@ -18,7 +18,7 @@ import { useSafeWatchData } from "@/lib/data";
 import { completedCount, useProgress } from "@/lib/progress";
 
 export default function HomePage() {
-  const { scenarios, source } = useSafeWatchData();
+  const { scenarios, source, sourceDetail } = useSafeWatchData();
   const { progress } = useProgress();
   const { displayName } = useAuth();
 
@@ -30,8 +30,7 @@ export default function HomePage() {
   )[0]?.[0];
 
   const nextScenario =
-    scenarios.find((s) => !s.is_draft && !progress[s.slug]) ??
-    scenarios.find((s) => !s.is_draft);
+    scenarios.find((s) => !progress[s.slug]) ?? scenarios[0];
 
   const continueHref = lastSlug
     ? `/senaryo/${lastSlug}`
@@ -93,7 +92,7 @@ export default function HomePage() {
           </div>
 
           <div className="mt-4">
-            <DataSourceNote source={source} />
+            <DataSourceNote source={source} detail={sourceDetail} />
           </div>
         </div>
       </div>
