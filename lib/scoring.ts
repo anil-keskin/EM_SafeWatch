@@ -1,0 +1,143 @@
+import type {
+  Scenario,
+  ScenarioAnswers,
+  ScenarioResult,
+  SectionResult,
+} from "@/lib/types";
+
+/**
+ * SafeWatch puanlama motoru.
+ *
+ * İki ayrı eksen üretir:
+ *  - Teknik doğruluk : tehlike tanıma, doğru KKD ailesi, gereksiz KKD'den kaçınma,
+ *                      yüklenici ve işletme personelindeki eksikleri görme.
+ *  - Kontrollük davranışı : doğru kişiye bildirme, gerektiğinde durdurma,
+ *                           yetki sınırını aşmama, kayıt tutma.
+ *
+ * Puan bir geçme/kalma eşiği değil, bir gelişim göstergesidir.
+ */
+
+/** Her ipucu kademesinin her iki eksenden düşürdüğü puan. */
+const HINT_PENALTY_PER_LEVEL = 5;
+
+const TECHNICAL_WEIGHTS = {
+  hazards: 0.3,
+  self: 0.4,
+  contractor: 0.15,
+  operator: 0.15,
+} as const;
+
+function clamp(value: number, min = 0, max = 100): number {
+  return Math.max(min, Math.min(max, value));
+}
+
+/**
+ * Bir çoktan seçmeli bölümü puanlar.
+ *
+ * @param selected  Oyuncunun işaretledikleri
+ * @param correct   Doğru cevap kümesi
+ * @param critical  Seçilmesi ağır hata sayılan kodlar (yasak KKD, yetki aşan aksiyon)
+ */
+export function scoreSection(
+  selected: string[],
+  correct: string[],
+  critical: string[] = []
+): SectionResult {
+  const selectedSet = new Set(selected);
+  const correctSet = new Set(correct);
+  const criticalSet = new Set(critical);
+
+  const hits = correct.filter((code) => selectedSet.has(code));
+  const misses = correct.filter((code) => !selectedSet.has(code));
+  const extras = selected.filter((code) => !correctSet.has(code));
+  const criticalExtras = extras.filter((code) => criticalSet.has(code));
+  const mildExtras = extras.filter((code) => !criticalSet.has(code));
+
+  // Kritik yanlışlar tam, sıradan fazlalıklar yarım puan ağırlığıyla düşer.
+  const penalty = criticalExtras.length + mildExtras.length * 0.5;
+
+  let ratio: number;
+  if (correct.length === 0) {
+    // Doğru cevabın "hiçbiri" olduğu bölümler: boş bırakmak tam puandır.
+    ratio = 1 - penalty / 2;
+  } else {
+    ratio = (hits.length - penalty) / correct.length;
+  }
+
+  return {
+    score: Math.round(clamp(ratio * 100)),
+    hits,
+    misses,
+    extras,
+    criticalExtras,
+  };
+}
+
+export function evaluateScenario(
+  scenario: Scenario,
+  answers: ScenarioAnswers,
+  hintsUsed: number
+): ScenarioResult {
+  const realHazards = scenario.hazards
+    .filter((h) => h.is_real)
+    .map((h) => h.code);
+  const fakeHazards = scenario.hazards
+    .filter((h) => !h.is_real)
+    .map((h) => h.code);
+
+  const sections = {
+    hazards: scoreSection(answers.hazards, realHazards, fakeHazards),
+    self: scoreSection(
+      answers.self,
+      scenario.required_self,
+      scenario.forbidden_self
+    ),
+    contractor: scoreSection(answers.contractor, scenario.contractor_gaps),
+    operator: scoreSection(answers.operator, scenario.operator_gaps),
+    actions: scoreSection(
+      answers.action,
+      scenario.correct_actions,
+      scenario.wrong_actions
+    ),
+  };
+
+  const hintPenalty = Math.min(hintsUsed, scenario.hints.length) *
+    HINT_PENALTY_PER_LEVEL;
+
+  const technicalRaw =
+    sections.hazards.score * TECHNICAL_WEIGHTS.hazards +
+    sections.self.score * TECHNICAL_WEIGHTS.self +
+    sections.contractor.score * TECHNICAL_WEIGHTS.contractor +
+    sections.operator.score * TECHNICAL_WEIGHTS.operator;
+
+  const technical = Math.round(clamp(technicalRaw - hintPenalty));
+  const behavior = Math.round(clamp(sections.actions.score - hintPenalty));
+
+  // Yetkinlik puanı: senaryonun etiketlerine iki eksenin ortalaması yazılır.
+  const overall = Math.round((technical + behavior) / 2);
+  const competencyScores: Record<string, number> = {};
+  for (const tag of scenario.competency_tags) {
+    competencyScores[tag] = overall;
+  }
+
+  return {
+    slug: scenario.slug,
+    technical,
+    behavior,
+    hintsUsed,
+    hintPenalty,
+    sections,
+    competencyScores,
+    completedAt: new Date().toISOString(),
+  };
+}
+
+/** Puanı kurumsal ve teşvik edici bir ifadeye çevirir. Geçti/kaldı yoktur. */
+export function scoreBand(score: number): {
+  label: string;
+  tone: "strong" | "solid" | "developing";
+} {
+  if (score >= 80) return { label: "Güçlü", tone: "strong" };
+  if (score >= 55) return { label: "Yeterli", tone: "solid" };
+  return { label: "Gelişime açık", tone: "developing" };
+}
