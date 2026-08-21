@@ -48,32 +48,71 @@ const LOCAL_CONTENT = {
 
 type RemoteContent = Omit<SafeWatchData, "source">;
 
+function normalizeList(value: unknown): string[] {
+  return Array.isArray(value) ? (value as string[]) : [];
+}
+
+function normalizeScenario(row: Scenario): Scenario {
+  return {
+    ...row,
+    is_draft: false,
+    briefing: row.briefing ?? {},
+    hazards: Array.isArray(row.hazards) ? row.hazards : [],
+    actors: Array.isArray(row.actors) ? row.actors : [],
+    required_self: normalizeList(row.required_self),
+    forbidden_self: normalizeList(row.forbidden_self),
+    contractor_gaps: normalizeList(row.contractor_gaps),
+    operator_gaps: normalizeList(row.operator_gaps),
+    correct_actions: normalizeList(row.correct_actions),
+    wrong_actions: normalizeList(row.wrong_actions),
+    hints: normalizeList(row.hints),
+    competency_tags: normalizeList(row.competency_tags),
+  };
+}
+
+/**
+ * Supabase'de eksik kalan senaryolar yerel listeden tamamlanır.
+ * Böylece veritabanında 6 kayıt olsa bile saha seçiminde 30 senaryo görünür.
+ */
+function mergeScenarios(remote: Scenario[], local: Scenario[]): Scenario[] {
+  const bySlug = new Map<string, Scenario>();
+  for (const item of local) {
+    bySlug.set(item.slug, normalizeScenario(item));
+  }
+  for (const item of remote) {
+    if (!item?.slug) continue;
+    const previous = bySlug.get(item.slug);
+    bySlug.set(item.slug, normalizeScenario({ ...previous, ...item } as Scenario));
+  }
+  return Array.from(bySlug.values());
+}
+
 async function fetchFromSupabase(): Promise<RemoteContent | null> {
   const supabase = getSupabase();
   if (!supabase) return null;
 
   const [zonesRes, scenariosRes, categoriesRes, itemsRes] = await Promise.all([
     supabase.from("zones").select("*").order("order_index"),
-    supabase.from("scenarios").select("*").order("order_index"),
+    supabase.from("scenarios").select("*").order("order_index").limit(100),
     supabase.from("equipment_categories").select("*").order("order_index"),
-    supabase.from("equipment_items").select("*").order("order_index"),
+    supabase.from("equipment_items").select("*").order("order_index").limit(200),
   ]);
 
-  const failed =
-    zonesRes.error || scenariosRes.error || categoriesRes.error || itemsRes.error;
-  // Şema kurulmuş ama seed çalıştırılmamışsa tablolar boş gelir.
-  const empty =
-    !zonesRes.data?.length ||
-    !scenariosRes.data?.length ||
-    !itemsRes.data?.length;
+  if (zonesRes.error && scenariosRes.error) return null;
 
-  if (failed || empty) return null;
+  const zones = (zonesRes.data?.length ? (zonesRes.data as Zone[]) : ZONES);
+  const remoteScenarios = (scenariosRes.data ?? []) as Scenario[];
+  if (zones.length === 0) return null;
 
   return {
-    zones: zonesRes.data as Zone[],
-    scenarios: scenariosRes.data as Scenario[],
-    categories: categoriesRes.data as EquipmentCategory[],
-    equipment: itemsRes.data as EquipmentItem[],
+    zones,
+    scenarios: mergeScenarios(remoteScenarios, SCENARIOS),
+    categories: (categoriesRes.data?.length
+      ? (categoriesRes.data as EquipmentCategory[])
+      : EQUIPMENT_CATEGORIES),
+    equipment: (itemsRes.data?.length
+      ? (itemsRes.data as EquipmentItem[])
+      : EQUIPMENT_ITEMS),
   };
 }
 

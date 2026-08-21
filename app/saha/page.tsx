@@ -228,20 +228,6 @@ function ZoneCard({
         <ul className="border-t border-erd-line">
           {scenarios.map((scenario) => {
             const entry = progress[scenario.slug];
-            if (scenario.is_draft) {
-              return (
-                <li
-                  key={scenario.slug}
-                  className="flex items-center gap-2 px-4 py-2.5 text-sm text-erd-gray/70"
-                >
-                  <span className="h-2 w-2 rounded-full bg-erd-line" />
-                  <span className="min-w-0 flex-1 truncate">{scenario.title}</span>
-                  <span className="rounded-md bg-erd-light px-2 py-0.5 text-[10px] font-semibold uppercase">
-                    Yakında
-                  </span>
-                </li>
-              );
-            }
             return (
               <li key={scenario.slug}>
                 <Link

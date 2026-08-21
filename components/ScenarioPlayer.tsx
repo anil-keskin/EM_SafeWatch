@@ -55,15 +55,6 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
     );
   }
 
-  if (scenario.is_draft) {
-    return (
-      <EmptyState
-        title={`${scenario.title} — yakında`}
-        body="Bu senaryonun içeriği henüz hazırlanmadı. Tamamlanmış senaryolarla antrenmana devam edebilirsiniz."
-      />
-    );
-  }
-
   const handleToggle = (tab: DecisionTab, code: string) => {
     setAnswers((prev) => ({ ...prev, [tab]: toggle(prev[tab], code) }));
   };

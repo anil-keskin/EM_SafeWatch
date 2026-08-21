@@ -462,49 +462,51 @@ on conflict (slug) do update set
   explanation = excluded.explanation, competency_tags = excluded.competency_tags;
 
 -- ===========================================================================
--- TASLAK SENARYOLAR (24 adet)
--- Aynı formatta boş kayıtlar. İçerikleri sonradan doldurulacaktır.
--- Doldurmak için: is_draft = false yapıp ilgili jsonb alanlarını güncelleyin.
+-- KALAN SENARYOLAR (24 adet) — tamamı açık, içerik sonradan doldurulabilir.
 -- ===========================================================================
 insert into scenarios (slug, zone_id, order_index, title, is_draft) values
   -- Yüksek Fırın (bölge toplamı 5)
-  ('yf-tapa-makinesi',       'yuksek_firin',    2, 'Tapa Makinesi Bakım Denetimi',        true),
-  ('yf-cruf-granulasyon',    'yuksek_firin',    3, 'Cüruf Granülasyon Hattı Turu',        true),
-  ('yf-sarj-kati',           'yuksek_firin',    4, 'Şarj Katı Malzeme Besleme',           true),
-  ('yf-toz-tutma',           'yuksek_firin',    5, 'Toz Tutma Ünitesi Bakımı',            true),
+  ('yf-tapa-makinesi',       'yuksek_firin',    2, 'Tapa Makinesi Bakım Denetimi',        false),
+  ('yf-cruf-granulasyon',    'yuksek_firin',    3, 'Cüruf Granülasyon Hattı Turu',        false),
+  ('yf-sarj-kati',           'yuksek_firin',    4, 'Şarj Katı Malzeme Besleme',           false),
+  ('yf-toz-tutma',           'yuksek_firin',    5, 'Toz Tutma Ünitesi Bakımı',            false),
   -- Çelikhane (bölge toplamı 5)
-  ('ch-pota-ocagi',          'celikhane',       3, 'Pota Ocağı Elektrot Değişimi',        true),
-  ('ch-konvertor-refrakter', 'celikhane',       4, 'Konvertör Refrakter Örümü',           true),
-  ('ch-surekli-dokum',       'celikhane',       5, 'Sürekli Döküm Segment Değişimi',      true),
+  ('ch-pota-ocagi',          'celikhane',       3, 'Pota Ocağı Elektrot Değişimi',        false),
+  ('ch-konvertor-refrakter', 'celikhane',       4, 'Konvertör Refrakter Örümü',           false),
+  ('ch-surekli-dokum',       'celikhane',       5, 'Sürekli Döküm Segment Değişimi',      false),
   -- Kok Fabrikası (3)
-  ('kk-batarya-ustu',        'kok_fabrikasi',   1, 'Kok Bataryası Üstü Turu',             true),
-  ('kk-sondurme-kulesi',     'kok_fabrikasi',   2, 'Söndürme Kulesi İncelemesi',          true),
-  ('kk-gaz-arindirma',       'kok_fabrikasi',   3, 'Gaz Arıtma Ünitesi Bakımı',           true),
+  ('kk-batarya-ustu',        'kok_fabrikasi',   1, 'Kok Bataryası Üstü Turu',             false),
+  ('kk-sondurme-kulesi',     'kok_fabrikasi',   2, 'Söndürme Kulesi İncelemesi',          false),
+  ('kk-gaz-arindirma',       'kok_fabrikasi',   3, 'Gaz Arıtma Ünitesi Bakımı',           false),
   -- Sinter (2)
-  ('sn-eleme-hatti',         'sinter',          1, 'Eleme Hattı Toz Kontrolü',            true),
-  ('sn-konveyor-bakim',      'sinter',          2, 'Konveyör Bant Bakımı',                true),
+  ('sn-eleme-hatti',         'sinter',          1, 'Eleme Hattı Toz Kontrolü',            false),
+  ('sn-konveyor-bakim',      'sinter',          2, 'Konveyör Bant Bakımı',                false),
   -- Haddehane (4)
-  ('hd-sicak-serit',         'haddehane',       1, 'Sıcak Şerit Hattı Gözlemi',           true),
-  ('hd-merdane-degisimi',    'haddehane',       2, 'Merdane Değişimi Denetimi',           true),
-  ('hd-hidrolik-unite',      'haddehane',       3, 'Hidrolik Ünite Bakımı',               true),
-  ('hd-tav-firini',          'haddehane',       4, 'Tav Fırını Bakım Denetimi',           true),
+  ('hd-sicak-serit',         'haddehane',       1, 'Sıcak Şerit Hattı Gözlemi',           false),
+  ('hd-merdane-degisimi',    'haddehane',       2, 'Merdane Değişimi Denetimi',           false),
+  ('hd-hidrolik-unite',      'haddehane',       3, 'Hidrolik Ünite Bakımı',               false),
+  ('hd-tav-firini',          'haddehane',       4, 'Tav Fırını Bakım Denetimi',           false),
   -- Enerji Merkezi (2)
-  ('en-salt-sahasi',         'enerji_elektrik', 1, 'Şalt Sahası Yaklaşma Mesafesi',       true),
-  ('en-trafo-binasi',        'enerji_elektrik', 2, 'Trafo Binası Bakım Denetimi',         true),
+  ('en-salt-sahasi',         'enerji_elektrik', 1, 'Şalt Sahası Yaklaşma Mesafesi',       false),
+  ('en-trafo-binasi',        'enerji_elektrik', 2, 'Trafo Binası Bakım Denetimi',         false),
   -- Gaz Hatları (bölge toplamı 3)
-  ('gh-vana-istasyonu',      'gaz_hatlari',     2, 'Vana İstasyonu Devreye Alma',         true),
-  ('gh-kacak-mudahale',      'gaz_hatlari',     3, 'Gaz Kaçağı İhbarına Müdahale',        true),
+  ('gh-vana-istasyonu',      'gaz_hatlari',     2, 'Vana İstasyonu Devreye Alma',         false),
+  ('gh-kacak-mudahale',      'gaz_hatlari',     3, 'Gaz Kaçağı İhbarına Müdahale',        false),
   -- Liman (2)
-  ('lm-gemi-bosaltma',       'liman_stok',      1, 'Gemi Boşaltma Operasyonu',            true),
-  ('lm-stok-sahasi-trafik',  'liman_stok',      2, 'Stok Sahası Araç Trafiği',            true),
+  ('lm-gemi-bosaltma',       'liman_stok',      1, 'Gemi Boşaltma Operasyonu',            false),
+  ('lm-stok-sahasi-trafik',  'liman_stok',      2, 'Stok Sahası Araç Trafiği',            false),
   -- Yüksekte/İskele (bölge toplamı 2)
-  ('yi-cati-calismasi',      'yuksekte_iskele', 2, 'Çatı Üzeri Sac Yenileme',             true),
+  ('yi-cati-calismasi',      'yuksekte_iskele', 2, 'Çatı Üzeri Sac Yenileme',             false),
   -- Kapalı Alan (1)
-  ('ka-tank-girisi',         'kapali_alan',     1, 'Gaz Tankı İçi Kapalı Hacim Girişi',   true)
+  ('ka-tank-girisi',         'kapali_alan',     1, 'Gaz Tankı İçi Kapalı Hacim Girişi',   false)
 on conflict (slug) do update set
   zone_id     = excluded.zone_id,
   order_index = excluded.order_index,
-  title       = excluded.title;
+  title       = excluded.title,
+  is_draft    = false;
+
+-- Daha önce taslak işaretlenen tüm kayıtları aç.
+update scenarios set is_draft = false;
 
 -- ===========================================================================
 -- TEMİZLİK

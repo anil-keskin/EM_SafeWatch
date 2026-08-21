@@ -5,8 +5,8 @@ import type { Scenario } from "@/lib/types";
  * Supabase yapılandırılmadığında uygulama bu listeyi kullanır, böylece proje
  * veritabanı bağlanmadan da çalışır.
  *
- * Taslak senaryolar (is_draft: true) sadece başlık ve bölge bilgisi taşır;
- * içerikleri doldurulunca is_draft alanı false yapılmalıdır.
+ * 30 senaryonun tamamı açıktır. İçeriği henüz ince olanlar da oynanabilir;
+ * sonradan doldurulabilir.
  */
 
 const draft = (
@@ -19,7 +19,7 @@ const draft = (
   zone_id,
   order_index,
   title,
-  is_draft: true,
+  is_draft: false,
   briefing: {},
   hazards: [],
   actors: [],
