@@ -33,8 +33,9 @@ jobs:
         env:
           GITHUB_PAGES: "true"
           NEXT_PUBLIC_BASE_PATH: /EM_SafeWatch
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          # Boş secret .env.production değerini ezerdi; yoksa üretim anahtarı kullanılır.
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://waxigsgovqiwncybppab.supabase.co' }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_wJ870Lt8WXuo0FMqNb-4rw_ZiHOd-f7' }}
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

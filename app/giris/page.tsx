@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import PageShell from "@/components/PageShell";
 import { getSupabase, isSupabaseConfigured } from "@/lib/supabase/client";
+import { withBase } from "@/lib/paths";
 
 type Mode = "giris" | "kayit";
 
@@ -64,10 +65,19 @@ export default function GirisPage() {
     setError(null);
     setStatus(null);
 
+    const emailRedirectTo =
+      typeof window !== "undefined"
+        ? `${window.location.origin}${withBase("/giris/")}`
+        : undefined;
+
     const result =
       mode === "giris"
         ? await supabase.auth.signInWithPassword({ email, password })
-        : await supabase.auth.signUp({ email, password });
+        : await supabase.auth.signUp({
+            email,
+            password,
+            options: emailRedirectTo ? { emailRedirectTo } : undefined,
+          });
 
     setBusy(false);
 

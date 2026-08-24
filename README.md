@@ -128,8 +128,14 @@ siteyi derleyip Pages’e yükler.
 1. Depo **Settings > Pages**
 2. **Build and deployment > Source** = **GitHub Actions**
    (Branch/root seçiliyse README görünür, oyun açılmaz.)
-3. İsteğe bağlı: **Settings > Secrets and variables > Actions** içine
-   `NEXT_PUBLIC_SUPABASE_URL` ve `NEXT_PUBLIC_SUPABASE_ANON_KEY` ekleyin.
+3. Supabase Dashboard → **Authentication → URL Configuration**
+   - Site URL: `https://anil-keskin.github.io/EM_SafeWatch`
+   - Redirect URLs: `https://anil-keskin.github.io/EM_SafeWatch/**`
+     ve yerel geliştirme için `http://localhost:3000/**`
+
+Üretim derlemesi `.env.production` içindeki publishable anahtarı kullanır
+(`service_role` yoktur). GitHub Secrets ile aynı iki değişkeni verirseniz
+onlar öncelikli olur.
 
 ## Yayın (Vercel)
 
