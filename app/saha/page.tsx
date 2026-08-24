@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { ChevronDown, ChevronRight, ClipboardList, Info, LayoutGrid, Search, Trophy } from "lucide-react";
+import AppIcon, { FilledIcon } from "@/components/AppIcon";
 import CircularProgress from "@/components/CircularProgress";
 import PageShell from "@/components/PageShell";
 import ZoneIcon from "@/components/ZoneIcon";
@@ -69,15 +70,18 @@ export default function SahaPage() {
         <div className="flex flex-col gap-2 sm:flex-row">
           <label className="relative block">
             <Search
-              size={16}
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-erd-gray"
+              size={18}
+              strokeWidth={1.7}
+              fill="currentColor"
+              fillOpacity={0.28}
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#546E7A]"
             />
             <input
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Saha ara..."
-              className="w-full rounded-xl border border-erd-line bg-white py-2.5 pl-9 pr-3 text-sm outline-none focus:border-erd-red/50 sm:w-56"
+              className="w-full rounded-xl border border-erd-line bg-white py-2.5 pl-10 pr-3 text-sm outline-none focus:border-erd-red/50 sm:w-56"
             />
           </label>
 
@@ -87,7 +91,7 @@ export default function SahaPage() {
               onClick={() => setFilterOpen((v) => !v)}
               className="flex w-full items-center gap-2 rounded-xl border border-erd-line bg-white px-3 py-2.5 text-sm font-medium text-erd-charcoal sm:w-40"
             >
-              <LayoutGrid size={16} className="text-erd-gray" />
+              <FilledIcon icon={LayoutGrid} tone="nav" size={18} />
               <span className="flex-1 text-left">{FILTER_LABEL[filter]}</span>
               <ChevronDown size={14} className="text-erd-gray" />
             </button>
@@ -150,12 +154,12 @@ export default function SahaPage() {
       <div className="mt-6 rounded-2xl bg-erd-light px-4 py-4 sm:px-6">
         <div className="grid gap-4 sm:grid-cols-3 sm:items-center">
           <Stat
-            icon={<ClipboardList size={20} className="text-erd-red" />}
+            icon={<AppIcon icon={ClipboardList} tone="kkd" size="sm" />}
             label="Toplam Senaryo"
             value={String(total)}
           />
           <Stat
-            icon={<Trophy size={20} className="text-erd-red" />}
+            icon={<AppIcon icon={Trophy} tone="crane" size="sm" />}
             label="Tamamlanan Senaryo"
             value={`${done} / ${total}`}
           />
@@ -170,7 +174,7 @@ export default function SahaPage() {
       </div>
 
       <p className="mt-4 flex items-start gap-2 text-xs leading-snug text-erd-gray">
-        <Info size={14} className="mt-0.5 shrink-0 text-erd-red" />
+        <FilledIcon icon={Info} tone="kkd" size={16} className="mt-0.5" />
         Senaryoları dilediğiniz sırayla çözebilirsiniz. Her senaryo tamamlandığında
         ilerlemeniz kaydedilir.
       </p>
@@ -208,8 +212,9 @@ function ZoneCard({
   progress: ProgressMap;
 }) {
   return (
-    <section className="overflow-hidden rounded-2xl border border-erd-line bg-white">
-      <header className="flex items-center gap-3 border-b border-erd-line bg-erd-light/40 p-3.5">
+    <section className="relative overflow-hidden rounded-2xl border border-erd-line bg-white">
+      <ZoneIcon zoneId={zone.id} watermark />
+      <header className="relative flex items-center gap-3 border-b border-erd-line bg-erd-light/40 p-3.5">
         <ZoneIcon zoneId={zone.id} />
         <div className="min-w-0 flex-1">
           <h2 className="text-sm font-bold text-erd-charcoal">{zone.name}</h2>
@@ -239,7 +244,7 @@ function ZoneCard({
                     {entry.best_technical}/{entry.best_behavior}
                   </span>
                 )}
-                <ChevronRight size={16} className="shrink-0 text-erd-red" />
+                <ChevronRight size={18} className="shrink-0 text-erd-red" />
               </Link>
             </li>
           );

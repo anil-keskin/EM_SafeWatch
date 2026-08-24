@@ -1,7 +1,18 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import {
+  BarChart3,
+  ClipboardList,
+  HardHat,
+  Shield,
+  TriangleAlert,
+} from "lucide-react";
+import AppIcon, { IconWatermark } from "@/components/AppIcon";
 import PageShell from "@/components/PageShell";
 import { ACTIONS } from "@/content/actions";
+import { actionKindGlyph } from "@/lib/icon-theme";
+import type { IconTone } from "@/lib/icon-theme";
+import type { LucideIcon } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Nasıl Oynanır | SafeWatch",
@@ -34,26 +45,40 @@ const RULES = [
   },
 ];
 
-const STEPS = [
+const STEPS: Array<{
+  step: string;
+  title: string;
+  body: string;
+  icon: LucideIcon;
+  tone: IconTone;
+}> = [
   {
     step: "1",
     title: "Görev Kartı",
     body: "Nereye ve neden gittiğinizi, işletmenin ve müteahhidin ne yaptığını, hava ve özel durumları okursunuz.",
+    icon: ClipboardList,
+    tone: "kkd",
   },
   {
     step: "2",
     title: "Tehlike Tanıma",
     body: "Sahnedeki risk noktalarını işaretlersiniz. Bazı noktalar bilinçli olarak sahte konulmuştur. Takılırsanız HEPSİNİ BELİRLE gerçek noktaları işaretler; bu bir çözümdür ve puan düşürür.",
+    icon: TriangleAlert,
+    tone: "risk",
   },
   {
     step: "3",
     title: "Hazırlık ve Denetim",
     body: "Dört karar sekmesini doldurursunuz: kendi donanımınız, yüklenicideki eksikler, işletmedeki uygunsuzluklar ve müdahale kararınız. (i) rehberdir, puan düşürmez. TAK açık ailedeki doğruları, HEPSİNİ TAK tüm sekmenin doğrularını giydirir; çözüm puan düşürür.",
+    icon: HardHat,
+    tone: "kkd",
   },
   {
     step: "4",
     title: "Sonuç Kartı",
     body: "Teknik doğruluk ve kontrollük davranışı ayrı ayrı gösterilir; doğrular, eksikler ve gereksiz seçimler kurumsal bir dille açıklanır.",
+    icon: BarChart3,
+    tone: "nav",
   },
 ];
 
@@ -96,9 +121,7 @@ export default function NasilOynanirPage() {
         <ol className="mt-3 space-y-3">
           {STEPS.map((item) => (
             <li key={item.step} className="flex gap-3">
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-erd-red text-xs font-bold text-white">
-                {item.step}
-              </span>
+              <AppIcon icon={item.icon} tone={item.tone} size="sm" />
               <div className="min-w-0">
                 <p className="text-sm font-semibold text-erd-charcoal">
                   {item.title}
@@ -133,11 +156,12 @@ export default function NasilOynanirPage() {
 
       <section className="grid gap-3 sm:grid-cols-2">
         {RULES.map((rule) => (
-          <div key={rule.title} className="sw-card p-4">
-            <h3 className="text-sm font-bold text-erd-charcoal">
+          <div key={rule.title} className="sw-card relative overflow-hidden p-4">
+            <IconWatermark icon={Shield} tone="kkd" />
+            <h3 className="relative text-sm font-bold text-erd-charcoal">
               {rule.title}
             </h3>
-            <p className="mt-1 text-sm leading-snug text-erd-gray">
+            <p className="relative mt-1 text-sm leading-snug text-erd-gray">
               {rule.body}
             </p>
           </div>
@@ -178,14 +202,27 @@ export default function NasilOynanirPage() {
           {ACTIONS.map((action) => (
             <li
               key={action.code}
-              className="rounded-xl border border-erd-line p-3"
+              className="relative overflow-hidden rounded-xl border border-erd-line p-3"
             >
-              <p className="text-sm font-semibold text-erd-charcoal">
-                {action.label}
-              </p>
-              <p className="mt-0.5 text-xs leading-snug text-erd-gray">
-                {action.description}
-              </p>
+              <IconWatermark
+                icon={actionKindGlyph(action.kind).icon}
+                tone={actionKindGlyph(action.kind).tone}
+              />
+              <div className="relative flex items-start gap-2.5">
+                <AppIcon
+                  icon={actionKindGlyph(action.kind).icon}
+                  tone={actionKindGlyph(action.kind).tone}
+                  size="sm"
+                />
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-erd-charcoal">
+                    {action.label}
+                  </p>
+                  <p className="mt-0.5 text-xs leading-snug text-erd-gray">
+                    {action.description}
+                  </p>
+                </div>
+              </div>
             </li>
           ))}
         </ul>

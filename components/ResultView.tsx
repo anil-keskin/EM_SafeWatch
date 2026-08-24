@@ -4,9 +4,11 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import HazardScene from "@/components/HazardScene";
 import ScoreMeter from "@/components/ScoreMeter";
+import AppIcon, { IconWatermark } from "@/components/AppIcon";
 import { actionLabel } from "@/content/actions";
 import { competencyLabel } from "@/content/scenarios";
 import { useSafeWatchData, findScenario, scenariosOfZone } from "@/lib/data";
+import { zoneGlyph, zoneTone } from "@/lib/icon-theme";
 import { loadLastResult } from "@/lib/progress";
 import type { EquipmentItem, ScenarioResult, SectionResult } from "@/lib/types";
 
@@ -69,15 +71,33 @@ export default function ResultView({ slug }: { slug: string }) {
   return (
     <div className="space-y-4">
       <div className="sw-card overflow-hidden">
-        <div className="bg-erd-charcoal px-5 py-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/55">
-            Değerlendirme · {zone?.name}
-          </p>
-          <h1 className="mt-1 text-xl font-bold text-white sm:text-2xl">
-            {scenario.title}
-          </h1>
+        <div className="relative overflow-hidden bg-erd-charcoal px-5 py-4">
+          <div className="flex items-start gap-3">
+            {zone && (
+              <AppIcon
+                icon={zoneGlyph(zone.id)}
+                tone={zoneTone(zone.id)}
+                size="md"
+                onDark
+              />
+            )}
+            <div className="min-w-0">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/55">
+                Değerlendirme · {zone?.name}
+              </p>
+              <h1 className="mt-1 text-xl font-bold text-white sm:text-2xl">
+                {scenario.title}
+              </h1>
+            </div>
+          </div>
         </div>
-        <div className="grid gap-3 p-4 sm:grid-cols-2">
+        <div className="relative grid gap-3 overflow-hidden p-4 sm:grid-cols-2">
+          {zone && (
+            <IconWatermark
+              icon={zoneGlyph(zone.id)}
+              tone={zoneTone(zone.id)}
+            />
+          )}
           <ScoreMeter
             label="Teknik Doğruluk"
             hint="Tehlike tanıma, doğru KKD ailesi ve gereksiz seçimden kaçınma."

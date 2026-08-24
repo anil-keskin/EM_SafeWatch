@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from "react";
 import CardHint from "@/components/CardHint";
+import EquipmentGlyph from "@/components/EquipmentGlyph";
+import { FilledIcon, IconWatermark } from "@/components/AppIcon";
 import SolutionAssist from "@/components/SolutionAssist";
 import { TAB_SELECT_CONTEXT, whySelectFor } from "@/content/card-hints";
 import {
@@ -9,6 +11,7 @@ import {
   SOLUTION_FULL_PENALTY,
 } from "@/lib/scoring";
 import { codesInCategory, isExactSolved, isScopeSolved } from "@/lib/solutions";
+import { categoryGlyph, categoryTone, equipmentGlyph } from "@/lib/icon-theme";
 import type { DecisionTab, EquipmentCategory, EquipmentItem } from "@/lib/types";
 
 interface EquipmentPickerProps {
@@ -130,6 +133,7 @@ export default function EquipmentPicker({
             <CategoryChip
               key={cat.id}
               label={cat.name}
+              categoryId={cat.id}
               active={activeCategory === cat.id}
               onClick={() => setActiveCategory(cat.id)}
             />
@@ -140,26 +144,30 @@ export default function EquipmentPicker({
         {visible.map((item) => {
           const isSelected = selectedSet.has(item.code);
           const infoOpen = openInfo === item.code;
+          const glyph = equipmentGlyph(item.code, item.category_id);
           return (
             <div
               key={item.code}
-              className={`relative rounded-xl border p-2.5 transition-colors ${
+              className={`relative overflow-hidden rounded-xl border p-2.5 transition-colors ${
                 isSelected
                   ? "border-erd-red bg-red-50/60"
                   : "border-erd-line bg-white hover:border-erd-gray/40"
               }`}
             >
-              <div className="flex items-start gap-1">
+              <IconWatermark icon={glyph.icon} tone={glyph.tone} />
+              <div className="relative flex items-start gap-1">
                 <button
                   type="button"
                   disabled={disabled}
                   onClick={() => onToggle(item.code)}
-                  className="flex min-w-0 flex-1 items-start gap-2 text-left disabled:opacity-60"
+                  className="flex min-w-0 flex-1 items-start gap-2.5 text-left disabled:opacity-60"
                   aria-pressed={isSelected}
                 >
-                  <span className="text-xl leading-none text-erd-red">
-                    {item.icon}
-                  </span>
+                  <EquipmentGlyph
+                    code={item.code}
+                    categoryId={item.category_id}
+                    size="sm"
+                  />
                   <span className="min-w-0 pr-0.5">
                     <span className="block text-xs font-semibold leading-snug text-erd-charcoal">
                       {item.name}
@@ -200,10 +208,12 @@ export default function EquipmentPicker({
 
 function CategoryChip({
   label,
+  categoryId,
   active,
   onClick,
 }: {
   label: string;
+  categoryId?: string;
   active: boolean;
   onClick: () => void;
 }) {
@@ -211,12 +221,20 @@ function CategoryChip({
     <button
       type="button"
       onClick={onClick}
-      className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
+      className={`flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
         active
           ? "bg-erd-charcoal text-white"
           : "bg-erd-light text-erd-gray hover:bg-erd-line"
       }`}
     >
+      {categoryId && (
+        <FilledIcon
+          icon={categoryGlyph(categoryId)}
+          tone={active ? "kkd" : categoryTone(categoryId)}
+          size={14}
+          className={active ? "!text-white" : ""}
+        />
+      )}
       {label}
     </button>
   );

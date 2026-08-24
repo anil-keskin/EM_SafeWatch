@@ -1,8 +1,11 @@
 import ActorBadge, { actorMeta } from "@/components/ActorBadge";
+import AppIcon from "@/components/AppIcon";
+import { zoneGlyph, zoneTone } from "@/lib/icon-theme";
 import type { Actor, Briefing } from "@/lib/types";
 
 interface BriefingCardProps {
   title: string;
+  zoneId?: string;
   zoneName: string;
   briefing: Briefing;
   actors: Actor[];
@@ -19,6 +22,7 @@ const CONDITION_FIELDS: Array<{ key: keyof Briefing; label: string }> = [
 /** Senaryonun ilk ekranı: görev kartı. */
 export default function BriefingCard({
   title,
+  zoneId,
   zoneName,
   briefing,
   actors,
@@ -30,7 +34,11 @@ export default function BriefingCard({
   return (
     <div className="space-y-4">
       <div className="sw-card overflow-hidden">
-        <div className="border-b border-erd-line bg-erd-charcoal px-5 py-4">
+        <div className="flex items-start gap-3 border-b border-erd-line bg-erd-charcoal px-5 py-4">
+          {zoneId && (
+            <AppIcon icon={zoneGlyph(zoneId)} tone={zoneTone(zoneId)} size="md" onDark />
+          )}
+          <div className="min-w-0">
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/55">
             Görev Kartı · {zoneName}
           </p>
@@ -40,6 +48,7 @@ export default function BriefingCard({
           {briefing.konum && (
             <p className="mt-1 text-sm text-white/70">{briefing.konum}</p>
           )}
+          </div>
         </div>
 
         <div className="space-y-4 p-5">

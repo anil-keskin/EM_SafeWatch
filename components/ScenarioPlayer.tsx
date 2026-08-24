@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
+import { ClipboardList, HardHat, TriangleAlert } from "lucide-react";
 import BriefingCard from "@/components/BriefingCard";
 import DecisionPanel, {
   decisionTabShort,
@@ -166,6 +167,7 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
         <>
           <BriefingCard
             title={scenario.title}
+            zoneId={scenario.zone_id}
             zoneName={zone?.name ?? ""}
             briefing={scenario.briefing}
             actors={scenario.actors}
@@ -319,10 +321,10 @@ function StepBar({
   step: Step;
   onStep: (s: Step) => void;
 }) {
-  const steps: Array<{ id: Step; label: string }> = [
-    { id: "brief", label: "1. Görev Kartı" },
-    { id: "hazard", label: "2. Tehlike Tanıma" },
-    { id: "decide", label: "3. Hazırlık ve Denetim" },
+  const steps: Array<{ id: Step; label: string; icon: typeof ClipboardList }> = [
+    { id: "brief", label: "1. Görev Kartı", icon: ClipboardList },
+    { id: "hazard", label: "2. Tehlike Tanıma", icon: TriangleAlert },
+    { id: "decide", label: "3. Hazırlık ve Denetim", icon: HardHat },
   ];
   const currentIndex = steps.findIndex((s) => s.id === step);
 
@@ -331,12 +333,13 @@ function StepBar({
       {steps.map((s, index) => {
         const active = s.id === step;
         const visited = index <= currentIndex;
+        const Icon = s.icon;
         return (
           <button
             key={s.id}
             type="button"
             onClick={() => onStep(s.id)}
-            className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
+            className={`flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
               active
                 ? "bg-erd-red text-white"
                 : visited
@@ -344,6 +347,12 @@ function StepBar({
                   : "bg-white text-erd-gray border border-erd-line"
             }`}
           >
+            <Icon
+              size={16}
+              strokeWidth={1.7}
+              fill="currentColor"
+              fillOpacity={0.32}
+            />
             {s.label}
           </button>
         );

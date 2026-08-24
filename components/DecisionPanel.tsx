@@ -2,8 +2,11 @@
 
 import ActionPicker from "@/components/ActionPicker";
 import ActorBadge from "@/components/ActorBadge";
+import EquipmentGlyph from "@/components/EquipmentGlyph";
 import EquipmentPicker from "@/components/EquipmentPicker";
+import { FilledIcon } from "@/components/AppIcon";
 import { DECISION_TABS } from "@/content/decision-tabs";
+import { tabGlyph } from "@/lib/icon-theme";
 import type {
   Actor,
   DecisionTab,
@@ -79,12 +82,17 @@ export default function DecisionPanel({
               key={tab.id}
               type="button"
               onClick={() => onTabChange(tab.id)}
-              className={`relative shrink-0 px-4 py-3 text-xs font-semibold transition-colors sm:text-sm ${
+              className={`relative flex shrink-0 items-center gap-1.5 px-3 py-3 text-xs font-semibold transition-colors sm:px-4 sm:text-sm ${
                 active
                   ? "bg-white text-erd-charcoal"
                   : "text-erd-gray hover:text-erd-charcoal"
               }`}
             >
+              <FilledIcon
+                icon={tabGlyph(tab.id).icon}
+                tone={active ? tabGlyph(tab.id).tone : "nav"}
+                size={18}
+              />
               <span className="sm:hidden">{tab.short}</span>
               <span className="hidden sm:inline">{tab.label}</span>
               {count > 0 && (
@@ -182,14 +190,24 @@ function ObservedActor({
             Gözlemlenebilir bir koruyucu yok.
           </li>
         )}
-        {current.map((code) => (
-          <li
-            key={code}
-            className="rounded-lg border border-erd-line bg-white px-2 py-1 text-[11px] font-medium text-erd-charcoal"
-          >
-            {byCode.get(code)?.icon} {byCode.get(code)?.name ?? code}
-          </li>
-        ))}
+        {current.map((code) => {
+          const item = byCode.get(code);
+          return (
+            <li
+              key={code}
+              className="flex items-center gap-1.5 rounded-lg border border-erd-line bg-white px-2 py-1 text-[11px] font-medium text-erd-charcoal"
+            >
+              {item && (
+                <EquipmentGlyph
+                  code={item.code}
+                  categoryId={item.category_id}
+                  size="xs"
+                />
+              )}
+              {item?.name ?? code}
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

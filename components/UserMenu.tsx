@@ -11,6 +11,7 @@ import {
   Settings,
   Trophy,
 } from "lucide-react";
+import { FilledIcon } from "@/components/AppIcon";
 import { saveDisplayName, useUser } from "@/lib/user";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
 
@@ -108,7 +109,7 @@ export default function UserMenu() {
                   className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-erd-charcoal transition-colors hover:bg-erd-light"
                   role="menuitem"
                 >
-                  <Icon className="h-4 w-4 text-erd-gray" />
+                  <FilledIcon icon={Icon} tone="kkd" size={18} />
                   {label}
                 </Link>
               </li>
@@ -123,7 +124,7 @@ export default function UserMenu() {
                 className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm font-medium text-erd-red transition-colors hover:bg-erd-light"
                 role="menuitem"
               >
-                <LogOut className="h-4 w-4" />
+                <FilledIcon icon={LogOut} tone="risk" size={18} />
                 Çıkış
               </button>
             ) : (
@@ -133,7 +134,7 @@ export default function UserMenu() {
                 className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-erd-charcoal transition-colors hover:bg-erd-light"
                 role="menuitem"
               >
-                <LogIn className="h-4 w-4 text-erd-gray" />
+                <FilledIcon icon={LogIn} tone="kkd" size={18} />
                 {isSupabaseConfigured ? "Giriş Yap" : "Adınızı belirleyin"}
               </Link>
             )}

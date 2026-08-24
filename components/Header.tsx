@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import BrandMark from "@/components/BrandMark";
 import OyakMark from "@/components/OyakMark";
+import { FilledIcon } from "@/components/AppIcon";
 import { useAuth } from "@/lib/auth";
 import { withBase } from "@/lib/paths";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
@@ -88,7 +89,13 @@ export default function Header() {
                   active ? "bg-white/10 text-white" : "text-white/70 hover:bg-white/5 hover:text-white"
                 }`}
               >
-                <Icon size={18} strokeWidth={1.8} />
+                <Icon
+                  size={20}
+                  strokeWidth={1.6}
+                  fill="currentColor"
+                  fillOpacity={active ? 0.55 : 0.38}
+                  className={active ? "text-[#FFCDD2]" : "text-white"}
+                />
                 {item.label}
               </Link>
             );
@@ -122,7 +129,13 @@ export default function Header() {
                   active ? "bg-white/10 text-white" : "text-white/70"
                 }`}
               >
-                <Icon size={16} strokeWidth={1.8} />
+                <Icon
+                  size={20}
+                  strokeWidth={1.6}
+                  fill="currentColor"
+                  fillOpacity={active ? 0.55 : 0.38}
+                  className={active ? "text-[#FFCDD2]" : "text-white"}
+                />
                 {item.label}
               </Link>
             );
@@ -138,7 +151,7 @@ export default function Header() {
             aria-haspopup="menu"
           >
             <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-white">
-              <UserRound size={18} strokeWidth={1.8} />
+              <UserRound size={18} strokeWidth={1.7} fill="currentColor" fillOpacity={0.28} />
             </span>
             <span className="hidden leading-tight sm:block">
               <span className="block text-sm font-semibold text-white">{displayName}</span>
@@ -176,7 +189,13 @@ export default function Header() {
                   onClick={handleSignOut}
                   className="flex w-full items-center gap-2 px-3 py-2 text-sm text-erd-charcoal hover:bg-erd-light"
                 >
-                  <LogOut size={16} />
+                  <LogOut
+                    size={16}
+                    strokeWidth={1.7}
+                    fill="currentColor"
+                    fillOpacity={0.3}
+                    className="text-[#D32F2F]"
+                  />
                   Çıkış
                 </button>
               )}
@@ -203,7 +222,7 @@ function MenuLink({
       role="menuitem"
       className="flex items-center gap-2 px-3 py-2 text-sm text-erd-charcoal hover:bg-erd-light"
     >
-      <Icon size={16} />
+      <FilledIcon icon={Icon} tone="kkd" size={18} />
       {label}
     </Link>
   );

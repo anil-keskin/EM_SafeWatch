@@ -88,16 +88,22 @@ export default function CardHint({
           event.stopPropagation();
           onToggle();
         }}
-        className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border bg-white text-erd-gray transition-colors ${
+        className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border bg-white transition-colors ${
           open
-            ? "border-erd-red text-erd-red"
-            : "border-erd-line hover:border-erd-gray hover:text-erd-charcoal"
+            ? "border-[#D32F2F] text-[#D32F2F]"
+            : "border-erd-line text-[#546E7A] hover:border-erd-gray hover:text-erd-charcoal"
         }`}
         aria-expanded={open}
         aria-haspopup="dialog"
         aria-label={`${label} — neden seçmeliyim`}
       >
-        <Info className="h-3.5 w-3.5" strokeWidth={2.4} aria-hidden="true" />
+        <Info
+          className="h-4 w-4"
+          strokeWidth={1.7}
+          fill="currentColor"
+          fillOpacity={0.32}
+          aria-hidden="true"
+        />
       </button>
 
       {open &&

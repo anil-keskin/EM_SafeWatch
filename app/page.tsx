@@ -5,9 +5,12 @@ import {
   BarChart3,
   BookOpen,
   ChevronRight,
+  ClipboardList,
+  HardHat,
   MapPin,
   Play,
 } from "lucide-react";
+import AppIcon, { IconWatermark } from "@/components/AppIcon";
 import BrandMark from "@/components/BrandMark";
 import CircularProgress from "@/components/CircularProgress";
 import DataSourceNote from "@/components/DataSourceNote";
@@ -18,11 +21,18 @@ import PrinciplesBar from "@/components/PrinciplesBar";
 import { useAuth } from "@/lib/auth";
 import { useSafeWatchData } from "@/lib/data";
 import { completedCount, useProgress } from "@/lib/progress";
+import type { IconTone } from "@/lib/icon-theme";
+import type { LucideIcon } from "lucide-react";
 
-const HOME_FACTS = [
-  { value: "11", label: "Bölge" },
-  { value: "30", label: "Senaryo" },
-  { value: "4", label: "Karar" },
+const HOME_FACTS: Array<{
+  value: string;
+  label: string;
+  icon: LucideIcon;
+  tone: IconTone;
+}> = [
+  { value: "11", label: "Bölge", icon: MapPin, tone: "steel" },
+  { value: "30", label: "Senaryo", icon: ClipboardList, tone: "kkd" },
+  { value: "4", label: "Karar", icon: HardHat, tone: "kkd" },
 ];
 
 export default function HomePage() {
@@ -68,18 +78,21 @@ export default function HomePage() {
               href={continueHref}
               label="Oyuna Başla"
               icon={Play}
+              tone="kkd"
               primary
             />
-            <HomeButton href="/saha" label="Saha Seçimi" icon={MapPin} />
+            <HomeButton href="/saha" label="Saha Seçimi" icon={MapPin} tone="steel" />
             <HomeButton
               href="/ilerlemem"
               label="Gelişim Raporum"
               icon={BarChart3}
+              tone="nav"
             />
             <HomeButton
               href="/yardim"
               label="Nasıl Oynanır"
               icon={BookOpen}
+              tone="port"
             />
           </div>
 
@@ -129,12 +142,13 @@ export default function HomePage() {
             {HOME_FACTS.map((fact) => (
               <li
                 key={fact.label}
-                className="rounded-xl border border-erd-line/80 bg-white/80 px-3 py-3 text-center backdrop-blur-sm"
+                className="relative overflow-hidden rounded-xl border border-erd-line/80 bg-white/80 px-3 py-3 text-center backdrop-blur-sm"
               >
-                <p className="text-xl font-bold tabular-nums text-erd-charcoal">
+                <IconWatermark icon={fact.icon} tone={fact.tone} />
+                <p className="relative text-xl font-bold tabular-nums text-erd-charcoal">
                   {fact.value}
                 </p>
-                <p className="mt-0.5 text-[11px] font-medium text-erd-gray">
+                <p className="relative mt-0.5 text-[11px] font-medium text-erd-gray">
                   {fact.label}
                 </p>
               </li>
@@ -152,11 +166,13 @@ function HomeButton({
   href,
   label,
   icon: Icon,
+  tone,
   primary = false,
 }: {
   href: string;
   label: string;
-  icon: typeof Play;
+  icon: LucideIcon;
+  tone: IconTone;
   primary?: boolean;
 }) {
   return (
@@ -168,14 +184,21 @@ function HomeButton({
           : "border border-erd-red/70 bg-white text-erd-charcoal hover:bg-red-50/50"
       }`}
     >
-      <Icon
-        size={18}
-        strokeWidth={2}
-        className={primary ? "text-white" : "text-erd-red"}
-      />
+      {primary ? (
+        <Icon
+          size={22}
+          strokeWidth={1.7}
+          fill="currentColor"
+          fillOpacity={0.28}
+          className="text-white"
+        />
+      ) : (
+        <AppIcon icon={Icon} tone={tone} size="sm" />
+      )}
       <span className="flex-1 text-left">{label}</span>
       <ChevronRight
         size={18}
+        strokeWidth={2}
         className={primary ? "text-white/80" : "text-erd-red"}
       />
     </Link>

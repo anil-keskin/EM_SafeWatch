@@ -3,6 +3,7 @@
 import { useState } from "react";
 import CardHint from "@/components/CardHint";
 import SolutionAssist from "@/components/SolutionAssist";
+import AppIcon, { FilledIcon, IconWatermark } from "@/components/AppIcon";
 import { ACTIONS } from "@/content/actions";
 import { TAB_SELECT_CONTEXT, whySelectFor } from "@/content/card-hints";
 import {
@@ -14,6 +15,7 @@ import {
   isExactSolved,
   isScopeSolved,
 } from "@/lib/solutions";
+import { actionKindGlyph } from "@/lib/icon-theme";
 
 interface ActionPickerProps {
   selected: string[];
@@ -26,10 +28,10 @@ interface ActionPickerProps {
 }
 
 const KIND_STYLES: Record<string, string> = {
-  gozlem: "bg-erd-light text-erd-gray",
-  durdurma: "bg-red-50 text-erd-red",
-  bildirim: "bg-blue-50 text-blue-700",
-  kayit: "bg-emerald-50 text-emerald-700",
+  gozlem: "bg-[#546E7A]/10 text-[#546E7A]",
+  durdurma: "bg-[#D32F2F]/10 text-[#D32F2F]",
+  bildirim: "bg-[#3D5A80]/10 text-[#3D5A80]",
+  kayit: "bg-[#424242]/10 text-[#424242]",
 };
 
 const KIND_LABELS: Record<string, string> = {
@@ -97,6 +99,7 @@ export default function ActionPicker({
         {KIND_ORDER.map((kind) => (
           <KindChip
             key={kind}
+            kind={kind}
             label={KIND_LABELS[kind]}
             active={activeKind === kind}
             onClick={() => setActiveKind(kind)}
@@ -111,13 +114,17 @@ export default function ActionPicker({
           return (
             <li
               key={action.code}
-              className={`rounded-xl border p-3.5 transition-colors ${
+              className={`relative overflow-hidden rounded-xl border p-3.5 transition-colors ${
                 isSelected
                   ? "border-erd-red bg-red-50/60"
                   : "border-erd-line bg-white hover:border-erd-gray/40"
               }`}
             >
-              <div className="flex items-start gap-3">
+              <IconWatermark
+                icon={actionKindGlyph(action.kind).icon}
+                tone={actionKindGlyph(action.kind).tone}
+              />
+              <div className="relative flex items-start gap-3">
                 <button
                   type="button"
                   disabled={disabled}
@@ -125,16 +132,11 @@ export default function ActionPicker({
                   aria-pressed={isSelected}
                   className="flex min-w-0 flex-1 items-start gap-3 text-left disabled:opacity-60"
                 >
-                  <span
-                    className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border text-[11px] font-bold ${
-                      isSelected
-                        ? "border-erd-red bg-erd-red text-white"
-                        : "border-erd-line text-transparent"
-                    }`}
-                    aria-hidden="true"
-                  >
-                    ✓
-                  </span>
+                  <AppIcon
+                    icon={actionKindGlyph(action.kind).icon}
+                    tone={actionKindGlyph(action.kind).tone}
+                    size="sm"
+                  />
                   <span className="min-w-0">
                     <span className="flex flex-wrap items-center gap-2">
                       <span className="text-sm font-semibold text-erd-charcoal">
@@ -167,24 +169,35 @@ export default function ActionPicker({
 }
 
 function KindChip({
+  kind,
   label,
   active,
   onClick,
 }: {
+  kind?: string;
   label: string;
   active: boolean;
   onClick: () => void;
 }) {
+  const glyph = kind ? actionKindGlyph(kind) : null;
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
+      className={`flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
         active
           ? "bg-erd-charcoal text-white"
           : "bg-erd-light text-erd-gray hover:bg-erd-line"
       }`}
     >
+      {glyph && (
+        <FilledIcon
+          icon={glyph.icon}
+          tone={glyph.tone}
+          size={14}
+          className={active ? "!text-white" : ""}
+        />
+      )}
       {label}
     </button>
   );

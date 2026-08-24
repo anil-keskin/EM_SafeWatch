@@ -1,5 +1,8 @@
 "use client";
 
+import { Lightbulb } from "lucide-react";
+import { FilledIcon } from "@/components/AppIcon";
+
 interface HintBoxProps {
   hints: string[];
   used: number;
@@ -23,7 +26,8 @@ export default function HintBox({
   return (
     <div className="sw-card p-4">
       <div className="flex items-center justify-between gap-3">
-        <h3 className="text-sm font-bold text-erd-charcoal">
+        <h3 className="flex items-center gap-2 text-sm font-bold text-erd-charcoal">
+          <FilledIcon icon={Lightbulb} tone="risk" size={18} />
           İpucu
           <span className="ml-2 text-xs font-medium text-erd-gray">
             {used}/{hints.length} açıldı

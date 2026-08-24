@@ -1,5 +1,6 @@
 "use client";
 
+import { TriangleAlert } from "lucide-react";
 import SceneBackdrop from "@/components/SceneBackdrop";
 import type { Hazard } from "@/lib/types";
 
@@ -63,8 +64,21 @@ export default function HazardScene({
             aria-pressed={isSelected}
             aria-label={revealed ? hazard.label : "İncelenmemiş risk noktası"}
           >
-            <span className="flex h-9 w-9 items-center justify-center text-sm font-bold sm:h-10 sm:w-10">
-              {revealed ? (correct ? "✓" : wrong ? "✕" : missed ? "!" : "") : isSelected ? "✓" : "?"}
+            <span className="flex h-10 w-10 items-center justify-center sm:h-11 sm:w-11">
+              {revealed ? (
+                <span className="text-sm font-bold">
+                  {correct ? "✓" : wrong ? "✕" : missed ? "!" : ""}
+                </span>
+              ) : isSelected ? (
+                <span className="text-sm font-bold">✓</span>
+              ) : (
+                <TriangleAlert
+                  size={20}
+                  strokeWidth={1.8}
+                  fill="currentColor"
+                  fillOpacity={0.35}
+                />
+              )}
             </span>
 
             {/* Etiket, değerlendirme sonrası veya üzerine gelince görünür */}

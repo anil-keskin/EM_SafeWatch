@@ -9,7 +9,8 @@
    `import "./globals.css"` ile yükler. */
 
 /* Erdemir Mühendislik marka paleti.
-   Kırmızı + antrasit gri + beyaz. Turuncu kullanılmaz. */
+   Buton ve metin: kırmızı + antrasit + beyaz.
+   İkon paleti (hadde / vinç / forklift) sınırlı turuncu kullanır. */
 @theme {
   --color-erd-red: #e1251b;
   --color-erd-red-dark: #b81c14;

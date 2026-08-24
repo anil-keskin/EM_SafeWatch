@@ -42,8 +42,8 @@ export default function CircularProgress({
           transform={`rotate(-90 ${size / 2} ${size / 2})`}
         />
       </svg>
-      <span className="absolute inset-0 flex items-center justify-center text-erd-red">
-        <ClipboardList size={size * 0.32} strokeWidth={2} />
+      <span className="absolute inset-0 flex items-center justify-center text-[#D32F2F]">
+        <ClipboardList size={size * 0.34} strokeWidth={1.7} fill="currentColor" fillOpacity={0.32} />
       </span>
     </div>
   );

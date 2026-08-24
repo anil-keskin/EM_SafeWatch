@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo } from "react";
 import PageShell from "@/components/PageShell";
 import ProgressBar from "@/components/ProgressBar";
+import ZoneIcon from "@/components/ZoneIcon";
 import { competencyLabel } from "@/content/scenarios";
 import { useSafeWatchData } from "@/lib/data";
 import { completedCount, useProgress } from "@/lib/progress";
@@ -123,11 +124,18 @@ export default function GelisimPage() {
             {reports.map((report) => {
               const band = scoreBand(report.average);
               return (
-                <article key={report.zoneId} className="sw-card p-4">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <h3 className="text-sm font-bold text-erd-charcoal">
-                      {report.zoneName}
-                    </h3>
+                <article
+                  key={report.zoneId}
+                  className="sw-card relative overflow-hidden p-4"
+                >
+                  <ZoneIcon zoneId={report.zoneId} watermark />
+                  <div className="relative flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex min-w-0 items-center gap-2.5">
+                      <ZoneIcon zoneId={report.zoneId} />
+                      <h3 className="text-sm font-bold text-erd-charcoal">
+                        {report.zoneName}
+                      </h3>
+                    </div>
                     <span className="text-xs font-semibold text-erd-gray">
                       Ortalama {report.average}/100 · {band.label}
                     </span>

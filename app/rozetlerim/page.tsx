@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { Award, Shield, Trophy } from "lucide-react";
+import { Award, Shield, Trophy, type LucideIcon } from "lucide-react";
+import AppIcon, { IconWatermark } from "@/components/AppIcon";
 import PageShell from "@/components/PageShell";
 import ZoneIcon from "@/components/ZoneIcon";
 import { competencyLabel } from "@/content/scenarios";
 import { scenariosOfZone, useSafeWatchData } from "@/lib/data";
 import { useProgress } from "@/lib/progress";
+import type { IconTone } from "@/lib/icon-theme";
 
 /**
  * Kişisel rozetler. Sıralama veya başka kullanıcılarla kıyas yoktur;
@@ -50,17 +52,20 @@ export default function RozetlerimPage() {
         <div className="mt-6 space-y-6">
           <section className="grid gap-3 sm:grid-cols-3">
             <SummaryCard
-              icon={<Trophy className="text-erd-red" size={22} />}
+              icon={Trophy}
+              tone="crane"
               label="Tamamlanan senaryo"
               value={String(completed.length)}
             />
             <SummaryCard
-              icon={<Shield className="text-erd-red" size={22} />}
+              icon={Shield}
+              tone="kkd"
               label="Tamamlanan bölge"
               value={String(zoneBadges.filter((b) => b.earned).length)}
             />
             <SummaryCard
-              icon={<Award className="text-erd-red" size={22} />}
+              icon={Award}
+              tone="steel"
               label="Güçlü yetkinlik"
               value={String(strongCompetencies.length)}
             />
@@ -74,17 +79,20 @@ export default function RozetlerimPage() {
               {zoneBadges.map(({ zone, total, done, earned }) => (
                 <li
                   key={zone.id}
-                  className={`flex items-center gap-3 rounded-2xl border p-3.5 ${
+                  className={`relative overflow-hidden flex items-center gap-3 rounded-2xl border p-3.5 ${
                     earned ? "border-erd-red/40 bg-red-50/40" : "border-erd-line bg-white"
                   }`}
                 >
-                  <ZoneIcon zoneId={zone.id} />
-                  <div className="min-w-0">
-                    <p className="text-sm font-bold text-erd-charcoal">{zone.name}</p>
-                    <p className="text-xs text-erd-gray">
-                      {done}/{total} senaryo
-                      {earned ? " · Bölge tamamlandı" : ""}
-                    </p>
+                  <ZoneIcon zoneId={zone.id} watermark />
+                  <div className="relative flex min-w-0 items-center gap-3">
+                    <ZoneIcon zoneId={zone.id} />
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-erd-charcoal">{zone.name}</p>
+                      <p className="text-xs text-erd-gray">
+                        {done}/{total} senaryo
+                        {earned ? " · Bölge tamamlandı" : ""}
+                      </p>
+                    </div>
                   </div>
                 </li>
               ))}
@@ -128,17 +136,20 @@ export default function RozetlerimPage() {
 
 function SummaryCard({
   icon,
+  tone,
   label,
   value,
 }: {
-  icon: React.ReactNode;
+  icon: LucideIcon;
+  tone: IconTone;
   label: string;
   value: string;
 }) {
   return (
-    <div className="sw-card flex items-center gap-3 p-4">
-      {icon}
-      <div>
+    <div className="sw-card relative flex items-center gap-3 overflow-hidden p-4">
+      <IconWatermark icon={icon} tone={tone} />
+      <AppIcon icon={icon} tone={tone} size="md" />
+      <div className="relative">
         <p className="text-xs text-erd-gray">{label}</p>
         <p className="text-xl font-bold text-erd-charcoal">{value}</p>
       </div>

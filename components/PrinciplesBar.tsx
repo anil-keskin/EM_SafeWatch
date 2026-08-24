@@ -1,10 +1,11 @@
-import { Bell, Shield, Target, Users } from "lucide-react";
+import AppIcon from "@/components/AppIcon";
+import { Bell, HardHat, Shield, Target } from "lucide-react";
 
 const PRINCIPLES = [
-  { icon: Shield, top: "Güvenli Çalış", bottom: "Kendini Koru" },
-  { icon: Users, top: "Doğru Donan", bottom: "Doğru Kullan" },
-  { icon: Bell, top: "Fark Et", bottom: "Bildir, Önle" },
-  { icon: Target, top: "HEDEFİMİZ", bottom: "Sıfır Kaza", emphasize: true },
+  { icon: Shield, top: "Güvenli Çalış", bottom: "Kendini Koru", tone: "kkd" as const },
+  { icon: HardHat, top: "Doğru Donan", bottom: "Doğru Kullan", tone: "kkd" as const },
+  { icon: Bell, top: "Fark Et", bottom: "Bildir, Önle", tone: "risk" as const },
+  { icon: Target, top: "HEDEFİMİZ", bottom: "Sıfır Kaza", emphasize: true, tone: "kkd" as const },
 ];
 
 /** Ana sayfanın altındaki koyu ilke şeridi. */
@@ -22,15 +23,12 @@ export default function PrinciplesBar() {
 
       <ul className="relative mx-auto grid max-w-6xl grid-cols-2 gap-px sm:grid-cols-4">
         {PRINCIPLES.map((item) => {
-          const Icon = item.icon;
           return (
             <li
               key={item.top}
               className="flex items-center gap-3 px-4 py-4 sm:justify-center sm:px-6"
             >
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-erd-red/40 text-erd-red">
-                <Icon size={18} strokeWidth={2} />
-              </span>
+              <AppIcon icon={item.icon} tone={item.tone} size="sm" onDark />
               <span className="leading-tight">
                 <span
                   className={`block text-xs font-bold uppercase tracking-wide ${
