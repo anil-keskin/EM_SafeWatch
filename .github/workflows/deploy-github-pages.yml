@@ -42,14 +42,14 @@ jobs:
         with:
           path: out
 
-      - name: Publish to main for branch-based Pages
+      - name: Publish to gh-pages branch
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: main
+          publish_branch: gh-pages
           publish_dir: ./out
-          keep_files: true
           enable_jekyll: false
+          force_orphan: true
           commit_message: "chore: github pages static files [skip ci]"
 
   deploy:

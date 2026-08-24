@@ -128,6 +128,7 @@ siteyi derleyip Pages’e yükler.
 1. Depo **Settings > Pages**
 2. **Build and deployment > Source** = **GitHub Actions**
    (Branch/root seçiliyse README görünür, oyun açılmaz.)
+   Alternatif: **Deploy from a branch** → `gh-pages` / `/ (root)`
 3. Supabase Dashboard → **Authentication → URL Configuration**
    - Site URL: `https://anil-keskin.github.io/EM_SafeWatch`
    - Redirect URLs: `https://anil-keskin.github.io/EM_SafeWatch/**`
