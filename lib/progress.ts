@@ -159,7 +159,11 @@ function applyResultToEntry(
     best_technical: Math.max(previous?.best_technical ?? 0, result.technical),
     best_behavior: Math.max(previous?.best_behavior ?? 0, result.behavior),
     attempts: (previous?.attempts ?? 0) + 1,
-    hints_used: (previous?.hints_used ?? 0) + result.hintsUsed,
+    hints_used:
+      (previous?.hints_used ?? 0) +
+      result.hintsUsed +
+      (result.categorySolutions ?? 0) +
+      (result.fullSolutions ?? 0),
     updated_at: result.completedAt,
   };
 }

@@ -2,7 +2,13 @@
 
 import { useMemo, useState } from "react";
 import CardHint from "@/components/CardHint";
+import SolutionAssist from "@/components/SolutionAssist";
 import { TAB_SELECT_CONTEXT, whySelectFor } from "@/content/card-hints";
+import {
+  SOLUTION_CATEGORY_PENALTY,
+  SOLUTION_FULL_PENALTY,
+} from "@/lib/scoring";
+import { codesInCategory, isExactSolved, isScopeSolved } from "@/lib/solutions";
 import type { DecisionTab, EquipmentCategory, EquipmentItem } from "@/lib/types";
 
 interface EquipmentPickerProps {
@@ -11,8 +17,20 @@ interface EquipmentPickerProps {
   selected: string[];
   onToggle: (code: string) => void;
   tab: Exclude<DecisionTab, "action">;
+  correctCodes: string[];
+  usedKeys: Set<string>;
+  onFillScope: (categoryId: string) => void;
+  onFillAll: () => void;
   disabled?: boolean;
 }
+
+const TAB_NOTE: Record<Exclude<DecisionTab, "action">, string> = {
+  self: "Açık ailede TAK yalnızca o koruma ailesinin doğrularını giydirir. HEPSİNİ TAK tüm sekmenin doğru donanımını yazar. Çözüm puan düşürür.",
+  contractor:
+    "Açık ailede TAK, yüklenicide o ailedeki eksikleri işaretler. HEPSİNİ TAK tüm eksikleri yazar. Çözüm puan düşürür.",
+  operator:
+    "Açık ailede TAK, işletmede o ailedeki uygunsuzlukları işaretler. HEPSİNİ TAK tüm eksikleri yazar. Çözüm puan düşürür.",
+};
 
 /**
  * Ekipman ve tedbir kartları.
@@ -24,6 +42,10 @@ export default function EquipmentPicker({
   selected,
   onToggle,
   tab,
+  correctCodes,
+  usedKeys,
+  onFillScope,
+  onFillAll,
   disabled = false,
 }: EquipmentPickerProps) {
   const [activeCategory, setActiveCategory] = useState<string>("all");
@@ -31,6 +53,16 @@ export default function EquipmentPicker({
   const [openInfo, setOpenInfo] = useState<string | null>(null);
 
   const selectedSet = new Set(selected);
+  const scopeCodes =
+    activeCategory === "all" ? [] : codesInCategory(items, activeCategory);
+  const tabSolved = isExactSolved(selected, correctCodes);
+  const scopeSolved =
+    activeCategory !== "all" &&
+    isScopeSolved(selected, correctCodes, scopeCodes);
+  const fillAllUsed = usedKeys.has(`${tab}:all`);
+  const fillUsed =
+    activeCategory !== "all" &&
+    (usedKeys.has(`${tab}:cat:${activeCategory}`) || fillAllUsed);
 
   const visible = useMemo(() => {
     const q = query.trim().toLocaleLowerCase("tr");
@@ -48,6 +80,28 @@ export default function EquipmentPicker({
 
   return (
     <div className="space-y-3">
+      <SolutionAssist
+        fillLabel={activeCategory === "all" ? undefined : "TAK"}
+        fillAllLabel="HEPSİNİ TAK"
+        onFill={
+          activeCategory === "all"
+            ? undefined
+            : () => onFillScope(activeCategory)
+        }
+        onFillAll={() => {
+          onFillAll();
+          setActiveCategory("all");
+          setQuery("");
+        }}
+        fillDisabled={disabled || scopeSolved}
+        fillAllDisabled={disabled || tabSolved}
+        fillUsed={fillUsed}
+        fillAllUsed={fillAllUsed}
+        categoryPenalty={SOLUTION_CATEGORY_PENALTY}
+        fullPenalty={SOLUTION_FULL_PENALTY}
+        note={TAB_NOTE[tab]}
+      />
+
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <input
           type="search"

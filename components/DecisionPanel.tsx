@@ -19,6 +19,10 @@ interface DecisionPanelProps {
   categories: EquipmentCategory[];
   equipment: EquipmentItem[];
   actors: Actor[];
+  correctByTab: Record<DecisionTab, string[]>;
+  usedKeys: Set<string>;
+  onFillScope: (tab: DecisionTab, scopeId: string) => void;
+  onFillTab: (tab: DecisionTab) => void;
 }
 
 const TABS: Array<{ id: DecisionTab; label: string; short: string }> = [
@@ -46,6 +50,10 @@ export default function DecisionPanel({
   categories,
   equipment,
   actors,
+  correctByTab,
+  usedKeys,
+  onFillScope,
+  onFillTab,
 }: DecisionPanelProps) {
   const contractor = actors.find((a) => a.type === "yuklenici");
   const operator = actors.find((a) => a.type === "isletme");
@@ -88,8 +96,9 @@ export default function DecisionPanel({
         </p>
         <p className="text-[11px] leading-snug text-erd-gray">
           Takıldığınız kartta{" "}
-          <span className="font-semibold text-erd-charcoal">(i)</span> düğmesine
-          basın. “Neden seçmeliyim?” rehberi puanınızı düşürmez.
+          <span className="font-semibold text-erd-charcoal">(i)</span> puan
+          düşürmez. TAK / SEÇ / HEPSİNİ TAK doğru cevabı giydirir ve puanınızı
+          düşürür.
         </p>
 
         {activeTab === "contractor" && contractor && (
@@ -109,6 +118,10 @@ export default function DecisionPanel({
           <ActionPicker
             selected={answers.action}
             onToggle={(code) => onToggle("action", code)}
+            correctCodes={correctByTab.action}
+            usedKeys={usedKeys}
+            onFillScope={(kind) => onFillScope("action", kind)}
+            onFillAll={() => onFillTab("action")}
           />
         ) : (
           <EquipmentPicker
@@ -117,6 +130,10 @@ export default function DecisionPanel({
             items={equipment}
             selected={answers[activeTab]}
             onToggle={(code) => onToggle(activeTab, code)}
+            correctCodes={correctByTab[activeTab]}
+            usedKeys={usedKeys}
+            onFillScope={(categoryId) => onFillScope(activeTab, categoryId)}
+            onFillAll={() => onFillTab(activeTab)}
           />
         )}
       </div>

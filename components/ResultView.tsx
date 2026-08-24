@@ -89,12 +89,7 @@ export default function ResultView({ slug }: { slug: string }) {
             score={result.behavior}
           />
         </div>
-        {result.hintsUsed > 0 && (
-          <p className="border-t border-erd-line px-5 py-3 text-xs text-erd-gray">
-            {result.hintsUsed} ipucu kullandınız; her iki puandan {result.hintPenalty}{" "}
-            puan düşüldü. İpucu almak bir eksiklik değil, öğrenme yoludur.
-          </p>
-        )}
+        <AssistSummary result={result} />
       </div>
 
       <div className="sw-card p-4">
@@ -207,6 +202,26 @@ export default function ResultView({ slug }: { slug: string }) {
         </Link>
       </div>
     </div>
+  );
+}
+
+function AssistSummary({ result }: { result: ScenarioResult }) {
+  const hints = result.hintsUsed ?? 0;
+  const solutions =
+    (result.categorySolutions ?? 0) + (result.fullSolutions ?? 0);
+  const penalty = result.hintPenalty ?? 0;
+  if (hints === 0 && solutions === 0) return null;
+
+  const parts: string[] = [];
+  if (solutions > 0) parts.push(`${solutions} çözüm`);
+  if (hints > 0) parts.push(`${hints} ipucu`);
+
+  return (
+    <p className="border-t border-erd-line px-5 py-3 text-xs leading-snug text-erd-gray">
+      {parts.join(" ve ")} kullandınız; her iki puandan {penalty} puan
+      düşüldü. Çözüm ve ipucu öğrenmeyi hızlandırır; bu kadar yardım alınca
+      gelişim raporunda ilgili alanlar “gelişime açık” görünebilir.
+    </p>
   );
 }
 

@@ -26,7 +26,7 @@ const RULES = [
   },
   {
     title: "Kart rehberi ve kademeli ipucu ayrıdır",
-    body: "Hazırlık panelindeki (i) hangi durumda seçeceğinizi anlatır, puanınızı düşürmez. Senaryo ipucu ise sahaya özeldir; her açılış puanı bir miktar düşürür ama ilerlemeyi engellemez.",
+    body: "Hazırlık panelindeki (i) hangi durumda seçeceğinizi anlatır, puanınızı düşürmez. TAK / HEPSİNİ TAK ve sahnedeki HEPSİNİ BELİRLE doğru cevabı giydirir; her kullanım puanı düşürür ve gelişime açık alanı belirginleştirir. Senaryo ipucu da puan düşürür ama ilerlemeyi engellemez.",
   },
   {
     title: "Gereksiz KKD de bir uygunsuzluktur",
@@ -43,12 +43,12 @@ const STEPS = [
   {
     step: "2",
     title: "Tehlike Tanıma",
-    body: "Sahnedeki risk noktalarını işaretlersiniz. Bazı noktalar bilinçli olarak sahte konulmuştur.",
+    body: "Sahnedeki risk noktalarını işaretlersiniz. Bazı noktalar bilinçli olarak sahte konulmuştur. Takılırsanız HEPSİNİ BELİRLE gerçek noktaları işaretler; bu bir çözümdür ve puan düşürür.",
   },
   {
     step: "3",
     title: "Hazırlık ve Denetim",
-    body: "Dört karar sekmesini doldurursunuz: kendi donanımınız, yüklenicideki eksikler, işletmedeki uygunsuzluklar ve müdahale kararınız. Takıldığınız karttaki (i) “Neden seçmeliyim?” rehberini açar; bu rehber puan düşürmez.",
+    body: "Dört karar sekmesini doldurursunuz: kendi donanımınız, yüklenicideki eksikler, işletmedeki uygunsuzluklar ve müdahale kararınız. (i) rehberdir, puan düşürmez. TAK açık ailedeki doğruları, HEPSİNİ TAK tüm sekmenin doğrularını giydirir; çözüm puan düşürür.",
   },
   {
     step: "4",

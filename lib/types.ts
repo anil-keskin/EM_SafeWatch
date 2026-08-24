@@ -127,11 +127,21 @@ export interface SectionResult {
   criticalExtras: string[];
 }
 
+export interface AssistUsage {
+  hintsUsed: number;
+  /** Bir aile / müdahale grubu için TAK veya SEÇ. */
+  categorySolutions: number;
+  /** Sekmenin veya sahnenin tamamı için HEPSİNİ TAK / SEÇ / BELİRLE. */
+  fullSolutions: number;
+}
+
 export interface ScenarioResult {
   slug: string;
   technical: number;
   behavior: number;
   hintsUsed: number;
+  categorySolutions: number;
+  fullSolutions: number;
   hintPenalty: number;
   sections: {
     hazards: SectionResult;

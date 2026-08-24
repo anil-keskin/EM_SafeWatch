@@ -69,7 +69,7 @@ const DEFINITIONS: BadgeDefinition[] = [
   {
     code: "ipucusuz_tur",
     name: "İpucusuz Tur",
-    description: "Bir senaryoyu hiç ipucu almadan tamamlayın.",
+    description: "Bir senaryoyu hiç ipucu ve çözüm kullanmadan tamamlayın.",
     target: 1,
   },
   {

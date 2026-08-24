@@ -1,4 +1,5 @@
 import type {
+  AssistUsage,
   Scenario,
   ScenarioAnswers,
   ScenarioResult,
@@ -17,8 +18,25 @@ import type {
  * Puan bir geçme/kalma eşiği değil, bir gelişim göstergesidir.
  */
 
-/** Her ipucu kademesinin her iki eksenden düşürdüğü puan. */
-const HINT_PENALTY_PER_LEVEL = 5;
+/** Her senaryo ipucu kademesinin her iki eksenden düşürdüğü puan. */
+export const HINT_PENALTY_PER_LEVEL = 5;
+/** Bir aile veya müdahale grubunu giydirme (TAK / SEÇ). */
+export const SOLUTION_CATEGORY_PENALTY = 12;
+/** Sekmenin veya sahnenin tam çözümünü giydirme. */
+export const SOLUTION_FULL_PENALTY = 22;
+
+export function assistPenalty(assist: AssistUsage, hintCount: number): number {
+  const hintPart =
+    Math.min(Math.max(assist.hintsUsed, 0), hintCount) * HINT_PENALTY_PER_LEVEL;
+  const categoryPart =
+    Math.max(assist.categorySolutions, 0) * SOLUTION_CATEGORY_PENALTY;
+  const fullPart = Math.max(assist.fullSolutions, 0) * SOLUTION_FULL_PENALTY;
+  return hintPart + categoryPart + fullPart;
+}
+
+export function emptyAssist(): AssistUsage {
+  return { hintsUsed: 0, categorySolutions: 0, fullSolutions: 0 };
+}
 
 const TECHNICAL_WEIGHTS = {
   hazards: 0.3,
@@ -91,17 +109,25 @@ function emptySection(): SectionResult {
   return { score: 0, hits: [], misses: [], extras: [], criticalExtras: [] };
 }
 
+function resultAssist(assist: AssistUsage) {
+  return {
+    hintsUsed: assist.hintsUsed,
+    categorySolutions: assist.categorySolutions,
+    fullSolutions: assist.fullSolutions,
+  };
+}
+
 export function evaluateScenario(
   scenario: Scenario,
   answers: ScenarioAnswers,
-  hintsUsed: number
+  assist: AssistUsage = emptyAssist()
 ): ScenarioResult {
   if (!isScenarioScorable(scenario)) {
     return {
       slug: scenario.slug,
       technical: 0,
       behavior: 0,
-      hintsUsed,
+      ...resultAssist(assist),
       hintPenalty: 0,
       sections: {
         hazards: emptySection(),
@@ -138,8 +164,7 @@ export function evaluateScenario(
     ),
   };
 
-  const hintPenalty = Math.min(hintsUsed, scenario.hints.length) *
-    HINT_PENALTY_PER_LEVEL;
+  const hintPenalty = assistPenalty(assist, scenario.hints.length);
 
   const technicalRaw =
     sections.hazards.score * TECHNICAL_WEIGHTS.hazards +
@@ -161,7 +186,7 @@ export function evaluateScenario(
     slug: scenario.slug,
     technical,
     behavior,
-    hintsUsed,
+    ...resultAssist(assist),
     hintPenalty,
     sections,
     competencyScores,

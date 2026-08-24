@@ -7,12 +7,26 @@ import BriefingCard from "@/components/BriefingCard";
 import DecisionPanel from "@/components/DecisionPanel";
 import HazardScene from "@/components/HazardScene";
 import HintBox from "@/components/HintBox";
+import SolutionAssist from "@/components/SolutionAssist";
 import { useSafeWatchData, findScenario } from "@/lib/data";
 import { useProgress } from "@/lib/progress";
-import { evaluateScenario, isScenarioScorable } from "@/lib/scoring";
+import {
+  HINT_PENALTY_PER_LEVEL,
+  SOLUTION_FULL_PENALTY,
+  evaluateScenario,
+  isScenarioScorable,
+} from "@/lib/scoring";
+import {
+  actionCodesInKind,
+  codesInCategory,
+  correctCodesForTab,
+  fillExact,
+  fillScope,
+  isExactSolved,
+  realHazardCodes,
+  tallySolutions,
+} from "@/lib/solutions";
 import type { DecisionTab, ScenarioAnswers } from "@/lib/types";
-
-const HINT_PENALTY = 5;
 
 type Step = "brief" | "hazard" | "decide";
 
@@ -39,6 +53,7 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
   const [answers, setAnswers] = useState<ScenarioAnswers>(EMPTY_ANSWERS);
   const [activeTab, setActiveTab] = useState<DecisionTab>("self");
   const [hintsUsed, setHintsUsed] = useState(0);
+  const [usedKeys, setUsedKeys] = useState<Set<string>>(() => new Set());
 
   const scenario = useMemo(
     () => findScenario(scenarios, slug),
@@ -65,9 +80,61 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
 
   const handleEvaluate = () => {
     if (!isScenarioScorable(scenario)) return;
-    const result = evaluateScenario(scenario, answers, hintsUsed);
+    const { categorySolutions, fullSolutions } = tallySolutions(usedKeys);
+    const result = evaluateScenario(scenario, answers, {
+      hintsUsed,
+      categorySolutions,
+      fullSolutions,
+    });
     recordResult(scenario, result);
     router.push(`/sonuc/${scenario.slug}`);
+  };
+
+  const markUsed = (key: string) => {
+    setUsedKeys((prev) => {
+      if (prev.has(key)) return prev;
+      const next = new Set(prev);
+      next.add(key);
+      return next;
+    });
+  };
+
+  const handleFillScope = (tab: DecisionTab, scopeId: string) => {
+    const correct = correctCodesForTab(scenario, tab);
+    const scopeCodes =
+      tab === "action"
+        ? actionCodesInKind(scopeId)
+        : codesInCategory(equipment, scopeId);
+    const key = tab === "action" ? `action:kind:${scopeId}` : `${tab}:cat:${scopeId}`;
+    setAnswers((prev) => ({
+      ...prev,
+      [tab]: fillScope(prev[tab], correct, scopeCodes),
+    }));
+    markUsed(key);
+  };
+
+  const handleFillTab = (tab: DecisionTab) => {
+    const correct = correctCodesForTab(scenario, tab);
+    setAnswers((prev) => ({
+      ...prev,
+      [tab]: fillExact(correct),
+    }));
+    markUsed(`${tab}:all`);
+  };
+
+  const handleFillHazards = () => {
+    setAnswers((prev) => ({
+      ...prev,
+      hazards: fillExact(realHazardCodes(scenario)),
+    }));
+    markUsed("hazards:all");
+  };
+
+  const correctByTab = {
+    self: correctCodesForTab(scenario, "self"),
+    contractor: correctCodesForTab(scenario, "contractor"),
+    operator: correctCodesForTab(scenario, "operator"),
+    action: correctCodesForTab(scenario, "action"),
   };
 
   const scorable = isScenarioScorable(scenario);
@@ -130,6 +197,23 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
                 onToggle={handleHazardToggle}
               />
 
+              {scenario.hazards.length > 0 && (
+                <div className="mt-4">
+                  <SolutionAssist
+                    fillAllLabel="HEPSİNİ BELİRLE"
+                    onFillAll={handleFillHazards}
+                    fillAllDisabled={isExactSolved(
+                      answers.hazards,
+                      realHazardCodes(scenario)
+                    )}
+                    fillAllUsed={usedKeys.has("hazards:all")}
+                    categoryPenalty={HINT_PENALTY_PER_LEVEL}
+                    fullPenalty={SOLUTION_FULL_PENALTY}
+                    note="HEPSİNİ BELİRLE gerçek risk noktalarını işaretler, sahte noktaları bırakır. Çözüm puan düşürür."
+                  />
+                </div>
+              )}
+
               {step === "hazard" && (
                 <div className="mt-4 flex flex-wrap gap-2">
                   <button
@@ -156,7 +240,7 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
               onReveal={() =>
                 setHintsUsed((n) => Math.min(n + 1, scenario.hints.length))
               }
-              penaltyPerHint={HINT_PENALTY}
+              penaltyPerHint={HINT_PENALTY_PER_LEVEL}
             />
           </div>
 
@@ -170,6 +254,10 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
                 categories={categories}
                 equipment={equipment}
                 actors={scenario.actors}
+                correctByTab={correctByTab}
+                usedKeys={usedKeys}
+                onFillScope={handleFillScope}
+                onFillTab={handleFillTab}
               />
 
               <div className="sw-card sticky bottom-4 flex flex-wrap items-center gap-3 p-4">
