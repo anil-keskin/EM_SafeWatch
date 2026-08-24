@@ -7,12 +7,13 @@ import {
   ChevronRight,
   MapPin,
   Play,
-  Shield,
 } from "lucide-react";
 import BrandMark from "@/components/BrandMark";
 import CircularProgress from "@/components/CircularProgress";
 import DataSourceNote from "@/components/DataSourceNote";
+import { DECISION_TABS } from "@/content/decision-tabs";
 import FactorySilhouette from "@/components/FactorySilhouette";
+import OyakMark from "@/components/OyakMark";
 import PrinciplesBar from "@/components/PrinciplesBar";
 import { useAuth } from "@/lib/auth";
 import { useSafeWatchData } from "@/lib/data";
@@ -21,7 +22,7 @@ import { completedCount, useProgress } from "@/lib/progress";
 const HOME_FACTS = [
   { value: "11", label: "Bölge" },
   { value: "30", label: "Senaryo" },
-  { value: "Yok", label: "Tanı" },
+  { value: "4", label: "Karar" },
 ];
 
 export default function HomePage() {
@@ -57,7 +58,8 @@ export default function HomePage() {
             <span className="font-semibold text-erd-charcoal">{displayName}</span>
           </p>
 
-          <div className="mt-4 flex justify-center">
+          <div className="mt-4 flex flex-col items-center gap-4">
+            <OyakMark size="hero" />
             <BrandMark size="hero" dark />
           </div>
 
@@ -105,17 +107,23 @@ export default function HomePage() {
         </div>
 
         <div className="flex flex-col justify-end pb-2 lg:min-h-[28rem] lg:pb-10">
-          <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-erd-red">
-            <Shield size={14} strokeWidth={2.2} />
-            Kontrollük antrenmanı
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-erd-red">
+            Dört karar
           </p>
-          <h2 className="mt-2 max-w-lg text-2xl font-bold tracking-tight text-erd-charcoal sm:text-3xl">
-            Saha refleksini, sahaya çıkmadan kurun.
-          </h2>
-          <p className="mt-3 max-w-md text-sm leading-relaxed text-erd-gray">
-            Dört karar sekmesiyle kendi donanımınızı, yüklenici eksiğini,
-            işletme uygunsuzluğunu ve müdahaleyi çalışırsınız. Sistem tanı
-            koymaz; yalnızca gelişim göstergesi üretir.
+          <ul className="mt-3 space-y-2">
+            {DECISION_TABS.map((tab) => (
+              <li
+                key={tab.id}
+                className="text-xl font-bold tracking-tight text-erd-charcoal sm:text-2xl"
+              >
+                {tab.label}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-4 max-w-md text-sm leading-relaxed text-erd-gray">
+            Kendi donanımınızı, yüklenici eksiğini, işletme uygunsuzluğunu ve
+            müdahaleyi sahaya çıkmadan çalışırsınız. Sistem tanı koymaz;
+            yalnızca gelişim göstergesi üretir.
           </p>
           <ul className="mt-6 grid max-w-md grid-cols-3 gap-2">
             {HOME_FACTS.map((fact) => (

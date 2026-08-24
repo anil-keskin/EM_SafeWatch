@@ -153,7 +153,7 @@ insert into scenarios (
     {"type":"isletme","employer":"Demir çelik işletmesi","activity":"Cüruf kanalı temizliği ve tapa makinesi hazırlığı.","expected_items":["baret_en397","gozluk_ir","fr_kiyafet","eldiven_isi","ayakkabi_s3","kulak_tikaci"],"current_items":["baret_en397","gozluk_ir","fr_kiyafet","eldiven_isi","ayakkabi_s3","kulak_tikaci"]}
   ]$j$::jsonb,
   $j$["gaz_dedektoru_co","kacis_maskesi_co","fr_kiyafet","baret_en397","gozluk_ir","eldiven_isi","ayakkabi_s3","kulak_tikaci","gaz_olcum_formu"]$j$::jsonb,
-  $j$["kaynak_maskesi","aluminize_giysi","tam_vucut_kemeri","eldiven_kimyasal","dozimetre","temiz_hava_solunum","kursun_onluk"]$j$::jsonb,
+  $j$["standart_is_kiyafeti","kaynak_maskesi","aluminize_giysi","tam_vucut_kemeri","eldiven_kimyasal","dozimetre","temiz_hava_solunum","kursun_onluk"]$j$::jsonb,
   $j$["gozluk_en166","toz_maskesi_ffp3","eldiven_isi"]$j$::jsonb,
   $j$[]$j$::jsonb,
   $j$["izin_kontrol","bildir_firma","kayit_al"]$j$::jsonb,
@@ -211,7 +211,7 @@ insert into scenarios (
     {"type":"yuklenici","employer":"Mekanik montaj yüklenicisi","activity":"Platformun 15 m uzağında yürüyüş yolu montajı.","expected_items":["baret_en397","gozluk_en166","eldiven_mekanik","fr_kiyafet","ayakkabi_s3","kulak_tikaci"],"current_items":["baret_en397","gozluk_en166","eldiven_mekanik","fr_kiyafet","ayakkabi_s3","kulak_tikaci"]}
   ]$j$::jsonb,
   $j$["baret_en397","gozluk_ir","fr_kiyafet","eldiven_isi","ayakkabi_s3","kulak_tikaci","guvenli_mesafe"]$j$::jsonb,
-  $j$["aluminize_giysi","kaynak_maskesi","tam_vucut_kemeri","temiz_hava_solunum","eldiven_kimyasal","kursun_onluk","dozimetre"]$j$::jsonb,
+  $j$["standart_is_kiyafeti","aluminize_giysi","kaynak_maskesi","tam_vucut_kemeri","temiz_hava_solunum","eldiven_kimyasal","kursun_onluk","dozimetre"]$j$::jsonb,
   $j$[]$j$::jsonb,
   $j$["aluminize_giysi","yuz_siperi","cizme_isi_hi3","eldiven_isi"]$j$::jsonb,
   $j$["bildir_isletme","bildir_isg","ekibi_cikar","kayit_al"]$j$::jsonb,
@@ -268,7 +268,7 @@ insert into scenarios (
     {"type":"isletme","employer":"Demir çelik işletmesi","activity":"20 m ötede cüruf potası taşıma hazırlığı.","expected_items":["baret_en397","gozluk_ir","fr_kiyafet","eldiven_isi","ayakkabi_s3"],"current_items":["baret_en397","gozluk_ir","fr_kiyafet","eldiven_isi","ayakkabi_s3"]}
   ]$j$::jsonb,
   $j$["baret_en397","gozluk_en166","fr_kiyafet","eldiven_mekanik","ayakkabi_s3","kulak_tikaci","is_izni"]$j$::jsonb,
-  $j$["kaynak_maskesi","aluminize_giysi","tam_vucut_kemeri","temiz_hava_solunum","kursun_onluk","dozimetre","cizme_isi_hi3"]$j$::jsonb,
+  $j$["standart_is_kiyafeti","kaynak_maskesi","aluminize_giysi","tam_vucut_kemeri","temiz_hava_solunum","kursun_onluk","dozimetre","cizme_isi_hi3"]$j$::jsonb,
   $j$["kaynak_maskesi","eldiven_kaynak","kaynakci_onlugu","kaynak_perdesi","yangin_sondurucu"]$j$::jsonb,
   $j$[]$j$::jsonb,
   $j$["durdur_muteahhit","bildir_firma","izin_kontrol","kayit_al"]$j$::jsonb,
@@ -326,7 +326,7 @@ insert into scenarios (
     {"type":"yuklenici","employer":"Boru ve kaynak yüklenicisi","activity":"Sahaya giriş için onay bekliyor.","expected_items":["gaz_dedektoru_4li","kacis_maskesi_co","antistatik_ex_kiyafet","baret_en397","ayakkabi_s3","fr_kiyafet"],"current_items":["baret_en397","ayakkabi_s3","fr_kiyafet"]}
   ]$j$::jsonb,
   $j$["gaz_dedektoru_4li","kacis_maskesi_co","antistatik_ex_kiyafet","fr_kiyafet","baret_en397","ayakkabi_s3","ex_el_feneri","telsiz_atex","ruzgar_yonu","kacis_guzergahi","gozetmen"]$j$::jsonb,
-  $j$["kaynak_maskesi","aluminize_giysi","dozimetre","toz_maskesi_ffp3","kursun_onluk","tam_vucut_kemeri","cizme_isi_hi3","gaz_dedektoru_co"]$j$::jsonb,
+  $j$["standart_is_kiyafeti","kaynak_maskesi","aluminize_giysi","dozimetre","toz_maskesi_ffp3","kursun_onluk","tam_vucut_kemeri","cizme_isi_hi3","gaz_dedektoru_co"]$j$::jsonb,
   $j$["gaz_dedektoru_4li","kacis_maskesi_co","antistatik_ex_kiyafet"]$j$::jsonb,
   $j$[]$j$::jsonb,
   $j$["ekibi_cikar","izin_kontrol","bildir_isletme","kayit_al"]$j$::jsonb,
@@ -440,7 +440,7 @@ insert into scenarios (
     {"type":"isletme","employer":"Demir çelik işletmesi","activity":"Komşu hatta rutin tur.","expected_items":["baret_en397","ayakkabi_s3","reflektorlu_yelek"],"current_items":["baret_en397","ayakkabi_s3","reflektorlu_yelek"]}
   ]$j$::jsonb,
   $j$["standart_is_kiyafeti","guvenli_mesafe","alan_bariyeri","radyografi_calisma_formu","dozimetre","baret_en397","ayakkabi_s3"]$j$::jsonb,
-  $j$["kursun_onluk","temiz_hava_solunum","aluminize_giysi","kaynak_maskesi","fr_kiyafet","tam_vucut_kemeri","gaz_dedektoru_4li","toz_maskesi_ffp3","yuz_siperi"]$j$::jsonb,
+  $j$["kursun_onluk","temiz_hava_solunum","aluminize_giysi","kaynak_maskesi","tam_vucut_kemeri","gaz_dedektoru_4li","toz_maskesi_ffp3","yuz_siperi"]$j$::jsonb,
   $j$["alan_bariyeri","radyografi_calisma_formu"]$j$::jsonb,
   $j$[]$j$::jsonb,
   $j$["ekibi_cikar","durdur_muteahhit","bildir_isletme","kayit_al"]$j$::jsonb,

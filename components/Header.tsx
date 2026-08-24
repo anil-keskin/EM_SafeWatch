@@ -14,6 +14,7 @@ import {
   UserRound,
 } from "lucide-react";
 import BrandMark from "@/components/BrandMark";
+import OyakMark from "@/components/OyakMark";
 import { useAuth } from "@/lib/auth";
 import { withBase } from "@/lib/paths";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
@@ -66,9 +67,11 @@ export default function Header() {
     <header className="sticky top-0 z-50 flex h-[4.5rem] border-b border-erd-line bg-erd-charcoal">
       <Link
         href="/"
-        className="flex shrink-0 items-center bg-white px-4 py-3 sm:px-5"
+        className="flex shrink-0 items-center gap-2.5 bg-white px-3 py-2 sm:gap-3.5 sm:px-4"
         aria-label="SafeWatch ana sayfa"
       >
+        <OyakMark size="header" />
+        <span className="h-8 w-px shrink-0 bg-erd-line" aria-hidden />
         <BrandMark size="header" dark />
       </Link>
 

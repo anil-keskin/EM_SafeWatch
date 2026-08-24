@@ -3,6 +3,7 @@
 import ActionPicker from "@/components/ActionPicker";
 import ActorBadge from "@/components/ActorBadge";
 import EquipmentPicker from "@/components/EquipmentPicker";
+import { DECISION_TABS } from "@/content/decision-tabs";
 import type {
   Actor,
   DecisionTab,
@@ -25,14 +26,9 @@ interface DecisionPanelProps {
   onFillTab: (tab: DecisionTab) => void;
 }
 
-const TABS: Array<{ id: DecisionTab; label: string; short: string }> = [
-  { id: "self", label: "Ben ne kullanmalıyım?", short: "Ben" },
-  { id: "contractor", label: "Yüklenici ne kullanmalı?", short: "Yüklenici" },
-  { id: "operator", label: "İşletmede ne eksik?", short: "İşletme" },
-  { id: "action", label: "Nasıl müdahale etmeliyim?", short: "Müdahale" },
-];
+export { DECISION_TABS };
 
-export const DECISION_TAB_ORDER = TABS.map((tab) => tab.id);
+export const DECISION_TAB_ORDER = DECISION_TABS.map((tab) => tab.id);
 
 export function nextDecisionTab(current: DecisionTab): DecisionTab {
   const index = DECISION_TAB_ORDER.indexOf(current);
@@ -40,7 +36,7 @@ export function nextDecisionTab(current: DecisionTab): DecisionTab {
 }
 
 export function decisionTabShort(id: DecisionTab): string {
-  return TABS.find((tab) => tab.id === id)?.short ?? id;
+  return DECISION_TABS.find((tab) => tab.id === id)?.short ?? id;
 }
 
 const TAB_HELP: Record<DecisionTab, string> = {
@@ -75,7 +71,7 @@ export default function DecisionPanel({
         id="decision-tabs"
         className="sticky top-[4.5rem] z-30 flex scroll-mt-[4.75rem] overflow-x-auto border-b border-erd-line bg-erd-light/95 backdrop-blur-sm"
       >
-        {TABS.map((tab) => {
+        {DECISION_TABS.map((tab) => {
           const count = answers[tab.id].length;
           const active = activeTab === tab.id;
           return (

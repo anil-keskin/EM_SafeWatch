@@ -196,6 +196,7 @@ export const SCENARIOS: Scenario[] = [
       "gaz_olcum_formu",
     ],
     forbidden_self: [
+      "standart_is_kiyafeti",
       "kaynak_maskesi",
       "aluminize_giysi",
       "tam_vucut_kemeri",
@@ -379,6 +380,7 @@ export const SCENARIOS: Scenario[] = [
       "guvenli_mesafe",
     ],
     forbidden_self: [
+      "standart_is_kiyafeti",
       "aluminize_giysi",
       "kaynak_maskesi",
       "tam_vucut_kemeri",
@@ -571,6 +573,7 @@ export const SCENARIOS: Scenario[] = [
       "is_izni",
     ],
     forbidden_self: [
+      "standart_is_kiyafeti",
       "kaynak_maskesi",
       "aluminize_giysi",
       "tam_vucut_kemeri",
@@ -762,6 +765,7 @@ export const SCENARIOS: Scenario[] = [
       "gozetmen",
     ],
     forbidden_self: [
+      "standart_is_kiyafeti",
       "kaynak_maskesi",
       "aluminize_giysi",
       "dozimetre",
@@ -1109,7 +1113,6 @@ export const SCENARIOS: Scenario[] = [
       "temiz_hava_solunum",
       "aluminize_giysi",
       "kaynak_maskesi",
-      "fr_kiyafet",
       "tam_vucut_kemeri",
       "gaz_dedektoru_4li",
       "toz_maskesi_ffp3",
