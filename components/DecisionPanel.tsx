@@ -51,7 +51,7 @@ export default function DecisionPanel({
   const operator = actors.find((a) => a.type === "isletme");
 
   return (
-    <div className="sw-card overflow-hidden">
+    <div className="sw-card">
       <div className="flex overflow-x-auto border-b border-erd-line bg-erd-light">
         {TABS.map((tab) => {
           const count = answers[tab.id].length;
@@ -86,6 +86,11 @@ export default function DecisionPanel({
         <p className="text-xs leading-snug text-erd-gray">
           {TAB_HELP[activeTab]}
         </p>
+        <p className="text-[11px] leading-snug text-erd-gray">
+          Takıldığınız kartta{" "}
+          <span className="font-semibold text-erd-charcoal">(i)</span> düğmesine
+          basın. “Neden seçmeliyim?” rehberi puanınızı düşürmez.
+        </p>
 
         {activeTab === "contractor" && contractor && (
           <ObservedActor actor={contractor} equipment={equipment} />
@@ -107,6 +112,7 @@ export default function DecisionPanel({
           />
         ) : (
           <EquipmentPicker
+            tab={activeTab}
             categories={categories}
             items={equipment}
             selected={answers[activeTab]}

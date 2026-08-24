@@ -25,8 +25,8 @@ const RULES = [
     body: "Kaldığınız yerden devam edebilir, tamamladığınız bir senaryoyu tekrar oynayıp en iyi puanınızı geliştirebilirsiniz.",
   },
   {
-    title: "Kademeli ipucu",
-    body: "Üç kademeli ipucu vardır. Her ipucu puanı bir miktar düşürür ama ilerlemenizi asla engellemez.",
+    title: "Kart rehberi ve kademeli ipucu ayrıdır",
+    body: "Hazırlık panelindeki (i) hangi durumda seçeceğinizi anlatır, puanınızı düşürmez. Senaryo ipucu ise sahaya özeldir; her açılış puanı bir miktar düşürür ama ilerlemeyi engellemez.",
   },
   {
     title: "Gereksiz KKD de bir uygunsuzluktur",
@@ -48,7 +48,7 @@ const STEPS = [
   {
     step: "3",
     title: "Hazırlık ve Denetim",
-    body: "Dört karar sekmesini doldurursunuz: kendi donanımınız, yüklenicideki eksikler, işletmedeki uygunsuzluklar ve müdahale kararınız.",
+    body: "Dört karar sekmesini doldurursunuz: kendi donanımınız, yüklenicideki eksikler, işletmedeki uygunsuzluklar ve müdahale kararınız. Takıldığınız karttaki (i) “Neden seçmeliyim?” rehberini açar; bu rehber puan düşürmez.",
   },
   {
     step: "4",

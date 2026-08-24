@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getSupabase, isSupabaseConfigured } from "@/lib/supabase/client";
+import { EQUIPMENT_WHY_SELECT } from "@/content/card-hints";
 import { ZONES } from "@/content/zones";
 import { EQUIPMENT_CATEGORIES, EQUIPMENT_ITEMS } from "@/content/equipment";
 import { SCENARIOS } from "@/content/scenarios";
@@ -133,6 +134,8 @@ function normalizeEquipment(row: Partial<EquipmentItem> & { id?: string }): Equi
     description: row.description ?? "",
     used_by: row.used_by ?? "hepsi",
     not_for: row.not_for ?? "",
+    why_select:
+      (row.why_select ?? "").trim() || EQUIPMENT_WHY_SELECT[code] || "",
     icon: row.icon ?? "",
     order_index: Number(row.order_index) || 0,
   };

@@ -29,6 +29,8 @@ export interface EquipmentItem {
   description: string;
   used_by: string;
   not_for: string;
+  /** Kart (i) rehberi. Boşsa uygulama yerel card-hints metnini kullanır. */
+  why_select?: string;
   icon: string;
   order_index: number;
 }

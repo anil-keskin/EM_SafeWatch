@@ -34,6 +34,7 @@ create table if not exists equipment_items (
   description text,                      -- ne işe yarar
   used_by     text,                      -- 'kontrolluk' | 'yuklenici' | 'isletme' | 'hepsi'
   not_for     text,                      -- hangi durumda yeterli değildir
+  why_select  text,                      -- kart (i) rehberi: neden seçmeliyim
   icon        text,
   order_index int default 0
 );

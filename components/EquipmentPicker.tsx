@@ -1,27 +1,29 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { EquipmentCategory, EquipmentItem } from "@/lib/types";
+import CardHint from "@/components/CardHint";
+import { TAB_SELECT_CONTEXT, whySelectFor } from "@/content/card-hints";
+import type { DecisionTab, EquipmentCategory, EquipmentItem } from "@/lib/types";
 
 interface EquipmentPickerProps {
   categories: EquipmentCategory[];
   items: EquipmentItem[];
   selected: string[];
   onToggle: (code: string) => void;
+  tab: Exclude<DecisionTab, "action">;
   disabled?: boolean;
 }
 
 /**
  * Ekipman ve tedbir kartları.
- * Kategori filtresi ve arama ile 45+ kart arasından hızlı seçim sağlar.
- * Kart üzerindeki bilgi düğmesi standardı ve "hangi durumda yeterli değildir"
- * açıklamasını gösterir; oyun bir sınav değil, öğretici bir antrenmandır.
+ * (i) düğmesi tanım değil, o sekmede "neden seçmeliyim?" rehberi açar.
  */
 export default function EquipmentPicker({
   categories,
   items,
   selected,
   onToggle,
+  tab,
   disabled = false,
 }: EquipmentPickerProps) {
   const [activeCategory, setActiveCategory] = useState<string>("all");
@@ -93,48 +95,41 @@ export default function EquipmentPicker({
                   : "border-erd-line bg-white hover:border-erd-gray/40"
               }`}
             >
-              <button
-                type="button"
-                disabled={disabled}
-                onClick={() => onToggle(item.code)}
-                className="flex w-full items-start gap-2 text-left disabled:opacity-60"
-                aria-pressed={isSelected}
-              >
-                <span className="text-xl leading-none text-erd-red">
-                  {item.icon}
-                </span>
-                <span className="min-w-0">
-                  <span className="block text-xs font-semibold leading-snug text-erd-charcoal">
-                    {item.name}
+              <div className="flex items-start gap-1">
+                <button
+                  type="button"
+                  disabled={disabled}
+                  onClick={() => onToggle(item.code)}
+                  className="flex min-w-0 flex-1 items-start gap-2 text-left disabled:opacity-60"
+                  aria-pressed={isSelected}
+                >
+                  <span className="text-xl leading-none text-erd-red">
+                    {item.icon}
                   </span>
-                  {item.standard && item.standard !== "—" && (
-                    <span className="mt-0.5 block text-[10px] font-medium uppercase tracking-wide text-erd-gray">
-                      {item.standard}
+                  <span className="min-w-0 pr-0.5">
+                    <span className="block text-xs font-semibold leading-snug text-erd-charcoal">
+                      {item.name}
                     </span>
-                  )}
-                </span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setOpenInfo(infoOpen ? null : item.code)}
-                className="absolute right-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded-full border border-erd-line bg-white text-[10px] font-bold text-erd-gray hover:border-erd-gray"
-                aria-label={`${item.name} hakkında bilgi`}
-              >
-                i
-              </button>
-
-              {infoOpen && (
-                <div className="mt-2 space-y-1 rounded-lg bg-erd-light p-2 text-[11px] leading-snug text-erd-charcoal">
-                  <p>{item.description}</p>
-                  {item.not_for && (
-                    <p className="text-erd-red">
-                      <span className="font-semibold">Dikkat: </span>
-                      {item.not_for}
-                    </p>
-                  )}
-                </div>
-              )}
+                    {item.standard && item.standard !== "—" && (
+                      <span className="mt-0.5 block text-[10px] font-medium uppercase tracking-wide text-erd-gray">
+                        {item.standard}
+                      </span>
+                    )}
+                  </span>
+                </button>
+                <CardHint
+                  label={item.name}
+                  context={TAB_SELECT_CONTEXT[tab]}
+                  why={
+                    item.why_select?.trim() ||
+                    whySelectFor(item.code, item.description)
+                  }
+                  caution={item.not_for || undefined}
+                  open={infoOpen}
+                  onToggle={() => setOpenInfo(infoOpen ? null : item.code)}
+                  onClose={() => setOpenInfo(null)}
+                />
+              </div>
             </div>
           );
         })}
