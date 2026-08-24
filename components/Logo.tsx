@@ -1,25 +1,45 @@
 "use client";
 
 import { useState } from "react";
+import { withBase } from "@/lib/paths";
+
+type Face = "logo" | "icon" | "mark";
+
+let skipLogoPng = false;
 
 /**
- * Üst bardaki marka alanı.
- * `/public/logo.png` eklendiğinde otomatik görünür; yoksa yazı gösterilir.
+ * Üst bardaki marka alanı (eski yerleşim).
+ * public/logo.png yoksa icon.svg, o da yoksa EM monogramı kullanılır.
  */
 export default function Logo() {
-  const [hasLogo, setHasLogo] = useState(true);
+  const [face, setFace] = useState<Face>(skipLogoPng ? "icon" : "logo");
+
+  const handleFail = () => {
+    setFace((current) => {
+      if (current === "logo") {
+        skipLogoPng = true;
+        return "icon";
+      }
+      return "mark";
+    });
+  };
 
   return (
-    <span className="flex items-center gap-3 min-w-0">
-      {hasLogo && (
-        // Logo dosyası opsiyoneldir; next/image yerine <img> kullanılarak
-        // dosya yokken sessizce yazı gösterimine düşülür.
+    <span className="flex min-w-0 items-center gap-3">
+      {face === "mark" ? (
+        <span
+          className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-erd-red text-[11px] font-bold text-white"
+          aria-hidden="true"
+        >
+          EM
+        </span>
+      ) : (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src="/logo.png"
+          src={face === "logo" ? withBase("/logo.png") : withBase("/icon.svg")}
           alt="Erdemir Mühendislik"
-          className="h-8 w-auto shrink-0"
-          onError={() => setHasLogo(false)}
+          className="h-8 w-auto shrink-0 bg-white object-contain"
+          onError={handleFail}
         />
       )}
       <span className="min-w-0 leading-tight">

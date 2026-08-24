@@ -1,5 +1,10 @@
 import ResultView from "@/components/ResultView";
 import PageShell from "@/components/PageShell";
+import { SCENARIOS } from "@/content/scenarios";
+
+export function generateStaticParams() {
+  return SCENARIOS.map((scenario) => ({ id: scenario.slug }));
+}
 
 export default async function ResultPage({
   params,

@@ -73,11 +73,48 @@ export function scoreSection(
   };
 }
 
+/**
+ * Görev metni, tehlike noktası veya doğru cevap kümesi olmayan taslaklar
+ * puanlanmaz. Altı dolu senaryonun bölüm boşluğu (ör. işletmede eksik yok)
+ * bu kontrolü geçmez; onlar hâlâ puanlanır.
+ */
+export function isScenarioScorable(scenario: Scenario): boolean {
+  return (
+    Boolean(scenario.briefing?.gorev) ||
+    (scenario.hazards?.length ?? 0) > 0 ||
+    (scenario.required_self?.length ?? 0) > 0 ||
+    (scenario.correct_actions?.length ?? 0) > 0
+  );
+}
+
+function emptySection(): SectionResult {
+  return { score: 0, hits: [], misses: [], extras: [], criticalExtras: [] };
+}
+
 export function evaluateScenario(
   scenario: Scenario,
   answers: ScenarioAnswers,
   hintsUsed: number
 ): ScenarioResult {
+  if (!isScenarioScorable(scenario)) {
+    return {
+      slug: scenario.slug,
+      technical: 0,
+      behavior: 0,
+      hintsUsed,
+      hintPenalty: 0,
+      sections: {
+        hazards: emptySection(),
+        self: emptySection(),
+        contractor: emptySection(),
+        operator: emptySection(),
+        actions: emptySection(),
+      },
+      competencyScores: {},
+      completedAt: new Date().toISOString(),
+    };
+  }
+
   const realHazards = scenario.hazards
     .filter((h) => h.is_real)
     .map((h) => h.code);

@@ -9,7 +9,7 @@ import HazardScene from "@/components/HazardScene";
 import HintBox from "@/components/HintBox";
 import { useSafeWatchData, findScenario } from "@/lib/data";
 import { useProgress } from "@/lib/progress";
-import { evaluateScenario } from "@/lib/scoring";
+import { evaluateScenario, isScenarioScorable } from "@/lib/scoring";
 import type { DecisionTab, ScenarioAnswers } from "@/lib/types";
 
 const HINT_PENALTY = 5;
@@ -64,10 +64,13 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
   };
 
   const handleEvaluate = () => {
+    if (!isScenarioScorable(scenario)) return;
     const result = evaluateScenario(scenario, answers, hintsUsed);
     recordResult(scenario, result);
     router.push(`/sonuc/${scenario.slug}`);
   };
+
+  const scorable = isScenarioScorable(scenario);
 
   const totalSelections =
     answers.self.length +
@@ -172,18 +175,21 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
               <div className="sw-card sticky bottom-4 flex flex-wrap items-center gap-3 p-4">
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold text-erd-charcoal">
-                    Değerlendirmeye hazır mısınız?
+                    {scorable
+                      ? "Değerlendirmeye hazır mısınız?"
+                      : "Bu senaryo henüz puanlanamaz"}
                   </p>
                   <p className="text-xs text-erd-gray">
-                    {totalSelections} karar,{" "}
-                    {answers.hazards.length} risk işaretlemesi yaptınız.
-                    Değerlendirme sonunda oyun bitmez; tekrar deneyebilirsiniz.
+                    {scorable
+                      ? `${totalSelections} karar, ${answers.hazards.length} risk işaretlemesi yaptınız. Değerlendirme sonunda oyun bitmez; tekrar deneyebilirsiniz.`
+                      : "Görev içeriği henüz doldurulmamış. Puan şişmesini önlemek için değerlendirme kapalıdır."}
                   </p>
                 </div>
                 <button
                   type="button"
-                  className="sw-btn-primary"
+                  className="sw-btn-primary disabled:cursor-not-allowed disabled:opacity-50"
                   onClick={handleEvaluate}
+                  disabled={!scorable}
                 >
                   Değerlendir
                 </button>

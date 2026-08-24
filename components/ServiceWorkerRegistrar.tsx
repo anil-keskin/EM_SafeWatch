@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { BASE_PATH } from "@/lib/paths";
 
 /** PWA service worker'ını yalnızca üretim yapısında kaydeder. */
 export default function ServiceWorkerRegistrar() {
@@ -8,7 +9,9 @@ export default function ServiceWorkerRegistrar() {
     if (process.env.NODE_ENV !== "production") return;
     if (!("serviceWorker" in navigator)) return;
 
-    navigator.serviceWorker.register("/sw.js").catch(() => {
+    const swUrl = `${BASE_PATH}/sw.js`;
+    const scope = `${BASE_PATH}/` || "/";
+    navigator.serviceWorker.register(swUrl, { scope }).catch(() => {
       // Kayıt başarısız olursa uygulama çevrimiçi olarak çalışmaya devam eder.
     });
   }, []);

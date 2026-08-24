@@ -1,13 +1,25 @@
 /**
  * SafeWatch — basit service worker.
  *
- * Amaç: uygulamanın yüklenebilir (PWA) olması ve zayıf bağlantıda daha hızlı
- * açılması. Gezinme isteklerinde önce ağ denenir, ağ yoksa önbellek kullanılır.
- * Statik varlıklarda önce önbellek okunur.
+ * GitHub Pages alt klasöründe (…/EM_SafeWatch/) de çalışır: yollar
+ * registration.scope üzerinden türetilir.
  */
 
-const CACHE = "safewatch-v1";
-const PRECACHE = ["/", "/saha", "/nasil-oynanir", "/manifest.webmanifest", "/icon.svg"];
+const CACHE = "safewatch-v2";
+
+function scoped(path) {
+  const base = self.registration.scope.replace(/\/$/, "");
+  if (path === "/") return `${base}/`;
+  return `${base}${path.startsWith("/") ? path : `/${path}`}`;
+}
+
+const PRECACHE = [
+  scoped("/"),
+  scoped("/saha/"),
+  scoped("/nasil-oynanir/"),
+  scoped("/manifest.webmanifest"),
+  scoped("/icon.svg"),
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -45,7 +57,9 @@ self.addEventListener("fetch", (event) => {
           caches.open(CACHE).then((cache) => cache.put(request, copy));
           return response;
         })
-        .catch(() => caches.match(request).then((hit) => hit || caches.match("/")))
+        .catch(() =>
+          caches.match(request).then((hit) => hit || caches.match(scoped("/")))
+        )
     );
     return;
   }

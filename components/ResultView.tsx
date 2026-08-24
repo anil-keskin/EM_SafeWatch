@@ -6,7 +6,7 @@ import HazardScene from "@/components/HazardScene";
 import ScoreMeter from "@/components/ScoreMeter";
 import { actionLabel } from "@/content/actions";
 import { competencyLabel } from "@/content/scenarios";
-import { useSafeWatchData, findScenario } from "@/lib/data";
+import { useSafeWatchData, findScenario, scenariosOfZone } from "@/lib/data";
 import { loadLastResult } from "@/lib/progress";
 import type { EquipmentItem, ScenarioResult, SectionResult } from "@/lib/types";
 
@@ -28,6 +28,14 @@ export default function ResultView({ slug }: { slug: string }) {
 
   const scenario = findScenario(scenarios, slug);
   const zone = zones.find((z) => z.id === scenario?.zone_id);
+  const zoneScenarios = scenario
+    ? scenariosOfZone(scenarios, scenario.zone_id)
+    : [];
+  const currentIndex = scenario
+    ? zoneScenarios.findIndex((item) => item.slug === scenario.slug)
+    : -1;
+  const nextScenario =
+    currentIndex >= 0 ? zoneScenarios[currentIndex + 1] : undefined;
 
   if (!ready) {
     return <p className="py-16 text-center text-sm text-erd-gray">Yükleniyor…</p>;
@@ -179,10 +187,19 @@ export default function ResultView({ slug }: { slug: string }) {
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <Link href={`/senaryo/${slug}`} className="sw-btn-primary">
+        {nextScenario ? (
+          <Link href={`/senaryo/${nextScenario.slug}`} className="sw-btn-primary">
+            Sonraki Senaryoya Geç
+          </Link>
+        ) : (
+          <Link href="/saha" className="sw-btn-primary">
+            Saha Senaryolarına Dön
+          </Link>
+        )}
+        <Link href={`/senaryo/${slug}`} className="sw-btn-dark">
           Tekrar Dene
         </Link>
-        <Link href="/saha" className="sw-btn-dark">
+        <Link href="/saha" className="sw-btn-ghost">
           Saha Seçimi
         </Link>
         <Link href="/gelisim" className="sw-btn-ghost">

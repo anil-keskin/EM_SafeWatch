@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { withBase } from "@/lib/paths";
 
 /**
  * Marka bloğu. "Safe" koyu, "Watch" kırmızı yazılır.
@@ -18,7 +19,7 @@ export function BrandMark({ className = "h-9 w-9" }: { className?: string }) {
       // dosya yokken sessizce yedek işarete düşülür.
       // eslint-disable-next-line @next/next/no-img-element
       <img
-        src="/logo.png"
+        src={withBase("/logo.png")}
         alt="Erdemir Mühendislik"
         className={`${className} object-contain`}
         onError={() => setHasLogo(false)}

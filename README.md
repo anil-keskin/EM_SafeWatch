@@ -115,10 +115,26 @@ etiketiyle görünür. Bir taslağı doldurmak için:
 
 Her ipucu kademesi iki eksenden 5 puan düşürür. Geçme/kalma eşiği yoktur.
 
+## Yayın (GitHub Pages)
+
+Canlı adres: <https://anil-keskin.github.io/EM_SafeWatch/>
+
+GitHub kullanıcı adı değiştiği için site proje klasöründe yayınlanır. `main`
+dalına her gönderimde `.github/workflows/deploy-github-pages.yml` statik
+siteyi derleyip Pages’e yükler.
+
+İlk kurulum (bir kez):
+
+1. Depo **Settings > Pages**
+2. **Build and deployment > Source** = **GitHub Actions**
+   (Branch/root seçiliyse README görünür, oyun açılmaz.)
+3. İsteğe bağlı: **Settings > Secrets and variables > Actions** içine
+   `NEXT_PUBLIC_SUPABASE_URL` ve `NEXT_PUBLIC_SUPABASE_ANON_KEY` ekleyin.
+
 ## Yayın (Vercel)
 
 1. Projeyi GitHub'a gönderin.
-2. <https://vercel.com> üzerinde **Add New > Project** ile repoyu seçin.
+2. <https://vercel.com> üzerinde **Add New > Project** ile `anil-keskin/EM_SafeWatch` reposunu seçin.
 3. **Environment Variables** kısmına `NEXT_PUBLIC_SUPABASE_URL` ve
    `NEXT_PUBLIC_SUPABASE_ANON_KEY` değerlerini ekleyin (Supabase kullanıyorsanız).
 4. **Deploy** deyin.
