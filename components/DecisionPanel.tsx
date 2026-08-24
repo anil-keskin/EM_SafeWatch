@@ -32,6 +32,17 @@ const TABS: Array<{ id: DecisionTab; label: string; short: string }> = [
   { id: "action", label: "Nasıl müdahale etmeliyim?", short: "Müdahale" },
 ];
 
+export const DECISION_TAB_ORDER = TABS.map((tab) => tab.id);
+
+export function nextDecisionTab(current: DecisionTab): DecisionTab {
+  const index = DECISION_TAB_ORDER.indexOf(current);
+  return DECISION_TAB_ORDER[(index + 1) % DECISION_TAB_ORDER.length];
+}
+
+export function decisionTabShort(id: DecisionTab): string {
+  return TABS.find((tab) => tab.id === id)?.short ?? id;
+}
+
 const TAB_HELP: Record<DecisionTab, string> = {
   self: "Bu göreve çıkarken kendi üzerinizde bulunması gereken koruyucuları, alan tedbirlerini ve giriş koşullarını işaretleyin. Gereksiz seçim de bir uygunsuzluktur.",
   contractor:
@@ -60,7 +71,10 @@ export default function DecisionPanel({
 
   return (
     <div className="sw-card">
-      <div className="flex overflow-x-auto border-b border-erd-line bg-erd-light">
+      <div
+        id="decision-tabs"
+        className="sticky top-[4.5rem] z-30 flex scroll-mt-[4.75rem] overflow-x-auto border-b border-erd-line bg-erd-light/95 backdrop-blur-sm"
+      >
         {TABS.map((tab) => {
           const count = answers[tab.id].length;
           const active = activeTab === tab.id;

@@ -256,6 +256,19 @@ export const EQUIPMENT_ITEMS: EquipmentItem[] = [
   },
   // --- Gövde ---------------------------------------------------------------
   {
+    code: "standart_is_kiyafeti",
+    name: "Standart İş Kıyafeti",
+    category_id: "govde",
+    standard: "EN ISO 13688",
+    description:
+      "Pamuk/karışım kumaşlı genel saha iş elbisesi. Alev, kıvılcım ve radyan ısı koruması yoktur.",
+    used_by: "hepsi",
+    not_for:
+      "Sıcak iş, döküm ve kıvılcım ortamında tutuşur; FR kıyafet yerine geçmez.",
+    icon: "👔",
+    order_index: 0,
+  },
+  {
     code: "fr_kiyafet",
     name: "Alev Almaz (FR) İş Elbisesi",
     category_id: "govde",

@@ -56,8 +56,10 @@ export const EQUIPMENT_WHY_SELECT: Record<string, string> = {
     "Sahaya çıkıyorsanız seçin. Ezilme ve delinme her yerde vardır; sıvı metal sıçramasında bot yetmez.",
   cizme_isi_hi3:
     "Sıvı metal, cüruf veya kızgın zemin varsa seçin. Bağcıksız, hızlı çıkarılabilir model seçilir. Ofis-saha yürüyüşünde gerekmez.",
+  standart_is_kiyafeti:
+    "Isı ve kıvılcım yoksa, genel saha yürüyüşü ve soğuk iş için seçin. Döküm, sıcak hat veya kaynak çevresinde seçmeyin; tutuşur.",
   fr_kiyafet:
-    "Kıvılcım, alev veya radyan ısı olan sıcak iş / döküm çevresinde seçin. Sentetik iş elbisesi tutuşur.",
+    "Kıvılcım, alev veya radyan ısı olan sıcak iş / döküm çevresinde seçin. Standart iş kıyafeti tutuşur; yerine bu kartı seçin.",
   aluminize_giysi:
     "Kişi sıvı metale doğrudan müdahale ediyorsa seçin. Kontrollük gözleminde seçmeyin; hareketi keser.",
   kaynakci_onlugu:

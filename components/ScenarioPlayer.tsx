@@ -4,7 +4,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import BriefingCard from "@/components/BriefingCard";
-import DecisionPanel from "@/components/DecisionPanel";
+import DecisionPanel, {
+  decisionTabShort,
+  nextDecisionTab,
+} from "@/components/DecisionPanel";
 import HazardScene from "@/components/HazardScene";
 import HintBox from "@/components/HintBox";
 import SolutionAssist from "@/components/SolutionAssist";
@@ -137,6 +140,16 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
     action: correctCodesForTab(scenario, "action"),
   };
 
+  const handleNextTab = () => {
+    const next = nextDecisionTab(activeTab);
+    setActiveTab(next);
+    requestAnimationFrame(() => {
+      document
+        .getElementById("decision-tabs")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  };
+
   const scorable = isScenarioScorable(scenario);
 
   const totalSelections =
@@ -260,7 +273,7 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
                 onFillTab={handleFillTab}
               />
 
-              <div className="sw-card sticky bottom-4 flex flex-wrap items-center gap-3 p-4">
+              <div className="sw-card sticky bottom-4 z-20 flex flex-wrap items-center gap-3 p-4">
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold text-erd-charcoal">
                     {scorable
@@ -273,14 +286,23 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
                       : "Görev içeriği henüz doldurulmamış. Puan şişmesini önlemek için değerlendirme kapalıdır."}
                   </p>
                 </div>
-                <button
-                  type="button"
-                  className="sw-btn-primary disabled:cursor-not-allowed disabled:opacity-50"
-                  onClick={handleEvaluate}
-                  disabled={!scorable}
-                >
-                  Değerlendir
-                </button>
+                <div className="flex w-full shrink-0 flex-wrap gap-2 sm:w-auto">
+                  <button
+                    type="button"
+                    className="sw-btn-ghost flex-1 px-4 py-3 text-sm sm:flex-none"
+                    onClick={handleNextTab}
+                  >
+                    Sıradaki · {decisionTabShort(nextDecisionTab(activeTab))}
+                  </button>
+                  <button
+                    type="button"
+                    className="sw-btn-primary flex-1 disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
+                    onClick={handleEvaluate}
+                    disabled={!scorable}
+                  >
+                    Değerlendir
+                  </button>
+                </div>
               </div>
             </div>
           )}

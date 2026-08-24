@@ -91,6 +91,10 @@ export default function Header() {
           })}
         </nav>
 
+        <p className="hidden min-w-0 flex-1 px-4 text-center text-[11px] font-medium tracking-wide text-white/45 md:block">
+          Saha simülasyonu · Sistem tanı koymaz
+        </p>
+
         <nav
           className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto md:hidden"
           aria-label="Ana menü"
