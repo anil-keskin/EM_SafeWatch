@@ -26,9 +26,10 @@ export const EQUIPMENT_ITEMS: EquipmentItem[] = [
     category_id: "bas",
     standard: "EN 397",
     description:
-      "Düşen cisim ve çarpma etkisine karşı temel baş koruması. Sahada istisnasız zorunludur.",
+      "Düşen cisim ve çarpma etkisine karşı temel baş koruması. Çene kayışlı baretle aynı saha ailesindendir.",
     used_by: "hepsi",
-    not_for: "Yüksekte çalışmada çene kayışı olmadan yeterli değildir.",
+    not_for:
+      "Isı koruması sağlamaz. Çene kayışlı model bu kartın yerine geçer; olmaz demeyiz.",
     icon: "⛑️",
     order_index: 1,
   },
@@ -38,9 +39,10 @@ export const EQUIPMENT_ITEMS: EquipmentItem[] = [
     category_id: "bas",
     standard: "EN 397 / EN 12492",
     description:
-      "Baş aşağı düşme ve eğilme hareketlerinde baretin düşmesini engelleyen çene kayışlı model.",
+      "Çene kayışlı saha bareti. Eğilme ve yüksekte baretin düşmesini önler; tesis standardı olarak da kullanılır.",
     used_by: "hepsi",
-    not_for: "Yüksek ısı bölgesinde tek başına ısı koruması sağlamaz.",
+    not_for:
+      "Tek başına ısı koruması sağlamaz. Endüstriyel baretle aynı baş koruma ailesindendir.",
     icon: "⛑️",
     order_index: 2,
   },

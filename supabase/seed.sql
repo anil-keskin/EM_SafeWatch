@@ -47,8 +47,8 @@ on conflict (id) do update
 -- ===========================================================================
 insert into equipment_items (code, name, category_id, standard, description, used_by, not_for, icon, order_index) values
   -- Baş
-  ('baret_en397',        'Endüstriyel Baret',                  'bas',      'EN 397',              'Düşen cisim ve çarpma etkisine karşı temel baş koruması. Sahada istisnasız zorunludur.',                         'hepsi',      'Yüksekte çalışmada çene kayışı olmadan yeterli değildir.',                                  '⛑️', 1),
-  ('baret_jugular',      'Çene Kayışlı Baret',                 'bas',      'EN 397 / EN 12492',   'Baş aşağı düşme ve eğilme hareketlerinde baretin düşmesini engelleyen çene kayışlı model.',                      'hepsi',      'Yüksek ısı bölgesinde tek başına ısı koruması sağlamaz.',                                   '⛑️', 2),
+  ('baret_en397',        'Endüstriyel Baret',                  'bas',      'EN 397',              'Düşen cisim ve çarpma etkisine karşı temel baş koruması. Çene kayışlı baretle aynı saha ailesindendir.',          'hepsi',      'Isı koruması sağlamaz. Çene kayışlı model bu kartın yerine geçer; olmaz demeyiz.',          '⛑️', 1),
+  ('baret_jugular',      'Çene Kayışlı Baret',                 'bas',      'EN 397 / EN 12492',   'Çene kayışlı saha bareti. Eğilme ve yüksekte baretin düşmesini önler; tesis standardı olarak da kullanılır.',     'hepsi',      'Tek başına ısı koruması sağlamaz. Endüstriyel baretle aynı baş koruma ailesindendir.',       '⛑️', 2),
   ('baret_en14052',      'Geniş Siperlikli Baret',             'bas',      'EN 14052',            'Yandan ve açılı darbelere karşı artırılmış koruma sağlar.',                                                      'hepsi',      'Dar hacimlerde hareket kısıtlar; her işte gerekli değildir.',                               '⛑️', 3),
   -- Göz ve yüz
   ('gozluk_en166',       'Koruyucu Gözlük',                    'goz',      'EN 166',              'Toz, parçacık ve düşük enerjili darbeye karşı temel göz koruması.',                                              'hepsi',      'Radyan ısı ve kaynak arkına karşı koruma sağlamaz.',                                        '🥽', 1),
@@ -380,11 +380,11 @@ insert into scenarios (
   ]$j$::jsonb,
   $j$[
     {"type":"kontrolluk","employer":"Erdemir Mühendislik","activity":"Kaynak dikişlerini iskele üzerinde gözle muayene edecek.","authority":"Kendi güvenliğinden tam sorumludur. Yüklenici üzerinde işi durdurma yetkisi vardır. İskelenin uygunluğunu onaylamak yetkili iskele kurulum sorumlusunun işidir."},
-    {"type":"yuklenici","employer":"Mekanik montaj yüklenicisi","activity":"İskele üzerinde boru askı montajı.","expected_items":["baret_jugular","tam_vucut_kemeri","soklu_lanyard","eldiven_mekanik","ayakkabi_s3","gozluk_en166"],"current_items":["baret_en397","eldiven_mekanik","ayakkabi_s3","gozluk_en166"]}
+    {"type":"yuklenici","employer":"Mekanik montaj yüklenicisi","activity":"İskele üzerinde boru askı montajı.","expected_items":["baret_en397","tam_vucut_kemeri","soklu_lanyard","eldiven_mekanik","ayakkabi_s3","gozluk_en166"],"current_items":["baret_en397","eldiven_mekanik","ayakkabi_s3","gozluk_en166"]}
   ]$j$::jsonb,
-  $j$["baret_jugular","tam_vucut_kemeri","cift_kancali_lanyard","ayakkabi_s3","gozluk_en166","eldiven_mekanik","iskele_kontrol_karti","toplu_koruma"]$j$::jsonb,
+  $j$["standart_is_kiyafeti","baret_jugular","tam_vucut_kemeri","cift_kancali_lanyard","ayakkabi_s3","gozluk_en166","eldiven_mekanik","iskele_kontrol_karti","toplu_koruma"]$j$::jsonb,
   $j$["aluminize_giysi","kaynak_maskesi","temiz_hava_solunum","gaz_dedektoru_4li","dozimetre","kursun_onluk","cizme_isi_hi3","eldiven_kimyasal"]$j$::jsonb,
-  $j$["baret_jugular","tam_vucut_kemeri","soklu_lanyard"]$j$::jsonb,
+  $j$["tam_vucut_kemeri","soklu_lanyard"]$j$::jsonb,
   $j$[]$j$::jsonb,
   $j$["durdur_muteahhit","bildir_firma","ekibi_cikar","kayit_al"]$j$::jsonb,
   $j$["gozleme_devam"]$j$::jsonb,
@@ -393,7 +393,7 @@ insert into scenarios (
     "Kırmızı etiket 'dikkatli ol' demek değildir; 'bu iskele kullanılamaz' demektir. Kemer takmak bu durumu düzeltmez.",
     "Düşme riskinde sıralama nettir: önce toplu koruma (korkuluk), sonra kişisel koruyucu. Sökülmüş korkuluk tamamlanmadan ve iskele yeşil etiketlenmeden ne siz çıkmalısınız ne de yüklenici çalışmaya devam etmelidir."
   ]$j$::jsonb,
-  'Bu senaryonun kilit noktası, iskeleye çıkmadan önce verilen karardır. Giriş kapısındaki kontrol kartı kırmızı etiketli ve üç hafta öncesine ait; bu, iskelenin kullanıma uygun olmadığını gösterir. Kemer takmak, lanyard bağlamak ya da dikkatli olmak bu durumu ortadan kaldırmaz. Üstelik ara korkuluğun bir bölümü sökülmüş durumda. Düşme riskinde koruma sıralaması nettir: önce toplu koruma gelir, kişisel koruyucu sonra devreye girer. Doğru davranış yüklenicinin çalışmasını durdurmak, firma saha sorumlusunu çağırmak, kendi ekibinizi iskeleden ve alt kottan uzak tutmak ve durumu kayıt altına almaktır. İskele yetkili kişi tarafından yeniden kontrol edilip yeşil etiketlenene kadar hiç kimse çıkmamalıdır. Yüklenici ekibinde ayrıca çene kayışlı baret, tam vücut kemeri ve şok emicili lanyard eksiktir; bu haliyle +12 metrede çalışıyor olmaları başlı başına kritik bir ihlaldir. Kendi donanımınıza gelince: iskeleye çıkacaksanız çene kayışlı baret, tam vücut kemeri ve yatay hareket için çift kancalı lanyard gerekir. Bu bölgede gaz dedektörü, alüminize giysi veya dozimetre gibi ekipmanlar gereksizdir; dikkati dağıtır ve hareketi kısıtlar.',
+  'Bu senaryonun kilit noktası, iskeleye çıkmadan önce verilen karardır. Giriş kapısındaki kontrol kartı kırmızı etiketli ve üç hafta öncesine ait; bu, iskelenin kullanıma uygun olmadığını gösterir. Kemer takmak, lanyard bağlamak ya da dikkatli olmak bu durumu ortadan kaldırmaz. Üstelik ara korkuluğun bir bölümü sökülmüş durumda. Düşme riskinde koruma sıralaması nettir: önce toplu koruma gelir, kişisel koruyucu sonra devreye girer. Doğru davranış yüklenicinin çalışmasını durdurmak, firma saha sorumlusunu çağırmak, kendi ekibinizi iskeleden ve alt kottan uzak tutmak ve durumu kayıt altına almaktır. İskele yetkili kişi tarafından yeniden kontrol edilip yeşil etiketlenene kadar hiç kimse çıkmamalıdır. Yüklenici ekibinde tam vücut kemeri ve şok emicili lanyard eksiktir; bu haliyle +12 metrede çalışıyor olmaları başlı başına kritik bir ihlaldir. Baret tipi (endüstriyel veya çene kayışlı) saha standardıdır, eksik sayılmaz. Kendi donanımınıza gelince: ısı ve kıvılcım yoksa standart iş kıyafeti yeter; iskeleye çıkılacaksa baret, tam vücut kemeri ve yatay hareket için çift kancalı lanyard gerekir. Bu bölgede gaz dedektörü, alüminize giysi veya dozimetre gibi ekipmanlar gereksizdir; dikkati dağıtır ve hareketi kısıtlar.',
   $j$["yuksekte_calisma","toplu_koruma_onceligi","iskele_kontrolu","isi_durdurma_karari","kontrolluk_davranisi"]$j$::jsonb
 )
 on conflict (slug) do update set
@@ -439,7 +439,7 @@ insert into scenarios (
     {"type":"yuklenici","employer":"Tahribatsız muayene yüklenicisi","activity":"Gama kaynağı ile film çekimi.","expected_items":["dozimetre","alan_bariyeri","radyografi_calisma_formu","guvenli_mesafe","baret_en397","ayakkabi_s3"],"current_items":["dozimetre","baret_en397","ayakkabi_s3"]},
     {"type":"isletme","employer":"Demir çelik işletmesi","activity":"Komşu hatta rutin tur.","expected_items":["baret_en397","ayakkabi_s3","reflektorlu_yelek"],"current_items":["baret_en397","ayakkabi_s3","reflektorlu_yelek"]}
   ]$j$::jsonb,
-  $j$["guvenli_mesafe","alan_bariyeri","radyografi_calisma_formu","dozimetre","baret_en397","ayakkabi_s3"]$j$::jsonb,
+  $j$["standart_is_kiyafeti","guvenli_mesafe","alan_bariyeri","radyografi_calisma_formu","dozimetre","baret_en397","ayakkabi_s3"]$j$::jsonb,
   $j$["kursun_onluk","temiz_hava_solunum","aluminize_giysi","kaynak_maskesi","fr_kiyafet","tam_vucut_kemeri","gaz_dedektoru_4li","toz_maskesi_ffp3","yuz_siperi"]$j$::jsonb,
   $j$["alan_bariyeri","radyografi_calisma_formu"]$j$::jsonb,
   $j$[]$j$::jsonb,

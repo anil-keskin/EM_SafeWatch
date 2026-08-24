@@ -910,7 +910,7 @@ export const SCENARIOS: Scenario[] = [
         employer: "Mekanik montaj yüklenicisi",
         activity: "İskele üzerinde boru askı montajı.",
         expected_items: [
-          "baret_jugular",
+          "baret_en397",
           "tam_vucut_kemeri",
           "soklu_lanyard",
           "eldiven_mekanik",
@@ -926,6 +926,7 @@ export const SCENARIOS: Scenario[] = [
       },
     ],
     required_self: [
+      "standart_is_kiyafeti",
       "baret_jugular",
       "tam_vucut_kemeri",
       "cift_kancali_lanyard",
@@ -945,7 +946,7 @@ export const SCENARIOS: Scenario[] = [
       "cizme_isi_hi3",
       "eldiven_kimyasal",
     ],
-    contractor_gaps: ["baret_jugular", "tam_vucut_kemeri", "soklu_lanyard"],
+    contractor_gaps: ["tam_vucut_kemeri", "soklu_lanyard"],
     operator_gaps: [],
     correct_actions: [
       "durdur_muteahhit",
@@ -960,7 +961,7 @@ export const SCENARIOS: Scenario[] = [
       "Düşme riskinde sıralama nettir: önce toplu koruma (korkuluk), sonra kişisel koruyucu. Sökülmüş korkuluk tamamlanmadan ve iskele yeşil etiketlenmeden ne siz çıkmalısınız ne de yüklenici çalışmaya devam etmelidir.",
     ],
     explanation:
-      "Bu senaryonun kilit noktası, iskeleye çıkmadan önce verilen karardır. Giriş kapısındaki kontrol kartı kırmızı etiketli ve üç hafta öncesine ait; bu, iskelenin kullanıma uygun olmadığını gösterir. Kemer takmak, lanyard bağlamak ya da dikkatli olmak bu durumu ortadan kaldırmaz. Üstelik ara korkuluğun bir bölümü sökülmüş durumda. Düşme riskinde koruma sıralaması nettir: önce toplu koruma gelir, kişisel koruyucu sonra devreye girer. Doğru davranış yüklenicinin çalışmasını durdurmak, firma saha sorumlusunu çağırmak, kendi ekibinizi iskeleden ve alt kottan uzak tutmak ve durumu kayıt altına almaktır. İskele yetkili kişi tarafından yeniden kontrol edilip yeşil etiketlenene kadar hiç kimse çıkmamalıdır. Yüklenici ekibinde ayrıca çene kayışlı baret, tam vücut kemeri ve şok emicili lanyard eksiktir; bu haliyle 12 metrede çalışıyor olmaları başlı başına kritik bir ihlaldir. Kendi donanımınıza gelince: iskeleye çıkacaksanız çene kayışlı baret, tam vücut kemeri ve yatay hareket için çift kancalı lanyard gerekir. Bu bölgede gaz dedektörü, alüminize giysi veya dozimetre gibi ekipmanlar gereksizdir; dikkati dağıtır ve hareketi kısıtlar.",
+      "Bu senaryonun kilit noktası, iskeleye çıkmadan önce verilen karardır. Giriş kapısındaki kontrol kartı kırmızı etiketli ve üç hafta öncesine ait; bu, iskelenin kullanıma uygun olmadığını gösterir. Kemer takmak, lanyard bağlamak ya da dikkatli olmak bu durumu ortadan kaldırmaz. Üstelik ara korkuluğun bir bölümü sökülmüş durumda. Düşme riskinde koruma sıralaması nettir: önce toplu koruma gelir, kişisel koruyucu sonra devreye girer. Doğru davranış yüklenicinin çalışmasını durdurmak, firma saha sorumlusunu çağırmak, kendi ekibinizi iskeleden ve alt kottan uzak tutmak ve durumu kayıt altına almaktır. İskele yetkili kişi tarafından yeniden kontrol edilip yeşil etiketlenene kadar hiç kimse çıkmamalıdır. Yüklenici ekibinde tam vücut kemeri ve şok emicili lanyard eksiktir; bu haliyle 12 metrede çalışıyor olmaları başlı başına kritik bir ihlaldir. Baret tipi (endüstriyel veya çene kayışlı) saha standardıdır, eksik sayılmaz. Kendi donanımınıza gelince: ısı ve kıvılcım yoksa standart iş kıyafeti yeter; iskeleye çıkılacaksa baret, tam vücut kemeri ve yatay hareket için çift kancalı lanyard gerekir. Bu bölgede gaz dedektörü, alüminize giysi veya dozimetre gibi ekipmanlar gereksizdir; dikkati dağıtır ve hareketi kısıtlar.",
     competency_tags: [
       "yuksekte_calisma",
       "toplu_koruma_onceligi",
@@ -1095,6 +1096,7 @@ export const SCENARIOS: Scenario[] = [
       },
     ],
     required_self: [
+      "standart_is_kiyafeti",
       "guvenli_mesafe",
       "alan_bariyeri",
       "radyografi_calisma_formu",

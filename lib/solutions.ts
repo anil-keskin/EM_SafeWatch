@@ -1,4 +1,5 @@
 import { ACTIONS } from "@/content/actions";
+import { selectedMatchesCorrect } from "@/lib/equipment-families";
 import type {
   DecisionTab,
   EquipmentItem,
@@ -60,12 +61,6 @@ export function fillExact(correct: string[]): string[] {
   return [...correct];
 }
 
-function sameSet(a: string[], b: string[]): boolean {
-  if (a.length !== b.length) return false;
-  const set = new Set(a);
-  return b.every((code) => set.has(code));
-}
-
 export function isScopeSolved(
   selected: string[],
   correct: string[],
@@ -74,11 +69,11 @@ export function isScopeSolved(
   const scope = new Set(scopeCodes);
   const selectedInScope = selected.filter((code) => scope.has(code));
   const correctInScope = correct.filter((code) => scope.has(code));
-  return sameSet(selectedInScope, correctInScope);
+  return selectedMatchesCorrect(selectedInScope, correctInScope);
 }
 
 export function isExactSolved(selected: string[], correct: string[]): boolean {
-  return sameSet(selected, correct);
+  return selectedMatchesCorrect(selected, correct);
 }
 
 export function tallySolutions(keys: Iterable<string>): {

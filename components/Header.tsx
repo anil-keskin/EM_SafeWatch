@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import BrandMark from "@/components/BrandMark";
 import { useAuth } from "@/lib/auth";
+import { withBase } from "@/lib/paths";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
 
 const NAV = [
@@ -62,7 +63,7 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 flex border-b border-erd-line bg-erd-charcoal">
+    <header className="sticky top-0 z-50 flex h-[4.5rem] border-b border-erd-line bg-erd-charcoal">
       <Link
         href="/"
         className="flex shrink-0 items-center bg-white px-4 py-3 sm:px-5"
@@ -71,8 +72,8 @@ export default function Header() {
         <BrandMark size="header" dark />
       </Link>
 
-      <div className="flex min-w-0 flex-1 items-center justify-between gap-2 px-3 sm:px-5">
-        <nav className="hidden items-center gap-1 md:flex" aria-label="Ana menü">
+      <div className="flex min-w-0 flex-1 items-stretch justify-between gap-2">
+        <nav className="hidden shrink-0 items-center gap-1 self-center px-3 md:flex" aria-label="Ana menü">
           {NAV.map((item) => {
             const Icon = item.icon;
             const active = isActive(pathname, item.href);
@@ -91,12 +92,20 @@ export default function Header() {
           })}
         </nav>
 
-        <p className="hidden min-w-0 flex-1 px-4 text-center text-[11px] font-medium tracking-wide text-white/45 md:block">
-          Saha simülasyonu · Sistem tanı koymaz
-        </p>
+        <div className="relative hidden min-w-0 flex-1 overflow-hidden md:block">
+          <img
+            src={withBase("/header-safety.jpg")}
+            alt=""
+            className="h-full w-full object-cover object-[center_35%]"
+          />
+          <div
+            className="pointer-events-none absolute inset-0 bg-gradient-to-r from-erd-charcoal via-erd-charcoal/25 to-erd-charcoal"
+            aria-hidden
+          />
+        </div>
 
         <nav
-          className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto md:hidden"
+          className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto self-center px-2 md:hidden"
           aria-label="Ana menü"
         >
           {NAV.map((item) => {
@@ -117,7 +126,7 @@ export default function Header() {
           })}
         </nav>
 
-        <div className="relative shrink-0" ref={menuRef}>
+        <div className="relative shrink-0 self-center px-3 sm:px-5" ref={menuRef}>
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}

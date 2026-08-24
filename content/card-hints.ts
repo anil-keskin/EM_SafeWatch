@@ -19,11 +19,11 @@ export const TAB_SELECT_CONTEXT: Record<DecisionTab, string> = {
 /** Ekipman / tedbir kartları: ne zaman seçilir. */
 export const EQUIPMENT_WHY_SELECT: Record<string, string> = {
   baret_en397:
-    "Sahaya adım atıyorsanız seçin. Düşen parça ve çarpma her bölgede vardır; baret temel saha kuralıdır.",
+    "Sahaya çıkıyorsanız baş koruması seçin. Çene kayışlı baret de aynı ihtiyacı karşılar; ikisi de saha standardıdır.",
   baret_jugular:
-    "Eğilme, iskele, çatı veya baş aşağı çalışma varsa seçin. Kayışsız baret bu hareketlerde düşer.",
+    "Sahada baş koruması olarak endüstriyel baretle aynı aile. İskele ve eğilmede kayış baretin düşmesini önler; saha turunda da doğrudur.",
   baret_en14052:
-    "Yandan darbe veya dar geçitlerde başın sıkışma riski yüksekse seçin. Rutin yürüyüş turunda genelde gerekmez.",
+    "Yandan darbe veya yüksek darbe enerjisi varsa seçin. Rutin turda şart değildir; seçerseniz baş koruması yerine geçer.",
   gozluk_en166:
     "Toz, tufal, kıvılcım veya uçuşan parça varsa seçin. Sıvı metal ve kaynak arkı için yetmez; onları ayrı kartlardan bakın.",
   gozluk_ir:

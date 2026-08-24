@@ -289,7 +289,7 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
                 <div className="flex w-full shrink-0 flex-wrap gap-2 sm:w-auto">
                   <button
                     type="button"
-                    className="sw-btn-ghost flex-1 px-4 py-3 text-sm sm:flex-none"
+                    className="sw-btn-primary flex-1 px-4 py-3 text-sm sm:flex-none"
                     onClick={handleNextTab}
                   >
                     Sıradaki · {decisionTabShort(nextDecisionTab(activeTab))}

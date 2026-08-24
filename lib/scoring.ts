@@ -1,3 +1,4 @@
+import { matchSelectedToCorrect } from "@/lib/equipment-families";
 import type {
   AssistUsage,
   Scenario,
@@ -10,8 +11,9 @@ import type {
  * SafeWatch puanlama motoru.
  *
  * İki ayrı eksen üretir:
- *  - Teknik doğruluk : tehlike tanıma, doğru KKD ailesi, gereksiz KKD'den kaçınma,
- *                      yüklenici ve işletme personelindeki eksikleri görme.
+ *  - Teknik doğruluk : tehlike tanıma, doğru KKD ailesi (eşdeğer kartlar
+ *                      isabet sayılır), gereksiz KKD'den kaçınma, yüklenici
+ *                      ve işletme personelindeki eksikleri görme.
  *  - Kontrollük davranışı : doğru kişiye bildirme, gerektiğinde durdurma,
  *                           yetki sınırını aşmama, kayıt tutma.
  *
@@ -61,13 +63,8 @@ export function scoreSection(
   correct: string[],
   critical: string[] = []
 ): SectionResult {
-  const selectedSet = new Set(selected);
-  const correctSet = new Set(correct);
+  const { hits, misses, extras } = matchSelectedToCorrect(selected, correct);
   const criticalSet = new Set(critical);
-
-  const hits = correct.filter((code) => selectedSet.has(code));
-  const misses = correct.filter((code) => !selectedSet.has(code));
-  const extras = selected.filter((code) => !correctSet.has(code));
   const criticalExtras = extras.filter((code) => criticalSet.has(code));
   const mildExtras = extras.filter((code) => !criticalSet.has(code));
 
