@@ -69,7 +69,7 @@ const STEPS: Array<{
   {
     step: "3",
     title: "Hazırlık ve Denetim",
-    body: "Dört karar sekmesini doldurursunuz: kendi donanımınız, yüklenicideki eksikler, işletmedeki uygunsuzluklar ve müdahale kararınız. (i) rehberdir, puan düşürmez. TAK açık ailedeki doğruları, HEPSİNİ TAK tüm sekmenin doğrularını giydirir; çözüm puan düşürür.",
+    body: "Dört karar sekmesini doldurursunuz: kendi donanımınız, yüklenicideki eksikler, işletmedeki uygunsuzluklar ve müdahale kararınız. Her sekmede koruma ailelerini İleri ile sırayla gezersiniz; bir kart seçince sonraki aileye geçilir. (i) rehberdir, puan düşürmez. TAK açık ailedeki doğruları, HEPSİNİ TAK tüm sekmenin doğrularını giydirir; çözüm puan düşürür.",
     icon: HardHat,
     tone: "kkd",
   },

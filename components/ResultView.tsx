@@ -9,6 +9,7 @@ import { actionLabel } from "@/content/actions";
 import { competencyLabel } from "@/content/scenarios";
 import { useSafeWatchData, findScenario, scenariosOfZone } from "@/lib/data";
 import { zoneGlyph, zoneTone } from "@/lib/icon-theme";
+import { assistAxisPenalties } from "@/lib/scoring";
 import { loadLastResult } from "@/lib/progress";
 import type { EquipmentItem, ScenarioResult, SectionResult } from "@/lib/types";
 
@@ -229,8 +230,16 @@ function AssistSummary({ result }: { result: ScenarioResult }) {
   const hints = result.hintsUsed ?? 0;
   const solutions =
     (result.categorySolutions ?? 0) + (result.fullSolutions ?? 0);
-  const penalty = result.hintPenalty ?? 0;
   if (hints === 0 && solutions === 0) return null;
+
+  const axis = assistAxisPenalties(
+    {
+      hintsUsed: hints,
+      categorySolutions: result.categorySolutions ?? 0,
+      fullSolutions: result.fullSolutions ?? 0,
+    },
+    hints
+  );
 
   const parts: string[] = [];
   if (solutions > 0) parts.push(`${solutions} çözüm`);
@@ -238,9 +247,10 @@ function AssistSummary({ result }: { result: ScenarioResult }) {
 
   return (
     <p className="border-t border-erd-line px-5 py-3 text-xs leading-snug text-erd-gray">
-      {parts.join(" ve ")} kullandınız; her iki puandan {penalty} puan
-      düşüldü. Çözüm ve ipucu öğrenmeyi hızlandırır; bu kadar yardım alınca
-      gelişim raporunda ilgili alanlar “gelişime açık” görünebilir.
+      {parts.join(" ve ")} kullandınız. Teknik puandan {axis.technical},
+      kontrollük davranışından {axis.behavior} puan düşüldü. Çözüm ve ipucu
+      öğrenmeyi hızlandırır; bu kadar yardım alınca gelişim raporunda ilgili
+      alanlar “gelişime açık” görünebilir.
     </p>
   );
 }

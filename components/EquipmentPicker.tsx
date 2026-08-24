@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import CardHint from "@/components/CardHint";
 import EquipmentGlyph from "@/components/EquipmentGlyph";
-import { FilledIcon, IconWatermark } from "@/components/AppIcon";
+import FamilyStepper from "@/components/FamilyStepper";
+import { IconWatermark } from "@/components/AppIcon";
 import SolutionAssist from "@/components/SolutionAssist";
 import { TAB_SELECT_CONTEXT, whySelectFor } from "@/content/card-hints";
 import {
@@ -11,7 +12,7 @@ import {
   SOLUTION_FULL_PENALTY,
 } from "@/lib/scoring";
 import { codesInCategory, isExactSolved, isScopeSolved } from "@/lib/solutions";
-import { categoryGlyph, categoryTone, equipmentGlyph } from "@/lib/icon-theme";
+import { equipmentGlyph } from "@/lib/icon-theme";
 import type { DecisionTab, EquipmentCategory, EquipmentItem } from "@/lib/types";
 
 interface EquipmentPickerProps {
@@ -51,11 +52,61 @@ export default function EquipmentPicker({
   onFillAll,
   disabled = false,
 }: EquipmentPickerProps) {
-  const [activeCategory, setActiveCategory] = useState<string>("all");
+  const sortedCategories = useMemo(
+    () => categories.slice().sort((a, b) => a.order_index - b.order_index),
+    [categories]
+  );
+  const [activeCategory, setActiveCategory] = useState<string>(
+    () => sortedCategories[0]?.id ?? "all"
+  );
   const [query, setQuery] = useState("");
   const [openInfo, setOpenInfo] = useState<string | null>(null);
+  const advanceTimer = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (advanceTimer.current) window.clearTimeout(advanceTimer.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    setActiveCategory(sortedCategories[0]?.id ?? "all");
+    setQuery("");
+    setOpenInfo(null);
+  }, [tab]);
 
   const selectedSet = new Set(selected);
+  const familyIds = sortedCategories.map((cat) => cat.id);
+  const familyIndex = familyIds.indexOf(activeCategory);
+  const inFamily = familyIndex >= 0;
+  const nextFamily = inFamily ? sortedCategories[familyIndex + 1] : undefined;
+
+  const goNextFamily = () => {
+    setOpenInfo(null);
+    setActiveCategory((current) => {
+      const ids = sortedCategories.map((cat) => cat.id);
+      const index = ids.indexOf(current);
+      if (index < 0 || index >= ids.length - 1) return current;
+      return ids[index + 1];
+    });
+  };
+
+  const goPrevFamily = () => {
+    setOpenInfo(null);
+    if (!inFamily) {
+      setActiveCategory(familyIds[familyIds.length - 1] ?? "all");
+      return;
+    }
+    if (familyIndex > 0) setActiveCategory(familyIds[familyIndex - 1]);
+  };
+
+  const handlePick = (code: string) => {
+    const adding = !selectedSet.has(code);
+    onToggle(code);
+    if (!adding || !inFamily || query.trim()) return;
+    if (advanceTimer.current) window.clearTimeout(advanceTimer.current);
+    advanceTimer.current = window.setTimeout(goNextFamily, 280);
+  };
   const scopeCodes =
     activeCategory === "all" ? [] : codesInCategory(items, activeCategory);
   const tabSolved = isExactSolved(selected, correctCodes);
@@ -68,16 +119,18 @@ export default function EquipmentPicker({
     (usedKeys.has(`${tab}:cat:${activeCategory}`) || fillAllUsed);
 
   const visible = useMemo(() => {
-    const q = query.trim().toLocaleLowerCase("tr");
     return items
-      .filter((item) =>
-        activeCategory === "all" ? true : item.category_id === activeCategory
-      )
-      .filter((item) =>
-        q.length === 0
+      .filter((item) => {
+        const q = query.trim().toLocaleLowerCase("tr");
+        if (q.length > 0) {
+          return `${item.name} ${item.standard}`
+            .toLocaleLowerCase("tr")
+            .includes(q);
+        }
+        return activeCategory === "all"
           ? true
-          : `${item.name} ${item.standard}`.toLocaleLowerCase("tr").includes(q)
-      )
+          : item.category_id === activeCategory;
+      })
       .sort((a, b) => a.order_index - b.order_index);
   }, [items, activeCategory, query]);
 
@@ -89,7 +142,10 @@ export default function EquipmentPicker({
         onFill={
           activeCategory === "all"
             ? undefined
-            : () => onFillScope(activeCategory)
+            : () => {
+                onFillScope(activeCategory);
+                goNextFamily();
+              }
         }
         onFillAll={() => {
           onFillAll();
@@ -120,25 +176,33 @@ export default function EquipmentPicker({
         )}
       </div>
 
-      <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
-        <CategoryChip
-          label="Tümü"
-          active={activeCategory === "all"}
-          onClick={() => setActiveCategory("all")}
+      {inFamily && (
+        <FamilyStepper
+          label={sortedCategories[familyIndex]?.name ?? ""}
+          index={familyIndex}
+          total={sortedCategories.length}
+          nextLabel={nextFamily?.name}
+          onPrev={goPrevFamily}
+          onNext={goNextFamily}
         />
-        {categories
-          .slice()
-          .sort((a, b) => a.order_index - b.order_index)
-          .map((cat) => (
-            <CategoryChip
-              key={cat.id}
-              label={cat.name}
-              categoryId={cat.id}
-              active={activeCategory === cat.id}
-              onClick={() => setActiveCategory(cat.id)}
-            />
-          ))}
-      </div>
+      )}
+
+      <select
+        value={activeCategory}
+        onChange={(e) => {
+          setActiveCategory(e.target.value);
+          setOpenInfo(null);
+        }}
+        className="w-full rounded-xl border border-erd-line bg-white px-3.5 py-2.5 text-sm text-erd-charcoal outline-none focus:border-erd-red/50"
+        aria-label="Koruma ailesi"
+      >
+        {sortedCategories.map((cat) => (
+          <option key={cat.id} value={cat.id}>
+            {cat.name}
+          </option>
+        ))}
+        <option value="all">Tüm kartlar</option>
+      </select>
 
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         {visible.map((item) => {
@@ -159,7 +223,7 @@ export default function EquipmentPicker({
                 <button
                   type="button"
                   disabled={disabled}
-                  onClick={() => onToggle(item.code)}
+                  onClick={() => handlePick(item.code)}
                   className="flex min-w-0 flex-1 items-start gap-2.5 text-left disabled:opacity-60"
                   aria-pressed={isSelected}
                 >
@@ -203,39 +267,5 @@ export default function EquipmentPicker({
         </p>
       )}
     </div>
-  );
-}
-
-function CategoryChip({
-  label,
-  categoryId,
-  active,
-  onClick,
-}: {
-  label: string;
-  categoryId?: string;
-  active: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
-        active
-          ? "bg-erd-charcoal text-white"
-          : "bg-erd-light text-erd-gray hover:bg-erd-line"
-      }`}
-    >
-      {categoryId && (
-        <FilledIcon
-          icon={categoryGlyph(categoryId)}
-          tone={active ? "kkd" : categoryTone(categoryId)}
-          size={14}
-          className={active ? "!text-white" : ""}
-        />
-      )}
-      {label}
-    </button>
   );
 }

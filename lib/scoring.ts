@@ -20,20 +20,34 @@ import type {
  * Puan bir geçme/kalma eşiği değil, bir gelişim göstergesidir.
  */
 
-/** Her senaryo ipucu kademesinin her iki eksenden düşürdüğü puan. */
-export const HINT_PENALTY_PER_LEVEL = 5;
+/** Her senaryo ipucu kademesinin düşürdüğü puan. */
+export const HINT_PENALTY_PER_LEVEL = 3;
 /** Bir aile veya müdahale grubunu giydirme (TAK / SEÇ). */
-export const SOLUTION_CATEGORY_PENALTY = 12;
+export const SOLUTION_CATEGORY_PENALTY = 6;
 /** Sekmenin veya sahnenin tam çözümünü giydirme. */
-export const SOLUTION_FULL_PENALTY = 22;
+export const SOLUTION_FULL_PENALTY = 10;
+/** KKD / sahne çözümü kontrollük davranışını daha az etkiler. */
+const BEHAVIOR_SOLUTION_FACTOR = 0.4;
+
+export function assistAxisPenalties(
+  assist: AssistUsage,
+  hintCount: number
+): { hints: number; solutions: number; technical: number; behavior: number } {
+  const hints =
+    Math.min(Math.max(assist.hintsUsed, 0), hintCount) * HINT_PENALTY_PER_LEVEL;
+  const solutions =
+    Math.max(assist.categorySolutions, 0) * SOLUTION_CATEGORY_PENALTY +
+    Math.max(assist.fullSolutions, 0) * SOLUTION_FULL_PENALTY;
+  return {
+    hints,
+    solutions,
+    technical: hints + solutions,
+    behavior: hints + Math.round(solutions * BEHAVIOR_SOLUTION_FACTOR),
+  };
+}
 
 export function assistPenalty(assist: AssistUsage, hintCount: number): number {
-  const hintPart =
-    Math.min(Math.max(assist.hintsUsed, 0), hintCount) * HINT_PENALTY_PER_LEVEL;
-  const categoryPart =
-    Math.max(assist.categorySolutions, 0) * SOLUTION_CATEGORY_PENALTY;
-  const fullPart = Math.max(assist.fullSolutions, 0) * SOLUTION_FULL_PENALTY;
-  return hintPart + categoryPart + fullPart;
+  return assistAxisPenalties(assist, hintCount).technical;
 }
 
 export function emptyAssist(): AssistUsage {
@@ -68,19 +82,21 @@ export function scoreSection(
   const criticalExtras = extras.filter((code) => criticalSet.has(code));
   const mildExtras = extras.filter((code) => !criticalSet.has(code));
 
-  // Kritik yanlışlar tam, sıradan fazlalıklar yarım puan ağırlığıyla düşer.
-  const penalty = criticalExtras.length + mildExtras.length * 0.5;
-
-  let ratio: number;
+  // İsabetler korunur. Fazlalık, isabeti bire bir silmez; hafif düşürür.
+  let score: number;
   if (correct.length === 0) {
     // Doğru cevabın "hiçbiri" olduğu bölümler: boş bırakmak tam puandır.
-    ratio = 1 - penalty / 2;
+    score = 100 - mildExtras.length * 8 - criticalExtras.length * 16;
   } else {
-    ratio = (hits.length - penalty) / correct.length;
+    const recall = hits.length / correct.length;
+    const extraDrop =
+      (mildExtras.length * 0.12 + criticalExtras.length * 0.28) /
+      Math.max(correct.length, 4);
+    score = (recall - extraDrop) * 100;
   }
 
   return {
-    score: Math.round(clamp(ratio * 100)),
+    score: Math.round(clamp(score)),
     hits,
     misses,
     extras,
@@ -161,7 +177,7 @@ export function evaluateScenario(
     ),
   };
 
-  const hintPenalty = assistPenalty(assist, scenario.hints.length);
+  const penalties = assistAxisPenalties(assist, scenario.hints.length);
 
   const technicalRaw =
     sections.hazards.score * TECHNICAL_WEIGHTS.hazards +
@@ -169,8 +185,10 @@ export function evaluateScenario(
     sections.contractor.score * TECHNICAL_WEIGHTS.contractor +
     sections.operator.score * TECHNICAL_WEIGHTS.operator;
 
-  const technical = Math.round(clamp(technicalRaw - hintPenalty));
-  const behavior = Math.round(clamp(sections.actions.score - hintPenalty));
+  const technical = Math.round(clamp(technicalRaw - penalties.technical));
+  const behavior = Math.round(
+    clamp(sections.actions.score - penalties.behavior)
+  );
 
   // Yetkinlik puanı: senaryonun etiketlerine iki eksenin ortalaması yazılır.
   const overall = Math.round((technical + behavior) / 2);
@@ -184,7 +202,7 @@ export function evaluateScenario(
     technical,
     behavior,
     ...resultAssist(assist),
-    hintPenalty,
+    hintPenalty: penalties.technical,
     sections,
     competencyScores,
     completedAt: new Date().toISOString(),

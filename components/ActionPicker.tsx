@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import CardHint from "@/components/CardHint";
+import FamilyStepper from "@/components/FamilyStepper";
 import SolutionAssist from "@/components/SolutionAssist";
-import AppIcon, { FilledIcon, IconWatermark } from "@/components/AppIcon";
+import AppIcon, { IconWatermark } from "@/components/AppIcon";
 import { ACTIONS } from "@/content/actions";
 import { TAB_SELECT_CONTEXT, whySelectFor } from "@/content/card-hints";
 import {
@@ -55,7 +56,31 @@ export default function ActionPicker({
 }: ActionPickerProps) {
   const selectedSet = new Set(selected);
   const [openInfo, setOpenInfo] = useState<string | null>(null);
-  const [activeKind, setActiveKind] = useState<string>("all");
+  const [activeKind, setActiveKind] = useState<string>(KIND_ORDER[0]);
+
+  const kindIndex = KIND_ORDER.indexOf(
+    activeKind as (typeof KIND_ORDER)[number]
+  );
+  const inKind = kindIndex >= 0;
+  const nextKind = inKind ? KIND_ORDER[kindIndex + 1] : undefined;
+
+  const goNextKind = () => {
+    setOpenInfo(null);
+    setActiveKind((current) => {
+      const index = KIND_ORDER.indexOf(current as (typeof KIND_ORDER)[number]);
+      if (index < 0 || index >= KIND_ORDER.length - 1) return current;
+      return KIND_ORDER[index + 1];
+    });
+  };
+
+  const goPrevKind = () => {
+    setOpenInfo(null);
+    if (!inKind) {
+      setActiveKind(KIND_ORDER[KIND_ORDER.length - 1]);
+      return;
+    }
+    if (kindIndex > 0) setActiveKind(KIND_ORDER[kindIndex - 1]);
+  };
 
   const scopeCodes = activeKind === "all" ? [] : actionCodesInKind(activeKind);
   const tabSolved = isExactSolved(selected, correctCodes);
@@ -76,7 +101,14 @@ export default function ActionPicker({
       <SolutionAssist
         fillLabel={activeKind === "all" ? undefined : "SEÇ"}
         fillAllLabel="HEPSİNİ SEÇ"
-        onFill={activeKind === "all" ? undefined : () => onFillScope(activeKind)}
+        onFill={
+          activeKind === "all"
+            ? undefined
+            : () => {
+                onFillScope(activeKind);
+                goNextKind();
+              }
+        }
         onFillAll={() => {
           onFillAll();
           setActiveKind("all");
@@ -90,22 +122,33 @@ export default function ActionPicker({
         note="Açık grupta SEÇ o türdeki doğru müdahaleyi işaretler. HEPSİNİ SEÇ tüm doğru adımları yazar. Çözüm puan düşürür."
       />
 
-      <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
-        <KindChip
-          label="Tümü"
-          active={activeKind === "all"}
-          onClick={() => setActiveKind("all")}
+      {inKind && (
+        <FamilyStepper
+          label={KIND_LABELS[activeKind]}
+          index={kindIndex}
+          total={KIND_ORDER.length}
+          nextLabel={nextKind ? KIND_LABELS[nextKind] : undefined}
+          onPrev={goPrevKind}
+          onNext={goNextKind}
         />
+      )}
+
+      <select
+        value={activeKind}
+        onChange={(e) => {
+          setActiveKind(e.target.value);
+          setOpenInfo(null);
+        }}
+        className="w-full rounded-xl border border-erd-line bg-white px-3.5 py-2.5 text-sm text-erd-charcoal outline-none focus:border-erd-red/50"
+        aria-label="Müdahale grubu"
+      >
         {KIND_ORDER.map((kind) => (
-          <KindChip
-            key={kind}
-            kind={kind}
-            label={KIND_LABELS[kind]}
-            active={activeKind === kind}
-            onClick={() => setActiveKind(kind)}
-          />
+          <option key={kind} value={kind}>
+            {KIND_LABELS[kind]}
+          </option>
         ))}
-      </div>
+        <option value="all">Tüm müdahaleler</option>
+      </select>
 
       <ul className="space-y-2">
         {visible.map((action) => {
@@ -165,40 +208,5 @@ export default function ActionPicker({
         })}
       </ul>
     </div>
-  );
-}
-
-function KindChip({
-  kind,
-  label,
-  active,
-  onClick,
-}: {
-  kind?: string;
-  label: string;
-  active: boolean;
-  onClick: () => void;
-}) {
-  const glyph = kind ? actionKindGlyph(kind) : null;
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
-        active
-          ? "bg-erd-charcoal text-white"
-          : "bg-erd-light text-erd-gray hover:bg-erd-line"
-      }`}
-    >
-      {glyph && (
-        <FilledIcon
-          icon={glyph.icon}
-          tone={glyph.tone}
-          size={14}
-          className={active ? "!text-white" : ""}
-        />
-      )}
-      {label}
-    </button>
   );
 }
