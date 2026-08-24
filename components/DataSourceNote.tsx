@@ -23,8 +23,8 @@ const MESSAGES: Record<
   },
   error: {
     dot: "bg-erd-red",
-    title: "Supabase okunamadı, yerel içerik kullanılıyor",
-    body: "Anahtarlar tanımlı ancak tablolar okunamadı. SQL Editor'da 0001_init.sql, seed.sql ve 0003_api_grants.sql dosyalarını çalıştırın.",
+    title: "Supabase'e ulaşılamadı",
+    body: "Anahtarlar tanımlı ancak veri okunamadı. Uygulama yerel içerikle çalışmaya devam ediyor. URL'de /rest/v1 olmamalı; publishable anahtar JWT gibi Bearer ile gitmemeli.",
   },
 };
 

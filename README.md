@@ -140,11 +140,20 @@ onlar öncelikli olur.
 
 ## Yayın (Vercel)
 
-1. Projeyi GitHub'a gönderin.
-2. <https://vercel.com> üzerinde **Add New > Project** ile `anil-keskin/EM_SafeWatch` reposunu seçin.
-3. **Environment Variables** kısmına `NEXT_PUBLIC_SUPABASE_URL` ve
-   `NEXT_PUBLIC_SUPABASE_ANON_KEY` değerlerini ekleyin (Supabase kullanıyorsanız).
-4. **Deploy** deyin.
+Repo `anil-keskin/EM_SafeWatch` olmalı (eski `gulsahanillexi` hesabı değil). `gh-pages`
+dalı yayınlanmaz; üretim `main` dalıdır.
+
+1. <https://vercel.com> → proje → **Settings > Git**: GitHub reposu
+   `anil-keskin/EM_SafeWatch`.
+2. **Settings > Environment Variables** — bu iki değer Production + Preview:
+   - `NEXT_PUBLIC_SUPABASE_URL` = `https://waxigsgovqiwncybppab.supabase.co`
+     (`/rest/v1` eklemeyin)
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = `.env.production` içindeki
+     `sb_publishable_…` değeri
+3. Dashboard’daki eski/yanlış değerler `.env.production` dosyasını ezer.
+   URL’de `/rest/v1` varsa silin, sonra **Deployments → ⋮ → Redeploy**.
+4. Supabase **Authentication → URL Configuration** Redirect URLs listesine
+   `https://<proje>.vercel.app/**` ekleyin.
 
 ## Komutlar
 

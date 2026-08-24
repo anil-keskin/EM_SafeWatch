@@ -74,8 +74,20 @@ export const isSupabaseConfigured = isUsableUrl(url) && isUsableKey(anonKey);
 let cached: SupabaseClient | null = null;
 let creationFailed = false;
 
-function withSafeAuthHeaders(_input: RequestInfo | URL, init?: RequestInit): RequestInit {
-  const headers = new Headers(init?.headers);
+function mergeHeaders(input: RequestInfo | URL, init?: RequestInit): Headers {
+  const headers = new Headers();
+  if (typeof Request !== "undefined" && input instanceof Request) {
+    input.headers.forEach((value, key) => headers.set(key, value));
+  }
+  new Headers(init?.headers).forEach((value, key) => headers.set(key, value));
+  return headers;
+}
+
+function withSafeAuthHeaders(
+  input: RequestInfo | URL,
+  init?: RequestInit
+): [RequestInfo | URL, RequestInit | undefined] {
+  const headers = mergeHeaders(input, init);
   if (!headers.has("apikey") && anonKey) {
     headers.set("apikey", anonKey);
   }
@@ -85,7 +97,11 @@ function withSafeAuthHeaders(_input: RequestInfo | URL, init?: RequestInit): Req
       headers.delete("Authorization");
     }
   }
-  return { ...init, headers };
+
+  if (typeof Request !== "undefined" && input instanceof Request) {
+    return [new Request(input, { ...init, headers }), undefined];
+  }
+  return [input, { ...init, headers }];
 }
 
 export function getSupabase(): SupabaseClient | null {
@@ -100,7 +116,10 @@ export function getSupabase(): SupabaseClient | null {
           flowType: "pkce",
         },
         global: {
-          fetch: (input, init) => fetch(input, withSafeAuthHeaders(input, init)),
+          fetch: (input, init) => {
+            const [nextInput, nextInit] = withSafeAuthHeaders(input, init);
+            return fetch(nextInput, nextInit);
+          },
         },
       });
     } catch {
