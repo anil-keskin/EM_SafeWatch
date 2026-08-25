@@ -43,7 +43,7 @@ export function decisionTabShort(id: DecisionTab): string {
 }
 
 const TAB_HELP: Record<DecisionTab, string> = {
-  self: "İki katman vardır. Ortam (ortak): gaz, gürültü, ısı, toz, baret/gözlük/ayakkabı — alana giren herkes için. İşe özel: kaynak maskesi, alüminize giysi, kemer — yalnızca o işi fiilen yapan kişide. Siz gözlemliyorsanız işe özel kartı kendinize takmayın.",
+  self: "İki katman vardır. Ortam (ortak): alandaki gaz, gürültü, ısı, toz, trafik veya temel saha riski — kim olursa olsun o alana giren herkes. İşe özel: yalnızca o işi fiilen yapan kişide (kaynak, sıvı metal müdahalesi, yüksekte çalışma, kimyasal temas, kapalı hacme giriş, su kenarı, sıcak iş ekibi tedbiri ve senaryodaki diğer özel işler). Siz gözlem/denetim yapıyorsanız işe özel kartı kendinize takmayın.",
   contractor:
     "Denetlediğiniz müteahhit çalışanında EKSİK olan koruyucuları işaretleyin. Eksiği yoksa hiçbir şey seçmeyin.",
   operator:
@@ -149,6 +149,7 @@ export default function DecisionPanel({
             selected={answers[activeTab]}
             onToggle={(code) => onToggle(activeTab, code)}
             correctCodes={correctByTab[activeTab]}
+            requiredSelf={correctByTab.self}
             usedKeys={usedKeys}
             onFillScope={(categoryId) => onFillScope(activeTab, categoryId)}
             onFillAll={() => onFillTab(activeTab)}

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { getSupabase, isSupabaseConfigured } from "@/lib/supabase/client";
 import { EQUIPMENT_WHY_SELECT } from "@/content/card-hints";
 import { riskLayerFor } from "@/lib/equipment-layers";
+import { applyLayerConsistency } from "@/lib/ppe-consistency";
 import { ZONES } from "@/content/zones";
 import { EQUIPMENT_CATEGORIES, EQUIPMENT_ITEMS } from "@/content/equipment";
 import { SCENARIOS } from "@/content/scenarios";
@@ -65,7 +66,7 @@ function normalizeScenario(
 ): Scenario | null {
   const slug = row.slug?.trim();
   if (!slug) return null;
-  return {
+  return applyLayerConsistency({
     slug,
     zone_id: row.zone_id ?? "",
     order_index: Number(row.order_index) || 0,
@@ -84,7 +85,7 @@ function normalizeScenario(
     competency_tags: asList(row.competency_tags),
     explanation: row.explanation ?? "",
     id: row.id,
-  };
+  });
 }
 
 function mergeById<T extends { id: string }>(remote: T[], local: T[]): T[] {

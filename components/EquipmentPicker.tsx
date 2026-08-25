@@ -23,6 +23,8 @@ interface EquipmentPickerProps {
   onToggle: (code: string) => void;
   tab: Exclude<DecisionTab, "action">;
   correctCodes: string[];
+  /** Kontrollüğün required_self listesi; kızgın zemin botu gibi çift katmanlı kartların etiketini belirler. */
+  requiredSelf?: string[];
   usedKeys: Set<string>;
   onFillScope: (categoryId: string) => void;
   onFillAll: () => void;
@@ -48,6 +50,7 @@ export default function EquipmentPicker({
   onToggle,
   tab,
   correctCodes,
+  requiredSelf,
   usedKeys,
   onFillScope,
   onFillAll,
@@ -243,7 +246,7 @@ export default function EquipmentPicker({
                       </span>
                     )}
                     <span className="mt-0.5 block text-[10px] font-medium text-erd-gray">
-                      {riskLayerLabel(item.risk_layer ?? riskLayerFor(item.code))}
+                      {riskLayerLabel(riskLayerFor(item.code, requiredSelf))}
                     </span>
                   </span>
                 </button>

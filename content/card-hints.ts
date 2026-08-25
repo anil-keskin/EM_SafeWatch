@@ -7,7 +7,7 @@ import type { DecisionTab } from "@/lib/types";
  */
 
 export const TAB_SELECT_CONTEXT: Record<DecisionTab, string> = {
-  self: "Ortam riski sizi de etkiliyorsa seçin. Kaynak, sıvı metal müdahalesi veya yüksekte çalışma sizin işiniz değilse o karta dokunmayın.",
+  self: "Ortam riski sizi de etkiliyorsa seçin (gaz, gürültü, ısı, toz, baret, gözlük, bot, FR, görünürlük). İşe özel donanım yalnızca o işi fiilen yapanındadır; gözlemciye takılmaz.",
   contractor:
     "Yüklenicide EKSİK veya uygunsuz gördüğünüzde işaretleyin. Sizde olanı değil, onda olmayanı seçin. Hepsi yerindeyse bu sekmeyi boş bırakın.",
   operator:
@@ -29,9 +29,9 @@ export const EQUIPMENT_WHY_SELECT: Record<string, string> = {
   gozluk_ir:
     "Kızgın yüzey, döküm kanalı veya sıvı metal ışınımı varsa seçin. Kaynak arkı için kaynakçı maskesi gerekir.",
   yuz_siperi:
-    "Sıçrama veya radyan ısı yüze geliyorsa seçin. Gözlüğün üstüne ekleyin; tek başına gözü kapatmaz.",
+    "Kişi sıçrama veya yüz hizası radyan ısıya maruz kalarak işi yapıyorsa seçin. Uzaktan gözlemde IR gözlük yeter; siper işe özeledir.",
   kaynak_maskesi:
-    "Siz veya denetlediğiniz kişi ark kaynağı yapıyorsa seçin. Yalnızca gözlemliyorsanız seçmeyin; görüşü keser ve gerekmez.",
+    "Kişi fiilen ark kaynağı yapıyorsa seçin. Kaynak yapmayan gözlemci, montajcı veya işletme personeli için seçmeyin.",
   kacis_maskesi_co:
     "CO üretilebilecek kapalı veya gaz riskli bölgeye giriyorsanız seçin. İçeride çalışmaya devam etmek için değil, çıkış içindir.",
   toz_maskesi_ffp3:
@@ -39,7 +39,7 @@ export const EQUIPMENT_WHY_SELECT: Record<string, string> = {
   yarim_yuz_maske:
     "Bilinen gaz/buhar ve uygun filtre varsa seçin. Oksijen düşükse veya ortam tanınmıyorsa seçmeyin.",
   temiz_hava_solunum:
-    "Oksijen yetersiz veya IDLH ortam ve eğitimli kişi müdahale ediyorsa seçin. Gözlem turunda seçmeyin.",
+    "Kapalı hacme veya IDLH ortama fiilen giren eğitimli kişide seçin. Dışarıdaki gözlemci, gözetmen veya izolasyon ekibi takmaz.",
   kulak_tikaci:
     "Gürültülü alandan kısa geçiş varsa seçin. Uzun süre yüksek gürültüde kulaklık daha uygundur.",
   kulaklik_en352:
@@ -49,21 +49,21 @@ export const EQUIPMENT_WHY_SELECT: Record<string, string> = {
   eldiven_isi:
     "Sıcak yüzey, cüruf veya döküm çevresinde el teması varsa seçin. Ark kaynağı için kaynakçı eldiveni gerekir.",
   eldiven_kaynak:
-    "Kişi fiilen kaynak yapıyorsa seçin. Gözlemci veya montaj el işi için seçmeyin.",
+    "Kişi fiilen kaynak yapıyorsa seçin. Kaynak yapmayan gözlemci veya montaj el işi için seçmeyin.",
   eldiven_kimyasal:
-    "Asit, baz, solvent veya hidrolik yağ teması varsa seçin. Isı ve kesilmeye karşı yetmez.",
+    "Kişi asit, baz, solvent veya hidrolik yağa fiilen dokunuyorsa seçin. Temas etmeyen gözlemciye takılmaz; ısı ve kesilmeye karşı yetmez.",
   ayakkabi_s3:
     "Sahaya çıkıyorsanız seçin. Ezilme ve delinme her yerde vardır; sıvı metal sıçramasında bot yetmez.",
   cizme_isi_hi3:
-    "Sıvı metal, cüruf veya kızgın zemin varsa seçin. Bağcıksız, hızlı çıkarılabilir model seçilir. Ofis-saha yürüyüşünde gerekmez.",
+    "Kızgın zeminde herkes yürüyorsa ortam donanımıdır. Sıvı metal sıçramasına müdahale eden kişide işe özeledir. Uzaktan gözlemde S3 yeter.",
   standart_is_kiyafeti:
     "Isı ve kıvılcım yoksa, genel saha yürüyüşü ve soğuk iş için seçin. Döküm, sıcak hat veya kaynak çevresinde seçmeyin; tutuşur.",
   fr_kiyafet:
     "Kıvılcım, alev veya radyan ısı olan sıcak iş / döküm çevresinde seçin. Standart iş kıyafeti tutuşur; yerine bu kartı seçin.",
   aluminize_giysi:
-    "Kişi sıvı metale doğrudan müdahale ediyorsa seçin. Kontrollük gözleminde seçmeyin; hareketi keser.",
+    "Kişi sıvı metale doğrudan müdahale ediyorsa seçin. Aynı alandaki gözlemci veya montaj yüklenicisi giymez.",
   kaynakci_onlugu:
-    "Kaynak yapan kişide sıçrantı gövdeye geliyorsa seçin. Kaynak yapmayan gözlemci için seçmeyin.",
+    "Kaynak yapan kişide sıçrantı gövdeye geliyorsa seçin. Kaynak yapmayan kimse için seçmeyin.",
   antistatik_ex_kiyafet:
     "Patlayıcı gaz/toz bölgesi (Ex) varsa seçin. Sıcak iş ısı koruması yerine geçmez.",
   reflektorlu_yelek:
@@ -71,7 +71,7 @@ export const EQUIPMENT_WHY_SELECT: Record<string, string> = {
   kursun_onluk:
     "Düşük enerjili tıbbi X-ışını varsa seçin. Endüstriyel gama çekiminde seçmeyin; asıl tedbir mesafe ve alan kapatmadır.",
   tam_vucut_kemeri:
-    "2 m ve üzeri düşme riski varsa seçin. Bağlanacak onaylı nokta yoksa kemer tek başına işe yaramaz.",
+    "Kişi 2 m ve üzeri kotta fiilen çalışıyor veya iskeleye/çatıya çıkıyorsa seçin. Yerden gözlemleyen takmaz. Bağlanacak onaylı nokta yoksa kemer tek başına işe yaramaz.",
   soklu_lanyard:
     "Düşme durdurma kullanılacak ve düşme mesafesi yeterliyse seçin. Alçak platformda şok emici yere çarptırabilir.",
   cift_kancali_lanyard:
@@ -89,11 +89,11 @@ export const EQUIPMENT_WHY_SELECT: Record<string, string> = {
   telsiz_atex:
     "Ex bölgede haberleşme veya yalnız çalışma varsa seçin. Sertifikasız telefon/telsiz içeri sokulmaz.",
   kaynak_perdesi:
-    "Ark veya sıçrantı çevredeki kişilere geliyorsa seçin. Kaynakçının KKD'sinin yerine geçmez.",
+    "Kaynak ekibi arkı ve sıçrantıyı çevreden izole etmiyorsa yüklenici eksiği olarak seçin. Gözlemci kendi üzerine perdesi takmaz; kaynakçının KKD'sinin yerine geçmez.",
   alan_bariyeri:
     "Yetkisiz giriş, düşme, radyografi veya sıcak iş çevreyi etkiliyorsa seçin. Şerit tek başına yetmez; giriş de kontrol edilmeli.",
   yangin_sondurucu:
-    "Sıcak iş izni varsa seçin. Söndürücü + yangın gözcüsü birlikte düşünülür; gözcüsüz tüp yetmez.",
+    "Sıcak işi yapan ekipte söndürücü ve yangın gözcüsü yoksa o işin eksiği olarak seçin. Gözcüsüz tüp yetmez; siz kaynak/yağ filtresi yapmıyorsanız bu sizin giysiniz değildir.",
   kacis_guzergahi:
     "Kapalı, gazlı veya döküm alanına girmeden önce seçin. İçeride kaldıktan sonra planlanamaz.",
   ruzgar_yonu:
@@ -115,7 +115,7 @@ export const EQUIPMENT_WHY_SELECT: Record<string, string> = {
   toolbox:
     "Vardiya veya iş başlamadan risk paylaşılmadıysa seçin. İmza listesi yetmez; ekip tedbiri anlamış olmalıdır.",
   can_yelegi:
-    "Su kenarı, iskele üstü liman veya düşme-suya riski varsa seçin. Kara sahasında ve döküm alanında seçmeyin.",
+    "Kişi korkuluksuz su kenarında, rıhtımda veya iskele üstünde fiilen çalışıyorsa seçin. Geriden gözlemleyen veya kara sahasındaki kişi takmaz.",
 };
 
 /** Müdahale kartları: ne zaman seçilir. */

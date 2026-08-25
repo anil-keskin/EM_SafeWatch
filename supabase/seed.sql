@@ -209,7 +209,7 @@ insert into scenarios (
   $j$[
     {"type":"kontrolluk","employer":"Erdemir Mühendislik","activity":"Yürüyüş yolu montajını gözlemliyor, ilerleme kaydı alıyor.","authority":"İşletme personeline doğrudan talimat verme yetkisi YOKTUR. Gözlemini işletme sorumlusuna ve İSG birimine bildirir. Kendi ekibini risk alanından çekme yetkisi tamdır."},
     {"type":"isletme","employer":"Demir çelik işletmesi","activity":"Tandiş çevresinde sıvı metal kaçağına müdahale ediyor.","expected_items":["aluminize_giysi","yuz_siperi","cizme_isi_hi3","eldiven_isi","baret_en397","kulak_tikaci"],"current_items":["fr_kiyafet","gozluk_en166","ayakkabi_s3","eldiven_mekanik","baret_en397","kulak_tikaci"]},
-    {"type":"yuklenici","employer":"Mekanik montaj yüklenicisi","activity":"Platformun 15 m uzağında yürüyüş yolu montajı.","expected_items":["baret_en397","gozluk_en166","eldiven_mekanik","fr_kiyafet","ayakkabi_s3","kulak_tikaci"],"current_items":["baret_en397","gozluk_en166","eldiven_mekanik","fr_kiyafet","ayakkabi_s3","kulak_tikaci"]}
+    {"type":"yuklenici","employer":"Mekanik montaj yüklenicisi","activity":"Platformun 15 m uzağında yürüyüş yolu montajı.","expected_items":["baret_en397","gozluk_en166","eldiven_mekanik","eldiven_isi","fr_kiyafet","ayakkabi_s3","kulak_tikaci"],"current_items":["baret_en397","gozluk_en166","eldiven_mekanik","eldiven_isi","fr_kiyafet","ayakkabi_s3","kulak_tikaci"]}
   ]$j$::jsonb,
   $j$["baret_en397","gozluk_ir","fr_kiyafet","eldiven_isi","ayakkabi_s3","kulak_tikaci","guvenli_mesafe"]$j$::jsonb,
   $j$["standart_is_kiyafeti","aluminize_giysi","kaynak_maskesi","tam_vucut_kemeri","temiz_hava_solunum","eldiven_kimyasal","kursun_onluk","dozimetre"]$j$::jsonb,
@@ -323,8 +323,8 @@ insert into scenarios (
   ]$j$::jsonb,
   $j$[
     {"type":"kontrolluk","employer":"Erdemir Mühendislik","activity":"Kompansatör yenileme işi öncesi saha ön incelemesi.","authority":"Kendi ekibinin sahaya girip girmeyeceğine karar verme yetkisi tamdır. Yüklenicinin giriş onayını verme/erteleme yetkisi vardır. Hattın izolasyonu işletmenin sorumluluğundadır."},
-    {"type":"isletme","employer":"Demir çelik işletmesi","activity":"Hat basıncını düşürme, blindaj hazırlığı.","expected_items":["gaz_dedektoru_4li","kacis_maskesi_co","antistatik_ex_kiyafet","fr_kiyafet","baret_en397","ayakkabi_s3"],"current_items":["gaz_dedektoru_4li","kacis_maskesi_co","antistatik_ex_kiyafet","fr_kiyafet","baret_en397","ayakkabi_s3"]},
-    {"type":"yuklenici","employer":"Boru ve kaynak yüklenicisi","activity":"Sahaya giriş için onay bekliyor.","expected_items":["gaz_dedektoru_4li","kacis_maskesi_co","antistatik_ex_kiyafet","baret_en397","ayakkabi_s3","fr_kiyafet"],"current_items":["baret_en397","ayakkabi_s3","fr_kiyafet"]}
+    {"type":"isletme","employer":"Demir çelik işletmesi","activity":"Hat basıncını düşürme, blindaj hazırlığı.","expected_items":["gaz_dedektoru_4li","kacis_maskesi_co","antistatik_ex_kiyafet","fr_kiyafet","baret_en397","ayakkabi_s3","ex_el_feneri","telsiz_atex"],"current_items":["gaz_dedektoru_4li","kacis_maskesi_co","antistatik_ex_kiyafet","fr_kiyafet","baret_en397","ayakkabi_s3","ex_el_feneri","telsiz_atex"]},
+    {"type":"yuklenici","employer":"Boru ve kaynak yüklenicisi","activity":"Sahaya giriş için onay bekliyor.","expected_items":["gaz_dedektoru_4li","kacis_maskesi_co","antistatik_ex_kiyafet","baret_en397","ayakkabi_s3","fr_kiyafet","ex_el_feneri","telsiz_atex"],"current_items":["baret_en397","ayakkabi_s3","fr_kiyafet","ex_el_feneri","telsiz_atex"]}
   ]$j$::jsonb,
   $j$["gaz_dedektoru_4li","kacis_maskesi_co","antistatik_ex_kiyafet","fr_kiyafet","baret_en397","ayakkabi_s3","ex_el_feneri","telsiz_atex","ruzgar_yonu","kacis_guzergahi","gozetmen"]$j$::jsonb,
   $j$["standart_is_kiyafeti","kaynak_maskesi","aluminize_giysi","dozimetre","toz_maskesi_ffp3","kursun_onluk","tam_vucut_kemeri","cizme_isi_hi3","gaz_dedektoru_co"]$j$::jsonb,
@@ -437,8 +437,8 @@ insert into scenarios (
   ]$j$::jsonb,
   $j$[
     {"type":"kontrolluk","employer":"Erdemir Mühendislik","activity":"Radyografik muayene sonuçlarını takip edecek.","authority":"Alana girmeme kararı tamamen kendisine aittir. Yüklenici NDT ekibinin çalışmasını durdurma yetkisi vardır. İşletme personelini uyarmak için işletme sorumlusuna bildirim yapar."},
-    {"type":"yuklenici","employer":"Tahribatsız muayene yüklenicisi","activity":"Gama kaynağı ile film çekimi.","expected_items":["dozimetre","alan_bariyeri","radyografi_calisma_formu","guvenli_mesafe","baret_en397","ayakkabi_s3"],"current_items":["dozimetre","baret_en397","ayakkabi_s3"]},
-    {"type":"isletme","employer":"Demir çelik işletmesi","activity":"Komşu hatta rutin tur.","expected_items":["baret_en397","ayakkabi_s3","reflektorlu_yelek"],"current_items":["baret_en397","ayakkabi_s3","reflektorlu_yelek"]}
+    {"type":"yuklenici","employer":"Tahribatsız muayene yüklenicisi","activity":"Gama kaynağı ile film çekimi.","expected_items":["dozimetre","alan_bariyeri","radyografi_calisma_formu","guvenli_mesafe","baret_en397","ayakkabi_s3","standart_is_kiyafeti"],"current_items":["dozimetre","baret_en397","ayakkabi_s3","guvenli_mesafe","standart_is_kiyafeti"]},
+    {"type":"isletme","employer":"Demir çelik işletmesi","activity":"Komşu hatta rutin tur.","expected_items":["baret_en397","ayakkabi_s3","reflektorlu_yelek","standart_is_kiyafeti"],"current_items":["baret_en397","ayakkabi_s3","reflektorlu_yelek","standart_is_kiyafeti"]}
   ]$j$::jsonb,
   $j$["standart_is_kiyafeti","guvenli_mesafe","alan_bariyeri","radyografi_calisma_formu","dozimetre","baret_en397","ayakkabi_s3"]$j$::jsonb,
   $j$["kursun_onluk","temiz_hava_solunum","aluminize_giysi","kaynak_maskesi","tam_vucut_kemeri","gaz_dedektoru_4li","toz_maskesi_ffp3","yuz_siperi"]$j$::jsonb,
