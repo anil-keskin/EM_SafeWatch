@@ -9,7 +9,7 @@ export type FeedbackCategory = (typeof FEEDBACK_CATEGORIES)[number];
 
 export const FEEDBACK_TO = "anil.keskin@hotmail.com";
 export const FEEDBACK_SUBJECT = "[SafeWatch] Yeni Geri Bildirim";
-export const FEEDBACK_ENDPOINT = "/.netlify/functions/send-feedback";
+export const FEEDBACK_ENDPOINT = "/send-feedback";
 export const FEEDBACK_SUCCESS =
   "Geri bildiriminiz alınmıştır.\nTeşekkür ederiz.";
 export const FEEDBACK_ERROR = "Gönderim sırasında bir sorun oluştu.";

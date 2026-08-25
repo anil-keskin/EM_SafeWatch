@@ -1,4 +1,4 @@
-import type { Handler } from "@netlify/functions";
+import type { Config } from "@netlify/functions";
 import { Resend } from "resend";
 import {
   FEEDBACK_SUBJECT,
@@ -9,33 +9,33 @@ import {
 
 /**
  * Geri bildirimi Resend ile anil.keskin@hotmail.com adresine iletir.
- * Netlify Forms kullanılmaz.
+ * Netlify Forms kullanılmaz. OpenNext catch-all yüzünden özel path kullanılır.
  */
-export const handler: Handler = async (event) => {
-  if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: "Method Not Allowed" };
+export async function handleFeedbackRequest(req: Request): Promise<Response> {
+  if (req.method !== "POST") {
+    return new Response("Method Not Allowed", { status: 405 });
   }
 
   let raw: unknown;
   try {
-    raw = JSON.parse(event.body || "{}");
+    raw = await req.json();
   } catch {
-    return { statusCode: 400, body: "Geçersiz istek" };
+    return new Response("Geçersiz istek", { status: 400 });
   }
 
   const record = raw as Record<string, unknown>;
   if (typeof record.honey === "string" && record.honey.trim()) {
-    return { statusCode: 200, body: JSON.stringify({ ok: true }) };
+    return Response.json({ ok: true });
   }
 
   const payload = parseFeedbackPayload(raw);
   if (!payload) {
-    return { statusCode: 400, body: "Eksik veya geçersiz alan" };
+    return new Response("Eksik veya geçersiz alan", { status: 400 });
   }
 
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
-    return { statusCode: 500, body: "E-posta yapılandırması eksik" };
+    return new Response("E-posta yapılandırması eksik", { status: 500 });
   }
 
   const resend = new Resend(apiKey);
@@ -52,8 +52,16 @@ export const handler: Handler = async (event) => {
   });
 
   if (error) {
-    return { statusCode: 502, body: "E-posta gönderilemedi" };
+    return new Response("E-posta gönderilemedi", { status: 502 });
   }
 
-  return { statusCode: 200, body: JSON.stringify({ ok: true }) };
+  return Response.json({ ok: true });
+}
+
+export default async function sendFeedbackFunction(req: Request) {
+  return handleFeedbackRequest(req);
+}
+
+export const config: Config = {
+  path: "/send-feedback",
 };

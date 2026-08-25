@@ -1,6 +1,6 @@
 # SafeWatch — Netlify
 # Form gönderimi: netlify/functions/send-feedback.ts (Resend)
-# Forms paneli kullanılmaz.
+# Forms paneli kullanılmaz. Function yolu: /send-feedback
 
 [build]
   command = "npm run build"
@@ -9,4 +9,4 @@
   NODE_VERSION = "20"
 
 [functions]
-  directory = "netlify/functions"
+  node_bundler = "esbuild"

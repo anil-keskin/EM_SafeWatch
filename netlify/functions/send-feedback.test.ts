@@ -1,32 +1,30 @@
 import { describe, expect, it } from "vitest";
-import { handler } from "@/netlify/functions/send-feedback";
+import { handleFeedbackRequest } from "@/netlify/functions/send-feedback";
 
 describe("send-feedback function", () => {
   it("GET isteğini reddeder", async () => {
-    const result = await handler(
-      { httpMethod: "GET" } as never,
-      {} as never,
-      () => undefined
+    const result = await handleFeedbackRequest(
+      new Request("https://example.com/send-feedback", { method: "GET" })
     );
-    expect(result?.statusCode).toBe(405);
+    expect(result.status).toBe(405);
   });
 
   it("geçersiz gövdeyi reddeder", async () => {
-    const result = await handler(
-      {
-        httpMethod: "POST",
+    const result = await handleFeedbackRequest(
+      new Request("https://example.com/send-feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ category: "Öneri", message: "kısa" }),
-      } as never,
-      {} as never,
-      () => undefined
+      })
     );
-    expect(result?.statusCode).toBe(400);
+    expect(result.status).toBe(400);
   });
 
   it("bal alanı doluysa sessizce 200 döner", async () => {
-    const result = await handler(
-      {
-        httpMethod: "POST",
+    const result = await handleFeedbackRequest(
+      new Request("https://example.com/send-feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           category: "Öneri",
           name: "",
@@ -34,10 +32,8 @@ describe("send-feedback function", () => {
           message: "Yeterince uzun bir mesaj",
           honey: "bot",
         }),
-      } as never,
-      {} as never,
-      () => undefined
+      })
     );
-    expect(result?.statusCode).toBe(200);
+    expect(result.status).toBe(200);
   });
 });
