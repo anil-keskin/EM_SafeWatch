@@ -5,7 +5,7 @@
  * registration.scope üzerinden türetilir.
  */
 
-const CACHE = "safewatch-v2";
+const CACHE = "safewatch-v3";
 
 function scoped(path) {
   const base = self.registration.scope.replace(/\/$/, "");
@@ -60,6 +60,26 @@ self.addEventListener("fetch", (event) => {
         .catch(() =>
           caches.match(request).then((hit) => hit || caches.match(scoped("/")))
         )
+    );
+    return;
+  }
+
+  const isScriptOrStyle =
+    url.pathname.includes("/_next/") ||
+    url.pathname.endsWith(".js") ||
+    url.pathname.endsWith(".css");
+
+  if (isScriptOrStyle) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response.ok && response.type === "basic") {
+            const copy = response.clone();
+            caches.open(CACHE).then((cache) => cache.put(request, copy));
+          }
+          return response;
+        })
+        .catch(() => caches.match(request))
     );
     return;
   }
