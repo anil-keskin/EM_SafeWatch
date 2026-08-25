@@ -121,7 +121,16 @@ export interface ScenarioAnswers {
 }
 
 export interface SectionResult {
+  /** 0–100 yüzde (eski kayıtlar ve rozet uyumu). */
   score: number;
+  /** Bölüm ham puanı (yardım kesintisi düşülmüş). */
+  rawScore?: number;
+  /** Bölümün ham tavanı (tehlike 35, kendi 20, yüklenici 20, müdahale 25). */
+  maxScore?: number;
+  /** Yardım düşülmeden önceki ham puan. */
+  baseScore?: number;
+  /** Otomatik yardım kesintisi (yanlış seçimden ayrı). */
+  assistPenalty?: number;
   /** Doğru işaretlenenler. */
   hits: string[];
   /** Gözden kaçanlar. */
@@ -132,12 +141,54 @@ export interface SectionResult {
   criticalExtras: string[];
 }
 
+/** Kartın bu denemede ilk nasıl seçildiği. Sonraki tıklama kaynağı değiştirmez. */
+export type SelectionSource = "manual" | "tak_assist" | "all_assist";
+
+export interface RoleAssistState {
+  manualSelectedCodes: string[];
+  takUsedCategoryIds: string[];
+  allAssistUsed: boolean;
+  autoAssistPenalty: number;
+  provenance: Record<string, SelectionSource>;
+}
+
+export interface HazardAssistState {
+  hintsUsed: number;
+  allAssistUsed: boolean;
+}
+
+export interface ScenarioAssistState {
+  self: RoleAssistState;
+  contractor: RoleAssistState;
+  operator: RoleAssistState;
+  action: RoleAssistState;
+  hazards: HazardAssistState;
+}
+
 export interface AssistUsage {
   hintsUsed: number;
   /** Bir aile / müdahale grubu için TAK veya SEÇ. */
   categorySolutions: number;
   /** Sekmenin veya sahnenin tamamı için HEPSİNİ TAK / SEÇ / BELİRLE. */
   fullSolutions: number;
+}
+
+export interface ScoreBreakdown {
+  riskRaw: number;
+  selfRaw: number;
+  contractorRaw: number;
+  interventionRaw: number;
+  totalRaw: number;
+  riskAssistPenalty: number;
+  selfAssistPenalty: number;
+  contractorAssistPenalty: number;
+  interventionAssistPenalty: number;
+  selfIndirectFull: boolean;
+  contractorIndirectFull: boolean;
+  actionIndirectFull: boolean;
+  behaviorCapped: boolean;
+  technicalNotes: string[];
+  behaviorNotes: string[];
 }
 
 export interface ScenarioResult {
@@ -148,6 +199,7 @@ export interface ScenarioResult {
   categorySolutions: number;
   fullSolutions: number;
   hintPenalty: number;
+  breakdown?: ScoreBreakdown;
   sections: {
     hazards: SectionResult;
     self: SectionResult;

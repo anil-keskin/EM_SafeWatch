@@ -1,80 +1,50 @@
 import { matchSelectedToCorrect } from "@/lib/equipment-families";
 import { taskSpecificExtrasForSelf } from "@/lib/equipment-layers";
+import {
+  ALL_ASSIST_PENALTY,
+  BEHAVIOR_HEAVY_ASSIST_CAP,
+  SCORE_MAX,
+  TAK_PENALTY,
+  actionAssistNote,
+  computeRoleAssistPenalty,
+  emptyScenarioAssist,
+  equipmentAssistNote,
+  hazardAssistPenalty,
+  heavyAssistShouldCap,
+  hintPenaltyTotal,
+  requiredActionKinds,
+  requiredCategoryIds,
+} from "@/lib/assist";
 import type {
-  AssistUsage,
+  EquipmentItem,
   Scenario,
   ScenarioAnswers,
+  ScenarioAssistState,
   ScenarioResult,
+  ScoreBreakdown,
   SectionResult,
 } from "@/lib/types";
 
 /**
  * SafeWatch puanlama motoru.
  *
- * İki ayrı eksen üretir:
- *  - Teknik doğruluk : tehlike tanıma, doğru KKD ailesi (eşdeğer kartlar
- *                      isabet sayılır), gereksiz KKD'den kaçınma, yüklenici
- *                      ve işletme personelindeki eksikleri görme.
- *  - Kontrollük davranışı : doğru kişiye bildirme, gerektiğinde durdurma,
- *                           yetki sınırını aşmama, kayıt tutma.
+ * Ham tavan: tehlike 35 + kendi donanım 20 + yüklenici 20 + müdahale 25 = 100.
+ * İşletme sekmesi bağımsız puan üretmez; müdahale kararına bağlam sağlar.
  *
- * Puan bir geçme/kalma eşiği değil, bir gelişim göstergesidir.
+ * Teknik bar yalnızca tehlike + kendi + yüklenici (75) üzerinden 0–100'e ölçeklenir.
+ * Kontrollük barı müdahale ham puanından (25) üretilir; teknik barın kopyası değildir.
  */
 
-/** Her senaryo ipucu kademesinin düşürdüğü puan. */
-export const HINT_PENALTY_PER_LEVEL = 3;
-/**
- * Bir aile / müdahale grubu (TAK, İŞARETLE, SEÇ).
- * Tek ailede takılınca ucuz yardım: 6 kez kullanmak 6 puan, eski 36 değil.
- */
-export const SOLUTION_CATEGORY_PENALTY = 1;
-/**
- * Sekmenin veya sahnenin tamamı (HEPSİNİ TAK / SEÇ / BELİRLE).
- * Altı ailelik TAK ile aynı maliyet; 1–5 ailede aile çözümü daha ucuz,
- * tüm sekmeyi tek tıkta teslim etmek altı aileden pahalıya gelmez.
- */
-export const SOLUTION_FULL_PENALTY = 6;
-/** KKD / sahne çözümü kontrollük davranışını daha az etkiler. */
-const BEHAVIOR_SOLUTION_FACTOR = 0.4;
+export const HINT_PENALTY_PER_LEVEL = 2;
+export const SOLUTION_CATEGORY_PENALTY = TAK_PENALTY;
+export const SOLUTION_FULL_PENALTY = ALL_ASSIST_PENALTY;
 
-export function assistAxisPenalties(
-  assist: AssistUsage,
-  hintCount: number
-): { hints: number; solutions: number; technical: number; behavior: number } {
-  const hints =
-    Math.min(Math.max(assist.hintsUsed, 0), hintCount) * HINT_PENALTY_PER_LEVEL;
-  const solutions =
-    Math.max(assist.categorySolutions, 0) * SOLUTION_CATEGORY_PENALTY +
-    Math.max(assist.fullSolutions, 0) * SOLUTION_FULL_PENALTY;
-  return {
-    hints,
-    solutions,
-    technical: hints + solutions,
-    behavior: hints + Math.round(solutions * BEHAVIOR_SOLUTION_FACTOR),
-  };
-}
-
-export function assistPenalty(assist: AssistUsage, hintCount: number): number {
-  return assistAxisPenalties(assist, hintCount).technical;
-}
-
-export function emptyAssist(): AssistUsage {
-  return { hintsUsed: 0, categorySolutions: 0, fullSolutions: 0 };
-}
-
-const TECHNICAL_WEIGHTS = {
-  hazards: 0.3,
-  self: 0.4,
-  contractor: 0.15,
-  operator: 0.15,
-} as const;
-
-function clamp(value: number, min = 0, max = 100): number {
+function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
 
 /**
- * Bir çoktan seçmeli bölümü puanlar.
+ * Bir çoktan seçmeli bölümü 0–100 doğruluk yüzdesi olarak puanlar.
  *
  * @param selected  Oyuncunun işaretledikleri
  * @param correct   Doğru cevap kümesi
@@ -90,10 +60,8 @@ export function scoreSection(
   const criticalExtras = extras.filter((code) => criticalSet.has(code));
   const mildExtras = extras.filter((code) => !criticalSet.has(code));
 
-  // İsabetler korunur. Fazlalık, isabeti bire bir silmez; hafif düşürür.
   let score: number;
   if (correct.length === 0) {
-    // Doğru cevabın "hiçbiri" olduğu bölümler: boş bırakmak tam puandır.
     score = 100 - mildExtras.length * 8 - criticalExtras.length * 16;
   } else {
     const recall = hits.length / correct.length;
@@ -103,8 +71,13 @@ export function scoreSection(
     score = (recall - extraDrop) * 100;
   }
 
+  const clamped = Math.round(clamp(score, 0, 100));
   return {
-    score: Math.round(clamp(score)),
+    score: clamped,
+    rawScore: clamped,
+    maxScore: 100,
+    baseScore: clamped,
+    assistPenalty: 0,
     hits,
     misses,
     extras,
@@ -112,11 +85,6 @@ export function scoreSection(
   };
 }
 
-/**
- * Görev metni, tehlike noktası veya doğru cevap kümesi olmayan taslaklar
- * puanlanmaz. Altı dolu senaryonun bölüm boşluğu (ör. işletmede eksik yok)
- * bu kontrolü geçmez; onlar hâlâ puanlanır.
- */
 export function isScenarioScorable(scenario: Scenario): boolean {
   return (
     Boolean(scenario.briefing?.gorev) ||
@@ -126,39 +94,90 @@ export function isScenarioScorable(scenario: Scenario): boolean {
   );
 }
 
-function emptySection(): SectionResult {
-  return { score: 0, hits: [], misses: [], extras: [], criticalExtras: [] };
+function emptySection(maxScore = 0): SectionResult {
+  return {
+    score: 0,
+    rawScore: 0,
+    maxScore,
+    baseScore: 0,
+    assistPenalty: 0,
+    hits: [],
+    misses: [],
+    extras: [],
+    criticalExtras: [],
+  };
 }
 
-function resultAssist(assist: AssistUsage) {
+function applyAssistToSection(
+  section: SectionResult,
+  maxScore: number,
+  assistPenalty: number
+): SectionResult {
+  const baseScore = Math.round((section.score / 100) * maxScore);
+  const rawScore = clamp(baseScore - assistPenalty, 0, maxScore);
+  const score =
+    maxScore <= 0 ? 0 : Math.round((rawScore / maxScore) * 100);
   return {
-    hintsUsed: assist.hintsUsed,
-    categorySolutions: assist.categorySolutions,
-    fullSolutions: assist.fullSolutions,
+    ...section,
+    score,
+    rawScore,
+    maxScore,
+    baseScore,
+    assistPenalty,
   };
+}
+
+function emptyBreakdown(): ScoreBreakdown {
+  return {
+    riskRaw: 0,
+    selfRaw: 0,
+    contractorRaw: 0,
+    interventionRaw: 0,
+    totalRaw: 0,
+    riskAssistPenalty: 0,
+    selfAssistPenalty: 0,
+    contractorAssistPenalty: 0,
+    interventionAssistPenalty: 0,
+    selfIndirectFull: false,
+    contractorIndirectFull: false,
+    actionIndirectFull: false,
+    behaviorCapped: false,
+    technicalNotes: [],
+    behaviorNotes: [],
+  };
+}
+
+export function emptyAssist(): ScenarioAssistState {
+  return emptyScenarioAssist();
 }
 
 export function evaluateScenario(
   scenario: Scenario,
   answers: ScenarioAnswers,
-  assist: AssistUsage = emptyAssist()
+  assist: ScenarioAssistState = emptyScenarioAssist(),
+  equipment: EquipmentItem[] = []
 ): ScenarioResult {
+  const completedAt = new Date().toISOString();
+
   if (!isScenarioScorable(scenario)) {
     return {
       slug: scenario.slug,
       technical: 0,
       behavior: 0,
-      ...resultAssist(assist),
+      hintsUsed: assist.hazards.hintsUsed,
+      categorySolutions: 0,
+      fullSolutions: 0,
       hintPenalty: 0,
+      breakdown: emptyBreakdown(),
       sections: {
-        hazards: emptySection(),
-        self: emptySection(),
-        contractor: emptySection(),
-        operator: emptySection(),
-        actions: emptySection(),
+        hazards: emptySection(SCORE_MAX.hazards),
+        self: emptySection(SCORE_MAX.self),
+        contractor: emptySection(SCORE_MAX.contractor),
+        operator: emptySection(0),
+        actions: emptySection(SCORE_MAX.intervention),
       },
       competencyScores: {},
-      completedAt: new Date().toISOString(),
+      completedAt,
     };
   }
 
@@ -169,55 +188,276 @@ export function evaluateScenario(
     .filter((h) => !h.is_real)
     .map((h) => h.code);
 
-  const sections = {
-    hazards: scoreSection(answers.hazards, realHazards, fakeHazards),
-    self: scoreSection(
-      answers.self,
-      scenario.required_self,
-      [
-        ...scenario.forbidden_self,
-        ...taskSpecificExtrasForSelf(scenario.required_self),
-      ]
-    ),
-    contractor: scoreSection(answers.contractor, scenario.contractor_gaps),
-    operator: scoreSection(answers.operator, scenario.operator_gaps),
-    actions: scoreSection(
-      answers.action,
-      scenario.correct_actions,
-      scenario.wrong_actions
-    ),
-  };
-
-  const penalties = assistAxisPenalties(assist, scenario.hints.length);
-
-  const technicalRaw =
-    sections.hazards.score * TECHNICAL_WEIGHTS.hazards +
-    sections.self.score * TECHNICAL_WEIGHTS.self +
-    sections.contractor.score * TECHNICAL_WEIGHTS.contractor +
-    sections.operator.score * TECHNICAL_WEIGHTS.operator;
-
-  const technical = Math.round(clamp(technicalRaw - penalties.technical));
-  const behavior = Math.round(
-    clamp(sections.actions.score - penalties.behavior)
+  const hazardSection = scoreSection(answers.hazards, realHazards, fakeHazards);
+  const selfSection = scoreSection(
+    answers.self,
+    scenario.required_self,
+    [
+      ...scenario.forbidden_self,
+      ...taskSpecificExtrasForSelf(scenario.required_self),
+    ]
+  );
+  const contractorSection = scoreSection(
+    answers.contractor,
+    scenario.contractor_gaps
+  );
+  const operatorSection = scoreSection(
+    answers.operator,
+    scenario.operator_gaps
+  );
+  const actionSection = scoreSection(
+    answers.action,
+    scenario.correct_actions,
+    scenario.wrong_actions
   );
 
-  // Yetkinlik puanı: senaryonun etiketlerine iki eksenin ortalaması yazılır.
-  const overall = Math.round((technical + behavior) / 2);
+  const selfAssist = computeRoleAssistPenalty(
+    assist.self,
+    answers.self,
+    requiredCategoryIds(scenario.required_self, equipment)
+  );
+  const contractorAssist = computeRoleAssistPenalty(
+    assist.contractor,
+    answers.contractor,
+    requiredCategoryIds(scenario.contractor_gaps, equipment)
+  );
+  const actionAssist = computeRoleAssistPenalty(
+    assist.action,
+    answers.action,
+    requiredActionKinds(scenario.correct_actions)
+  );
+
+  const riskAssistPenalty = hazardAssistPenalty(
+    assist.hazards.hintsUsed,
+    assist.hazards.allAssistUsed
+  );
+
+  const hazards = applyAssistToSection(
+    hazardSection,
+    SCORE_MAX.hazards,
+    riskAssistPenalty
+  );
+  const self = applyAssistToSection(
+    selfSection,
+    SCORE_MAX.self,
+    selfAssist.penalty
+  );
+  const contractor = applyAssistToSection(
+    contractorSection,
+    SCORE_MAX.contractor,
+    contractorAssist.penalty
+  );
+  const operator: SectionResult = {
+    ...operatorSection,
+    rawScore: 0,
+    maxScore: 0,
+    baseScore: 0,
+    assistPenalty: 0,
+    score: 0,
+  };
+  const actions = applyAssistToSection(
+    actionSection,
+    SCORE_MAX.intervention,
+    actionAssist.penalty
+  );
+
+  const riskRaw = hazards.rawScore ?? 0;
+  const selfRaw = self.rawScore ?? 0;
+  const contractorRaw = contractor.rawScore ?? 0;
+  const interventionRaw = actions.rawScore ?? 0;
+  const totalRaw = riskRaw + selfRaw + contractorRaw + interventionRaw;
+
+  const technical = Math.round(
+    (clamp(riskRaw + selfRaw + contractorRaw, 0, SCORE_MAX.technical) /
+      SCORE_MAX.technical) *
+      100
+  );
+
+  let behavior = Math.round(
+    (clamp(interventionRaw, 0, SCORE_MAX.intervention) /
+      SCORE_MAX.intervention) *
+      100
+  );
+
+  const selfPrepUsed =
+    selfAssist.penalty > 0 || assist.self.allAssistUsed;
+  const contractorPrepUsed =
+    contractorAssist.penalty > 0 || assist.contractor.allAssistUsed;
+  const prepTabsWithAssist =
+    (selfPrepUsed ? 1 : 0) + (contractorPrepUsed ? 1 : 0);
+  const hasAutoSolution =
+    selfPrepUsed ||
+    contractorPrepUsed ||
+    actionAssist.penalty > 0 ||
+    assist.action.allAssistUsed ||
+    assist.hazards.allAssistUsed;
+
+  const behaviorCapped = heavyAssistShouldCap({
+    hintsUsed: assist.hazards.hintsUsed,
+    hasAutoSolution,
+    prepTabsWithAssist,
+  });
+  if (behaviorCapped) {
+    behavior = Math.min(behavior, BEHAVIOR_HEAVY_ASSIST_CAP);
+  }
+
+  const technicalNotes = [
+    equipmentAssistNote({
+      tab: "self",
+      takCount: selfAssist.takCount,
+      penalty: selfAssist.penalty,
+      liveManualCount: selfAssist.liveManual.length,
+      allAssistUsed: assist.self.allAssistUsed,
+      indirectFullAssist: selfAssist.indirectFullAssist,
+    }),
+    equipmentAssistNote({
+      tab: "contractor",
+      takCount: contractorAssist.takCount,
+      penalty: contractorAssist.penalty,
+      liveManualCount: contractorAssist.liveManual.length,
+      allAssistUsed: assist.contractor.allAssistUsed,
+      indirectFullAssist: contractorAssist.indirectFullAssist,
+    }),
+    riskAssistPenalty > 0
+      ? riskHelpNote(assist.hazards.hintsUsed, assist.hazards.allAssistUsed, riskAssistPenalty)
+      : null,
+  ].filter((note): note is string => Boolean(note));
+
+  const behaviorNotes = buildBehaviorNotes({
+    actions,
+    actionNote: actionAssistNote({
+      takCount: actionAssist.takCount,
+      penalty: actionAssist.penalty,
+      liveManualCount: actionAssist.liveManual.length,
+      allAssistUsed: assist.action.allAssistUsed,
+      indirectFullAssist: actionAssist.indirectFullAssist,
+    }),
+    behaviorCapped,
+  });
+
+  const breakdown: ScoreBreakdown = {
+    riskRaw,
+    selfRaw,
+    contractorRaw,
+    interventionRaw,
+    totalRaw,
+    riskAssistPenalty,
+    selfAssistPenalty: selfAssist.penalty,
+    contractorAssistPenalty: contractorAssist.penalty,
+    interventionAssistPenalty: actionAssist.penalty,
+    selfIndirectFull: selfAssist.indirectFullAssist,
+    contractorIndirectFull: contractorAssist.indirectFullAssist,
+    actionIndirectFull: actionAssist.indirectFullAssist,
+    behaviorCapped,
+    technicalNotes,
+    behaviorNotes,
+  };
+
+  const categorySolutions =
+    assist.self.takUsedCategoryIds.length +
+    assist.contractor.takUsedCategoryIds.length +
+    assist.action.takUsedCategoryIds.length;
+  const fullSolutions =
+    Number(assist.self.allAssistUsed) +
+    Number(assist.contractor.allAssistUsed) +
+    Number(assist.action.allAssistUsed) +
+    Number(assist.hazards.allAssistUsed) +
+    Number(selfAssist.indirectFullAssist) +
+    Number(contractorAssist.indirectFullAssist) +
+    Number(actionAssist.indirectFullAssist);
+
   const competencyScores: Record<string, number> = {};
   for (const tag of scenario.competency_tags) {
-    competencyScores[tag] = overall;
+    competencyScores[tag] = totalRaw;
   }
 
   return {
     slug: scenario.slug,
     technical,
     behavior,
-    ...resultAssist(assist),
-    hintPenalty: penalties.technical,
-    sections,
+    hintsUsed: assist.hazards.hintsUsed,
+    categorySolutions,
+    fullSolutions,
+    hintPenalty: riskAssistPenalty,
+    breakdown,
+    sections: {
+      hazards,
+      self,
+      contractor,
+      operator,
+      actions,
+    },
     competencyScores,
-    completedAt: new Date().toISOString(),
+    completedAt,
   };
+}
+
+function riskHelpNote(
+  hintsUsed: number,
+  allAssistUsed: boolean,
+  penalty: number
+): string {
+  const parts: string[] = [];
+  if (hintsUsed > 0) {
+    parts.push(
+      `${hintsUsed} kademeli ipucu (−${hintPenaltyTotal(hintsUsed)})`
+    );
+  }
+  if (allAssistUsed) {
+    parts.push("HEPSİNİ BELİRLE otomatik yardımı (−8)");
+  }
+  return `Tehlike tanımada ${parts.join(" ve ")} kullandınız. Bu bölüme uygulanan yardım etkisi ${penalty} puandır.`;
+}
+
+function buildBehaviorNotes(input: {
+  actions: SectionResult;
+  actionNote: string | null;
+  behaviorCapped: boolean;
+}): string[] {
+  const notes: string[] = [];
+  const { actions } = input;
+  const hitRate =
+    actions.hits.length + actions.misses.length === 0
+      ? 1
+      : actions.hits.length / (actions.hits.length + actions.misses.length);
+
+  if (hitRate >= 0.99) {
+    notes.push("Müdahale doğruluğu: doğru bildirim ve kayıt adımlarını seçtiniz.");
+  } else if (actions.hits.length > 0) {
+    notes.push(
+      "Müdahale doğruluğu: bir kısım doğru adımı seçtiniz; gözden kaçanlar gelişim alanınızdır."
+    );
+  } else {
+    notes.push(
+      "Müdahale doğruluğu: bu denemede doğru müdahale adımları henüz seçilmedi."
+    );
+  }
+
+  if (actions.criticalExtras.length > 0) {
+    notes.push(
+      "Yetki sınırı: yetkiyi aşan veya bu bağlamda uygun olmayan bir adım seçildi. İşletme personeline doğrudan emir veya durdurma kontrollük yetkisinde değildir."
+    );
+  } else {
+    notes.push("Yetki sınırı: bu denemede yetki aşımı seçilmedi.");
+  }
+
+  if (actions.misses.length > 0) {
+    notes.push(
+      "Kritik karar sırası: bildirim, durdurma veya kayıt adımlarından biri gözden kaçtı. Tespit, doğru kanala iletme ve kayıt birlikte okunur."
+    );
+  } else {
+    notes.push(
+      "Kritik karar sırası: seçmeniz gereken müdahale adımları tamamlandı."
+    );
+  }
+
+  if (input.actionNote) notes.push(input.actionNote);
+  if (input.behaviorCapped) {
+    notes.push(
+      "Yoğun otomatik yardım nedeniyle kontrollük göstergesi 90 ile sınırlanmıştır. Bu bir başarısızlık değil; bağımsız karar alanını güçlendirmek için bir gelişim işaretidir."
+    );
+  }
+  return notes;
 }
 
 /** Puanı kurumsal ve teşvik edici bir ifadeye çevirir. Geçti/kaldı yoktur. */

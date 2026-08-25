@@ -7,18 +7,18 @@ interface HintBoxProps {
   hints: string[];
   used: number;
   onReveal: () => void;
-  penaltyPerHint: number;
+  nextPenalty: number;
 }
 
 /**
  * Kademeli ipucu kutusu.
- * Her ipucu puanı bir miktar düşürür ama hiçbir zaman ilerlemeyi engellemez.
+ * 1. kademe −2, 2. kademe ek −3, 3. kademe ek −5. İlerlemeyi engellemez.
  */
 export default function HintBox({
   hints,
   used,
   onReveal,
-  penaltyPerHint,
+  nextPenalty,
 }: HintBoxProps) {
   if (hints.length === 0) return null;
   const allRevealed = used >= hints.length;
@@ -39,14 +39,19 @@ export default function HintBox({
           disabled={allRevealed}
           className="sw-btn-ghost px-3 py-1.5 text-xs disabled:opacity-50"
         >
-          {allRevealed ? "Tüm ipuçları açık" : "İpucu Al"}
+          {allRevealed
+            ? "Tüm ipuçları açık"
+            : nextPenalty > 0
+              ? `İpucu Al (−${nextPenalty})`
+              : "İpucu Al"}
         </button>
       </div>
 
       {used === 0 ? (
         <p className="mt-2 text-xs leading-snug text-erd-gray">
-          Takıldıysanız ipucu alabilirsiniz. Her ipucu puanınızı{" "}
-          {penaltyPerHint} puan düşürür; ilerlemenizi engellemez.
+          Takıldıysanız ipucu alabilirsiniz. Kademeler tehlike tanıma ham
+          puanından 2, sonra 3, sonra 5 puan düşürür (en fazla 10). İlerlemenizi
+          engellemez.
         </p>
       ) : (
         <ol className="mt-3 space-y-2">

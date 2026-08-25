@@ -45,7 +45,7 @@ export default function SolutionAssist({
             className="sw-btn-ghost px-3 py-2 text-xs disabled:cursor-not-allowed disabled:opacity-50"
           >
             {fillUsed ? "Aile çözüldü" : fillLabel}
-            {!fillUsed && (
+            {!fillUsed && categoryPenalty > 0 && (
               <span className="font-medium text-erd-gray">−{categoryPenalty}</span>
             )}
           </button>
@@ -57,7 +57,7 @@ export default function SolutionAssist({
           className="sw-btn-dark px-3 py-2 text-xs disabled:cursor-not-allowed disabled:opacity-50"
         >
           {fillAllUsed ? "Çözüm uygulandı" : fillAllLabel}
-          {!fillAllUsed && (
+          {!fillAllUsed && fullPenalty > 0 && (
             <span className="font-medium text-white/70">−{fullPenalty}</span>
           )}
         </button>

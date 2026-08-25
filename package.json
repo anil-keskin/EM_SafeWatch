@@ -10,7 +10,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "vitest run"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.6",
@@ -21,7 +22,8 @@
     "eslint": "^9.39.5",
     "eslint-config-next": "^15.5.23",
     "tailwindcss": "^4.3.3",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.11"
   },
   "dependencies": {
     "@supabase/ssr": "^0.6.1",

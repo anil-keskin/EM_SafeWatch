@@ -53,13 +53,13 @@ const TAB_HELP: Record<DecisionTab, string> = {
 };
 
 const ASSIST_LINE: Record<DecisionTab, string> = {
-  self: "Takıldığınız kartta (i) puan düşürmez. TAK / HEPSİNİ TAK kendi donanımınızı giydirir ve puanınızı düşürür.",
+  self: "Takıldığınız kartta (i) puan düşürmez. Karta kendiniz tıklamak da sabit kesinti üretmez. TAK aile başına 1, HEPSİNİ TAK kesintiyi 8’e tamamlar.",
   contractor:
-    "Takıldığınız kartta (i) puan düşürmez. İŞARETLE yüklenicideki eksiği yazar, ona KKD giydirmez. Çözüm puan düşürür.",
+    "Takıldığınız kartta (i) puan düşürmez. İŞARETLE yüklenicideki eksiği yazar, ona KKD giydirmez. Aile 1, tüm sekme 8 puanlık yardım etkisidir.",
   operator:
-    "Takıldığınız kartta (i) puan düşürmez. İŞARETLE işletmedeki eksiği tespit eder; personeli giydirmezsiniz. Çözüm puan düşürür.",
+    "Takıldığınız kartta (i) puan düşürmez. Bu sekme bağımsız puan veya yardım kesintisi üretmez. Müdahale yetkisi bildirim sekmesindedir.",
   action:
-    "Takıldığınız kartta (i) puan düşürmez. SEÇ / HEPSİNİ SEÇ doğru müdahaleyi yazar ve puanınızı düşürür.",
+    "Takıldığınız kartta (i) puan düşürmez. Karta kendiniz tıklamak kesinti üretmez. SEÇ grup başına 1, HEPSİNİ SEÇ kesintiyi 8’e tamamlar.",
 };
 
 export default function DecisionPanel({

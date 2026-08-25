@@ -119,7 +119,7 @@ export default function ActionPicker({
         fillAllUsed={fillAllUsed}
         categoryPenalty={SOLUTION_CATEGORY_PENALTY}
         fullPenalty={SOLUTION_FULL_PENALTY}
-        note="Açık grupta SEÇ o türdeki doğru müdahaleyi işaretler. HEPSİNİ SEÇ tüm doğru adımları yazar. Çözüm puan düşürür."
+        note="Açık grupta SEÇ o türdeki doğru müdahaleyi işaretler (−1). HEPSİNİ SEÇ tüm doğru adımları yazar ve kesintiyi 8’e tamamlar. Karta sizin tıklamanız puan düşürmez."
       />
 
       {inKind && (

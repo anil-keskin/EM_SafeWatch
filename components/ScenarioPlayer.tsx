@@ -19,8 +19,16 @@ import {
 } from "@/lib/hazard-layout";
 import { useProgress } from "@/lib/progress";
 import {
-  HINT_PENALTY_PER_LEVEL,
-  SOLUTION_FULL_PENALTY,
+  ALL_ASSIST_PENALTY,
+  applyAllAssist,
+  applyManualToggle,
+  applyTakAssist,
+  emptyScenarioAssist,
+  nextHintPenalty,
+  patchRole,
+  roleOf,
+} from "@/lib/assist";
+import {
   evaluateScenario,
   isScenarioScorable,
 } from "@/lib/scoring";
@@ -32,7 +40,6 @@ import {
   fillScope,
   isExactSolved,
   realHazardCodes,
-  tallySolutions,
 } from "@/lib/solutions";
 import type { DecisionTab, ScenarioAnswers } from "@/lib/types";
 
@@ -60,7 +67,7 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
   const [step, setStep] = useState<Step>("brief");
   const [answers, setAnswers] = useState<ScenarioAnswers>(EMPTY_ANSWERS);
   const [activeTab, setActiveTab] = useState<DecisionTab>("self");
-  const [hintsUsed, setHintsUsed] = useState(0);
+  const [assist, setAssist] = useState(emptyScenarioAssist);
   const [usedKeys, setUsedKeys] = useState<Set<string>>(() => new Set());
   const [layoutSeed, setLayoutSeed] = useState<number | null>(null);
 
@@ -89,7 +96,11 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
   }
 
   const handleToggle = (tab: DecisionTab, code: string) => {
+    const wasSelected = answers[tab].includes(code);
     setAnswers((prev) => ({ ...prev, [tab]: toggle(prev[tab], code) }));
+    setAssist((prev) =>
+      patchRole(prev, tab, applyManualToggle(roleOf(prev, tab), code, wasSelected))
+    );
   };
 
   const handleHazardToggle = (code: string) => {
@@ -98,12 +109,7 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
 
   const handleEvaluate = () => {
     if (!isScenarioScorable(scenario)) return;
-    const { categorySolutions, fullSolutions } = tallySolutions(usedKeys);
-    const result = evaluateScenario(scenario, answers, {
-      hintsUsed,
-      categorySolutions,
-      fullSolutions,
-    });
+    const result = evaluateScenario(scenario, answers, assist, equipment);
     recordResult(scenario, result);
     router.push(`/sonuc/${scenario.slug}`);
   };
@@ -124,10 +130,14 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
         ? actionCodesInKind(scopeId)
         : codesInCategory(equipment, scopeId);
     const key = tab === "action" ? `action:kind:${scopeId}` : `${tab}:cat:${scopeId}`;
+    const filledCodes = correct.filter((code) => scopeCodes.includes(code));
     setAnswers((prev) => ({
       ...prev,
       [tab]: fillScope(prev[tab], correct, scopeCodes),
     }));
+    setAssist((prev) =>
+      patchRole(prev, tab, applyTakAssist(roleOf(prev, tab), scopeId, filledCodes))
+    );
     markUsed(key);
   };
 
@@ -137,6 +147,9 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
       ...prev,
       [tab]: fillExact(correct),
     }));
+    setAssist((prev) =>
+      patchRole(prev, tab, applyAllAssist(roleOf(prev, tab), correct))
+    );
     markUsed(`${tab}:all`);
   };
 
@@ -145,6 +158,11 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
       ...prev,
       hazards: fillExact(realHazardCodes(scenario)),
     }));
+    setAssist((prev) =>
+      prev.hazards.allAssistUsed
+        ? prev
+        : { ...prev, hazards: { ...prev.hazards, allAssistUsed: true } }
+    );
     markUsed("hazards:all");
   };
 
@@ -236,9 +254,9 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
                       realHazardCodes(scenario)
                     )}
                     fillAllUsed={usedKeys.has("hazards:all")}
-                    categoryPenalty={HINT_PENALTY_PER_LEVEL}
-                    fullPenalty={SOLUTION_FULL_PENALTY}
-                    note="HEPSİNİ BELİRLE gerçek risk noktalarını işaretler, sahte noktaları bırakır. Çözüm puan düşürür."
+                    categoryPenalty={0}
+                    fullPenalty={ALL_ASSIST_PENALTY}
+                    note="Risk noktasına sizin tıklamanız puan düşürmez. HEPSİNİ BELİRLE gerçek riskleri otomatik seçer (−8). İpucu kademeleri ayrıdır (−2 / −3 / −5); risk yardımının tavanı 15 puandır."
                   />
                 </div>
               )}
@@ -265,11 +283,20 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
 
             <HintBox
               hints={scenario.hints}
-              used={hintsUsed}
+              used={assist.hazards.hintsUsed}
               onReveal={() =>
-                setHintsUsed((n) => Math.min(n + 1, scenario.hints.length))
+                setAssist((prev) => ({
+                  ...prev,
+                  hazards: {
+                    ...prev.hazards,
+                    hintsUsed: Math.min(
+                      prev.hazards.hintsUsed + 1,
+                      scenario.hints.length
+                    ),
+                  },
+                }))
               }
-              penaltyPerHint={HINT_PENALTY_PER_LEVEL}
+              nextPenalty={nextHintPenalty(assist.hazards.hintsUsed)}
             />
           </div>
 

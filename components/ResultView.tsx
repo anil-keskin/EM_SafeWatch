@@ -10,7 +10,6 @@ import { competencyLabel } from "@/content/scenarios";
 import { useSafeWatchData, findScenario, scenariosOfZone } from "@/lib/data";
 import { readHazardLayoutSeed, scatterHazards } from "@/lib/hazard-layout";
 import { zoneGlyph, zoneTone } from "@/lib/icon-theme";
-import { assistAxisPenalties } from "@/lib/scoring";
 import { loadLastResult } from "@/lib/progress";
 import type { EquipmentItem, ScenarioResult, SectionResult } from "@/lib/types";
 
@@ -113,16 +112,17 @@ export default function ResultView({ slug }: { slug: string }) {
           )}
           <ScoreMeter
             label="Teknik Doğruluk"
-            hint="Tehlike tanıma, doğru KKD ailesi ve gereksiz seçimden kaçınma."
+            hint="Tehlike tanıma (35), kendi donanım (20) ve yüklenici donanımı (20). İşletme sekmesi bu bara girmez."
             score={result.technical}
           />
           <ScoreMeter
             label="Kontrollük Davranışı"
-            hint="Doğru kanala bildirme, gerektiğinde durdurma, yetki sınırını gözetme."
+            hint="Nasıl müdahale etmeliyim? kararı (25 ham puan). Teknik barın kopyası değildir."
             score={result.behavior}
           />
         </div>
         <AssistSummary result={result} />
+        <ScoreBreakdownCard result={result} />
       </div>
 
       <div className="sw-card p-4">
@@ -181,7 +181,8 @@ export default function ResultView({ slug }: { slug: string }) {
           section={result.sections.operator}
           labelFn={equipmentLabel}
           extrasTitle="İşletmede uygunsuzluk olmayan kalemler"
-          emptyMessage="Bu senaryoda işletme personelinde uygunsuzluk yoktu; boş bırakmak doğruydu."
+          emptyMessage="Bu senaryoda işletme personelinde uygunsuzluk yoktu. Bu sekme bağımsız puan üretmez; müdahale kararına bağlam sağlar."
+          unscoreable
         />
         <SectionCard
           title="Müdahale Kararlarınız"
@@ -242,28 +243,97 @@ function AssistSummary({ result }: { result: ScenarioResult }) {
   const hints = result.hintsUsed ?? 0;
   const solutions =
     (result.categorySolutions ?? 0) + (result.fullSolutions ?? 0);
-  if (hints === 0 && solutions === 0) return null;
-
-  const axis = assistAxisPenalties(
-    {
-      hintsUsed: hints,
-      categorySolutions: result.categorySolutions ?? 0,
-      fullSolutions: result.fullSolutions ?? 0,
-    },
-    hints
-  );
-
-  const parts: string[] = [];
-  if (solutions > 0) parts.push(`${solutions} çözüm`);
-  if (hints > 0) parts.push(`${hints} ipucu`);
+  const notes = result.breakdown?.technicalNotes ?? [];
+  if (hints === 0 && solutions === 0 && notes.length === 0) return null;
 
   return (
-    <p className="border-t border-erd-line px-5 py-3 text-xs leading-snug text-erd-gray">
-      {parts.join(" ve ")} kullandınız. Teknik puandan {axis.technical},
-      kontrollük davranışından {axis.behavior} puan düşüldü. Çözüm ve ipucu
-      öğrenmeyi hızlandırır; bu kadar yardım alınca gelişim raporunda ilgili
-      alanlar “gelişime açık” görünebilir.
-    </p>
+    <div className="space-y-2 border-t border-erd-line px-5 py-3 text-xs leading-snug text-erd-gray">
+      {notes.length > 0 ? (
+        notes.map((note) => <p key={note}>{note}</p>)
+      ) : (
+        <p>
+          {solutions > 0 ? `${solutions} otomatik yardım` : null}
+          {solutions > 0 && hints > 0 ? " ve " : null}
+          {hints > 0 ? `${hints} ipucu` : null} kullandınız. Yardım etkisi
+          sonuç kartında ilgili bölümün ham puanından düşülmüştür.
+        </p>
+      )}
+    </div>
+  );
+}
+
+function ScoreBreakdownCard({ result }: { result: ScenarioResult }) {
+  const b = result.breakdown;
+  const techRows = [
+    {
+      label: "Risk doğruluğu",
+      value: b?.riskRaw ?? result.sections.hazards.rawScore,
+      max: 35,
+      assist: b?.riskAssistPenalty ?? 0,
+    },
+    {
+      label: "Kendi donanımı",
+      value: b?.selfRaw ?? result.sections.self.rawScore,
+      max: 20,
+      assist: b?.selfAssistPenalty ?? 0,
+    },
+    {
+      label: "Yüklenici donanımı",
+      value: b?.contractorRaw ?? result.sections.contractor.rawScore,
+      max: 20,
+      assist: b?.contractorAssistPenalty ?? 0,
+    },
+  ];
+  const behaviorNotes = b?.behaviorNotes ?? [];
+
+  return (
+    <div className="border-t border-erd-line px-5 py-4">
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-erd-gray">
+            Teknik doğruluk
+          </p>
+          <ul className="mt-2 space-y-1.5 text-xs text-erd-charcoal">
+            {techRows.map((row) => (
+              <li key={row.label} className="flex justify-between gap-3">
+                <span>{row.label}</span>
+                <span className="shrink-0 tabular-nums text-erd-gray">
+                  {row.value ?? "—"}/{row.max}
+                  {row.assist > 0 ? ` · yardım ${row.assist}` : ""}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-erd-gray">
+            Kontrollük davranışı
+          </p>
+          <p className="mt-2 flex justify-between gap-3 text-xs text-erd-charcoal">
+            <span>Müdahale doğruluğu</span>
+            <span className="tabular-nums text-erd-gray">
+              {b?.interventionRaw ?? result.sections.actions.rawScore ?? "—"}
+              /25
+              {(b?.interventionAssistPenalty ?? 0) > 0
+                ? ` · yardım ${b?.interventionAssistPenalty}`
+                : ""}
+            </span>
+          </p>
+          {behaviorNotes.length > 0 && (
+            <ul className="mt-2 space-y-1.5 text-xs leading-snug text-erd-gray">
+              {behaviorNotes.map((note) => (
+                <li key={note}>{note}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+      {typeof b?.totalRaw === "number" && (
+        <p className="mt-3 text-xs font-medium text-erd-charcoal">
+          Toplam gelişim puanı {b.totalRaw}/100
+        </p>
+      )}
+    </div>
   );
 }
 
@@ -280,6 +350,7 @@ function SectionCard({
   criticalTitle = "Yanlış seçimler",
   emptyMessage,
   className = "",
+  unscoreable = false,
 }: {
   title: string;
   section: SectionResult;
@@ -288,6 +359,7 @@ function SectionCard({
   criticalTitle?: string;
   emptyMessage?: string;
   className?: string;
+  unscoreable?: boolean;
 }) {
   const mildExtras = section.extras.filter(
     (code) => !section.criticalExtras.includes(code)
@@ -296,15 +368,23 @@ function SectionCard({
     section.hits.length === 0 &&
     section.misses.length === 0 &&
     section.extras.length === 0;
+  const max = section.maxScore;
+  const raw = section.rawScore;
 
   return (
     <div className={`sw-card p-4 ${className}`}>
       <div className="flex items-center justify-between gap-3">
         <h3 className="text-sm font-bold text-erd-charcoal">{title}</h3>
-        <span className="text-sm font-bold tabular-nums text-erd-gray">
-          {section.score}
-          <span className="text-xs font-medium">/100</span>
-        </span>
+        {unscoreable || max === 0 ? (
+          <span className="text-[11px] font-semibold text-erd-gray">
+            Bağımsız puan yok
+          </span>
+        ) : (
+          <span className="text-sm font-bold tabular-nums text-erd-gray">
+            {raw ?? section.score}
+            <span className="text-xs font-medium">/{max ?? 100}</span>
+          </span>
+        )}
       </div>
 
       {nothingToShow ? (
@@ -313,6 +393,13 @@ function SectionCard({
         </p>
       ) : (
         <div className="mt-3 space-y-2.5">
+          {(section.assistPenalty ?? 0) > 0 && (
+            <p className="text-[11px] leading-snug text-erd-gray">
+              Doğruluk {section.baseScore}/{max}; yardım etkisi{" "}
+              {section.assistPenalty} puan. Yanlış seçim ile yardım ayrı
+              hesaplanır.
+            </p>
+          )}
           <CodeList
             title="Doğru belirledikleriniz"
             codes={section.hits}

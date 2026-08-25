@@ -32,11 +32,11 @@ interface EquipmentPickerProps {
 }
 
 const TAB_NOTE: Record<Exclude<DecisionTab, "action">, string> = {
-  self: "Açık ailede TAK yalnızca o koruma ailesinin doğrularını giydirir. HEPSİNİ TAK tüm sekmenin doğru donanımını yazar. Çözüm puan düşürür.",
+  self: "Karta sizin tıklamanız puan düşürmez. Açık ailede TAK o ailenin doğrularını giydirir (−1, aynı aileye tekrar basmak ek kesinti üretmez). HEPSİNİ TAK sekmenin doğrularını yazar ve kesintiyi 8’e tamamlar; TAK toplamına eklenmez.",
   contractor:
-    "Açık ailede İŞARETLE, yüklenicide o ailedeki eksikleri yazar — ona giydirmez. HEPSİNİ İŞARETLE tüm eksikleri yazar. Çözüm puan düşürür.",
+    "Karta sizin tıklamanız puan düşürmez. İŞARETLE yüklenicide o ailedeki eksikleri yazar — ona giydirmez (−1). HEPSİNİ İŞARETLE tüm eksikleri yazar ve kesintiyi 8’e tamamlar.",
   operator:
-    "Siz işletme personeline KKD giydirmezsiniz. İŞARETLE gördüğünüz eksiği tespit eder. Müdahale yetkisi bildirim sekmesindedir. Çözüm puan düşürür.",
+    "Siz işletme personeline KKD giydirmezsiniz. Bu sekme bağımsız puan üretmez; gördüğünüz eksiği kayda geçirir ve müdahale kararına bağlam sağlar.",
 };
 
 const FILL_LABEL: Record<
@@ -126,6 +126,7 @@ export default function EquipmentPicker({
   const scopeSolved =
     activeCategory !== "all" &&
     isScopeSolved(selected, correctCodes, scopeCodes);
+  const scored = tab !== "operator";
   const fillAllUsed = usedKeys.has(`${tab}:all`);
   const fillUsed =
     activeCategory !== "all" &&
@@ -169,8 +170,8 @@ export default function EquipmentPicker({
         fillAllDisabled={disabled || tabSolved}
         fillUsed={fillUsed}
         fillAllUsed={fillAllUsed}
-        categoryPenalty={SOLUTION_CATEGORY_PENALTY}
-        fullPenalty={SOLUTION_FULL_PENALTY}
+        categoryPenalty={scored ? SOLUTION_CATEGORY_PENALTY : 0}
+        fullPenalty={scored ? SOLUTION_FULL_PENALTY : 0}
         note={TAB_NOTE[tab]}
       />
 

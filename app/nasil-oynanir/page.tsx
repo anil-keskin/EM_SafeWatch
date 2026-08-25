@@ -37,7 +37,7 @@ const RULES = [
   },
   {
     title: "Kart rehberi ve kademeli ipucu ayrıdır",
-    body: "Hazırlık panelindeki (i) hangi durumda seçeceğinizi anlatır, puanınızı düşürmez. Bir koruma ailesini çözmek 1 puan, sekmenin veya sahnenin tamamını çözmek 6 puan düşürür. Böylece tek ailede takılınca TAK ucuz kalır; tüm sekmeyi teslim etmek altı ailelik yardımdan pahalıya gelmez. Senaryo ipucu kademesi 3 puan düşürür ama ilerlemeyi engellemez.",
+    body: "Hazırlık panelindeki (i) hangi durumda seçeceğinizi anlatır, puanınızı düşürmez. Karta kendiniz tıklamak da sabit kesinti üretmez. TAK / İŞARETLE / SEÇ her özgün aile için 1 puan; HEPSİNİ TAK / SEÇ / BELİRLE kesintiyi 8’e tamamlar (TAK toplamına eklenmez). Tüm aileleri yalnızca TAK ile ve hiç manuel seçim olmadan bitirmek de 8 sayılır. Senaryo ipuçları 2 + 3 + 5 puandır (en fazla 10); HEPSİNİ BELİRLE ile birlikte risk yardımı en fazla 15’tir.",
   },
   {
     title: "Gereksiz KKD de bir uygunsuzluktur",
@@ -62,14 +62,14 @@ const STEPS: Array<{
   {
     step: "2",
     title: "Tehlike Tanıma",
-    body: "Sahnedeki risk noktalarını işaretlersiniz. Bazı noktalar bilinçli olarak sahte konulmuştur. Takılırsanız HEPSİNİ BELİRLE gerçek noktaları işaretler; bu bir çözümdür ve puan düşürür.",
+    body: "Sahnedeki risk noktalarını işaretlersiniz. Bazı noktalar bilinçli olarak sahte konulmuştur. Noktaya sizin tıklamanız kesinti üretmez. Takılırsanız HEPSİNİ BELİRLE gerçek noktaları işaretler (−8). İpucu kademeleri ayrıdır.",
     icon: TriangleAlert,
     tone: "risk",
   },
   {
     step: "3",
     title: "Hazırlık ve Denetim",
-    body: "Dört karar sekmesini doldurursunuz: kendi donanımınız, yüklenicideki eksikler, işletmedeki uygunsuzluklar ve müdahale kararınız. İşletme sekmesi giydirme değil tespittir; durdurma kartı yalnızca müteahhit içindir. Her sekmede koruma ailelerini İleri ile sırayla gezersiniz. (i) rehberdir, puan düşürmez. Kendi donanımınızda TAK, diğer sekmelerde İŞARETLE çözümdür ve puan düşürür.",
+    body: "Dört karar sekmesini doldurursunuz: kendi donanımınız (20), yüklenicideki eksikler (20), işletmedeki gözlem ve müdahale kararınız (25). İşletme sekmesi giydirme ve bağımsız puan değildir; durdurma kartı yalnızca müteahhit içindir. Her sekmede koruma ailelerini İleri ile sırayla gezersiniz. (i) rehberdir, puan düşürmez.",
     icon: HardHat,
     tone: "kkd",
   },
@@ -178,8 +178,9 @@ export default function NasilOynanirPage() {
               Teknik doğruluk
             </p>
             <p className="mt-1 text-xs leading-snug text-erd-gray">
-              Tehlike tanıma, doğru KKD ailesi ve standart eşleşmesi, KKD dışı
-              tedbirler, gereksiz koruyucudan kaçınma.
+              Tehlike tanıma (35), kendi donanım (20) ve yüklenici donanımı
+              (20). Ham tavan 75’tir; bar 0–100’e ölçeklenir. İşletme sekmesi
+              bu bara girmez.
             </p>
           </div>
           <div className="rounded-xl bg-erd-light p-3.5">
@@ -187,8 +188,20 @@ export default function NasilOynanirPage() {
               Kontrollük davranışı
             </p>
             <p className="mt-1 text-xs leading-snug text-erd-gray">
-              Çalışanın bağlı olduğu kuruluşu fark etme, doğru kişiye bildirme,
-              gerektiğinde işi durdurma, yetki sınırını aşmama, kayıt tutma.
+              Nasıl müdahale etmeliyim? kararı (25 ham puan). Teknik barın
+              kopyası değildir. Yoğun otomatik yardımda (en az iki ipucu ve bir
+              çözüm, veya iki hazırlık sekmesinde çözüm) gösterge en fazla 90
+              olabilir.
+            </p>
+          </div>
+          <div className="rounded-xl bg-erd-light p-3.5 sm:col-span-2">
+            <p className="text-sm font-semibold text-erd-charcoal">
+              Toplam gelişim puanı
+            </p>
+            <p className="mt-1 text-xs leading-snug text-erd-gray">
+              35 + 20 + 20 + 25 = 100. Yanlış veya gereksiz seçim teknik
+              doğruluğu düşürür; TAK / HEPSİNİ TAK ayrı bir yardım etkisidir.
+              İkisi aynı şey sayılmaz.
             </p>
           </div>
         </div>
