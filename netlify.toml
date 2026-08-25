@@ -9,5 +9,7 @@
   NODE_VERSION = "20"
   GITHUB_PAGES = "false"
 
+# Handler dışında dosya koyma: *.test.ts function adına nokta ekler (deploy 422).
+
 [functions]
   node_bundler = "esbuild"
