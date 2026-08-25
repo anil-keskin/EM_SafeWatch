@@ -18,6 +18,10 @@
   --color-erd-gray: #6b6b6b;
   --color-erd-line: #e2e2e2;
   --color-erd-light: #f4f4f4;
+  /* Kurumsal eğitim zemini — kırık beyaz, düz #fff değil */
+  --color-erd-canvas: #f8f8f8;
+  --color-erd-canvas-hi: #fafafa;
+  --color-erd-canvas-lo: #f5f5f5;
   /* Erdemir Mühendislik logosundaki gri — SafeWatch "Safe" yazısı */
   --color-brand-safe-gray: #5c5a5b;
 
@@ -113,6 +117,47 @@ body {
 
 .sw-nav-item:hover {
   transform: translateX(2px);
+}
+
+/* Ana ekran: kurumsal eğitim zemini. Gradient bilinçli olarak neredeyse görünmez. */
+.sw-lms-wash {
+  background:
+    radial-gradient(
+      ellipse 70% 48% at 82% -8%,
+      color-mix(in srgb, var(--color-brand-safe-gray) 4%, transparent),
+      transparent 58%
+    ),
+    radial-gradient(
+      ellipse 55% 40% at 8% 108%,
+      color-mix(in srgb, var(--color-erd-canvas-lo) 80%, transparent),
+      transparent 52%
+    ),
+    linear-gradient(
+      180deg,
+      var(--color-erd-canvas-hi) 0%,
+      var(--color-erd-canvas) 48%,
+      var(--color-erd-canvas-lo) 100%
+    );
+}
+
+.sw-home-panel,
+.sw-home-card {
+  background-color: #fff;
+  border: 1px solid var(--color-erd-line);
+  box-shadow:
+    0 1px 1px rgba(46, 46, 46, 0.03),
+    0 10px 28px rgba(46, 46, 46, 0.05);
+}
+
+.sw-home-panel {
+  border-radius: 1.5rem;
+}
+
+.sw-lift.sw-home-card:hover {
+  border-color: color-mix(in srgb, var(--color-brand-safe-gray) 12%, var(--color-erd-line));
+  box-shadow:
+    0 2px 4px rgba(46, 46, 46, 0.04),
+    0 16px 36px rgba(46, 46, 46, 0.07);
 }
 
 @media (prefers-reduced-motion: reduce) {

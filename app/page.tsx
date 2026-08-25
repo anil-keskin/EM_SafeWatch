@@ -110,13 +110,13 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="relative flex min-h-[calc(100dvh-4.5rem)] flex-col overflow-hidden bg-erd-light">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(225,37,27,0.06),_transparent_48%),linear-gradient(180deg,#ffffff_0%,#f7f7f7_42%,#f0f0f0_100%)]" />
+    <div className="relative flex min-h-[calc(100dvh-4.5rem)] flex-col overflow-hidden bg-erd-canvas">
+      <div className="pointer-events-none absolute inset-0 sw-lms-wash" aria-hidden />
       <FactorySilhouette />
 
       <div className="relative z-10 mx-auto grid w-full max-w-6xl flex-1 items-start gap-8 px-4 py-7 sm:px-6 sm:py-10 lg:grid-cols-[minmax(17.5rem,20.5rem)_minmax(0,1fr)] lg:gap-10 lg:py-12">
         <aside className="lg:sticky lg:top-[5.25rem]">
-          <div className="rounded-3xl border border-erd-line/90 bg-white/95 p-6 shadow-[0_16px_48px_rgba(46,46,46,0.06)] backdrop-blur-sm sm:p-7">
+          <div className="sw-home-panel p-6 sm:p-7">
             <p className="text-center text-[11px] font-semibold uppercase tracking-[0.18em] text-erd-gray">
               Kontrollük antrenmanı
             </p>
@@ -199,7 +199,7 @@ export default function HomePage() {
                 return (
                   <li
                     key={item.id}
-                    className="sw-lift sw-card relative min-h-[11.5rem] overflow-hidden p-5 sm:min-h-[13rem] sm:p-6"
+                    className="sw-lift sw-home-card relative min-h-[11.5rem] overflow-hidden rounded-2xl p-5 sm:min-h-[13.25rem] sm:p-6"
                   >
                     <span className="absolute inset-y-0 left-0 w-1 bg-erd-red/80" aria-hidden />
                     <div className="flex items-start justify-between gap-3">
@@ -225,7 +225,7 @@ export default function HomePage() {
               {catalog.map((fact) => (
                 <li
                   key={fact.label}
-                  className="sw-lift sw-card relative overflow-hidden px-3 py-7 text-center sm:px-5 sm:py-10"
+                  className="sw-lift sw-home-card relative overflow-hidden rounded-2xl px-3 py-7 text-center sm:px-5 sm:py-10"
                 >
                   <span className="mx-auto mb-4 hidden sm:flex sm:justify-center">
                     <AppIcon icon={fact.icon} tone={fact.tone} size="md" />
@@ -280,7 +280,7 @@ function MetricCard({
   compact?: boolean;
 }) {
   return (
-    <li className="sw-card min-h-[5.5rem] px-4 py-5">
+    <li className="sw-home-card min-h-[5.5rem] rounded-2xl px-4 py-5">
       <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-erd-gray">
         {label}
       </p>
@@ -313,8 +313,8 @@ function HomeButton({
       href={href}
       className={`sw-nav-item flex w-full items-center gap-3 rounded-2xl px-3.5 py-3.5 text-sm font-semibold ${
         primary
-          ? "bg-erd-red text-white shadow-[0_8px_24px_rgba(225,37,27,0.28)] hover:bg-erd-red-dark"
-          : "border border-erd-line bg-erd-light/60 text-erd-charcoal hover:border-erd-red/35 hover:bg-white"
+          ? "bg-erd-red text-white shadow-[0_2px_8px_rgba(225,37,27,0.16)] hover:bg-erd-red-dark"
+          : "border border-erd-line bg-erd-canvas text-erd-charcoal hover:border-brand-safe-gray/25 hover:bg-white"
       }`}
     >
       {primary ? (
