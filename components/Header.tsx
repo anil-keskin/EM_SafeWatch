@@ -73,7 +73,7 @@ export default function Header() {
       >
         <OyakMark size="header" />
         <span className="h-8 w-px shrink-0 bg-erd-line" aria-hidden />
-        <BrandMark size="header" dark />
+        <BrandMark size="header" />
       </Link>
 
       <div className="flex min-w-0 flex-1 items-stretch justify-between gap-2">

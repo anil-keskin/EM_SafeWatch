@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import SafeWatchWordmark from "@/components/SafeWatchWordmark";
 import { withBase } from "@/lib/paths";
 
 interface BrandMarkProps {
-  /** Üst bardaki beyaz zemin için koyu metin; kart içi büyük logo için büyük punto. */
+  /** Üst bardaki yatay blok veya karşılama kartındaki büyük yazı. */
   size?: "header" | "hero";
-  dark?: boolean;
 }
 
 type Face = "logo" | "icon" | "mark";
@@ -61,9 +61,8 @@ function BrandImage({
  * Sol üst marka: logo (varsa) + SafeWatch yazısı.
  * public/logo.png sonradan eklenirse kod değiştirmeden kullanılır.
  */
-export default function BrandMark({ size = "header", dark = true }: BrandMarkProps) {
+export default function BrandMark({ size = "header" }: BrandMarkProps) {
   const isHero = size === "hero";
-  const titleColor = dark ? "text-erd-charcoal" : "text-white";
   const [face, setFace] = useState<Face>(skipLogoPng ? "icon" : "logo");
 
   const handleFail = () => {
@@ -87,14 +86,11 @@ export default function BrandMark({ size = "header", dark = true }: BrandMarkPro
           Erdemir Mühendislik
         </span>
       )}
-      <span
+      <SafeWatchWordmark
         className={`block font-bold tracking-tight ${
           isHero ? "text-4xl sm:text-5xl" : "text-lg sm:text-[22px]"
         }`}
-      >
-        <span className={titleColor}>Safe</span>
-        <span className="text-erd-red">Watch</span>
-      </span>
+      />
       <span
         className={`text-erd-gray ${
           isHero

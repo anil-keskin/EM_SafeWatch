@@ -17,6 +17,7 @@ import FeedbackForm from "@/components/FeedbackForm";
 import FactorySilhouette from "@/components/FactorySilhouette";
 import OyakMark from "@/components/OyakMark";
 import PrinciplesBar from "@/components/PrinciplesBar";
+import SafeWatchWordmark from "@/components/SafeWatchWordmark";
 import { findScenario, useSafeWatchData } from "@/lib/data";
 import { tabGlyph } from "@/lib/icon-theme";
 import { useAuth } from "@/lib/auth";
@@ -126,7 +127,7 @@ export default function HomePage() {
 
             <div className="mt-5 flex flex-col items-center gap-3">
               <OyakMark size="hero" />
-              <BrandMark size="hero" dark />
+              <BrandMark size="hero" />
             </div>
 
             <nav className="mt-8 space-y-2" aria-label="Öğrenme menüsü">
@@ -180,8 +181,9 @@ export default function HomePage() {
 
         <div className="flex min-w-0 flex-col gap-8 pb-2 lg:pt-1">
           <section>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-erd-red">
-              SafeWatch metodolojisi
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em]">
+              <SafeWatchWordmark />
+              <span className="text-erd-red"> metodolojisi</span>
             </p>
             <h1 className="mt-2 text-2xl font-bold tracking-tight text-erd-charcoal sm:text-3xl">
               Dört Karar Metodolojisi

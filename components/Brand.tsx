@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import SafeWatchWordmark from "@/components/SafeWatchWordmark";
 import { withBase } from "@/lib/paths";
 
 /**
- * Marka bloğu. "Safe" koyu, "Watch" kırmızı yazılır.
+ * Marka bloğu. "Safe" Erdemir grisi, "Watch" kırmızı yazılır.
  *
  * `/public/logo.png` eklendiğinde otomatik görünür; dosya yoksa yerine
  * sade bir SVG işaret çizilir, böylece tasarım hiçbir zaman boş kalmaz.
@@ -60,10 +61,9 @@ export function Wordmark({
 }: WordmarkProps) {
   return (
     <span className={`block leading-none ${className}`}>
-      <span className={`block font-extrabold tracking-tight ${SIZES[size]}`}>
-        <span className="text-erd-charcoal">Safe</span>
-        <span className="text-erd-red">Watch</span>
-      </span>
+      <SafeWatchWordmark
+        className={`block font-extrabold tracking-tight ${SIZES[size]}`}
+      />
       {subtitle && (
         <span
           className={`mt-1 block font-medium text-erd-gray ${

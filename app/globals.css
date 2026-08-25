@@ -18,6 +18,8 @@
   --color-erd-gray: #6b6b6b;
   --color-erd-line: #e2e2e2;
   --color-erd-light: #f4f4f4;
+  /* Erdemir Mühendislik logosundaki gri — SafeWatch "Safe" yazısı */
+  --color-brand-safe-gray: #5c5a5b;
 
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
     Arial, sans-serif;

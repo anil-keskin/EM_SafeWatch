@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import SafeWatchWordmark from "@/components/SafeWatchWordmark";
 import { withBase } from "@/lib/paths";
 
 type Face = "logo" | "icon" | "mark";
@@ -46,9 +47,7 @@ export default function Logo() {
         <span className="block truncate text-[11px] font-medium uppercase tracking-[0.14em] text-white/60">
           Erdemir Mühendislik
         </span>
-        <span className="block text-lg font-bold tracking-tight text-white">
-          SafeWatch
-        </span>
+        <SafeWatchWordmark className="block text-lg font-bold tracking-tight" />
       </span>
     </span>
   );

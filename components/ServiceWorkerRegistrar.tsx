@@ -9,7 +9,7 @@ export default function ServiceWorkerRegistrar() {
     if (process.env.NODE_ENV !== "production") return;
     if (!("serviceWorker" in navigator)) return;
 
-    const swUrl = `${BASE_PATH}/sw.js?v=6`;
+    const swUrl = `${BASE_PATH}/sw.js?v=7`;
     const scope = `${BASE_PATH}/` || "/";
     navigator.serviceWorker.register(swUrl, { scope }).catch(() => {
       // Kayıt başarısız olursa uygulama çevrimiçi olarak çalışmaya devam eder.
