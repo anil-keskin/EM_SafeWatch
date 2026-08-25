@@ -10,38 +10,83 @@ import {
   MapPin,
   Play,
 } from "lucide-react";
-import AppIcon, { IconWatermark } from "@/components/AppIcon";
+import AppIcon from "@/components/AppIcon";
 import BrandMark from "@/components/BrandMark";
 import CircularProgress from "@/components/CircularProgress";
-import DataSourceNote from "@/components/DataSourceNote";
-import { DECISION_TABS } from "@/content/decision-tabs";
 import FactorySilhouette from "@/components/FactorySilhouette";
 import OyakMark from "@/components/OyakMark";
 import PrinciplesBar from "@/components/PrinciplesBar";
+import { findScenario, useSafeWatchData } from "@/lib/data";
+import { tabGlyph } from "@/lib/icon-theme";
 import { useAuth } from "@/lib/auth";
-import { useSafeWatchData } from "@/lib/data";
 import { completedCount, useProgress } from "@/lib/progress";
+import type { DecisionTab } from "@/lib/types";
 import type { IconTone } from "@/lib/icon-theme";
 import type { LucideIcon } from "lucide-react";
 
-const HOME_FACTS: Array<{
-  value: string;
-  label: string;
-  icon: LucideIcon;
-  tone: IconTone;
+const METHODOLOGY: Array<{
+  id: DecisionTab;
+  num: string;
+  title: string;
+  body: string;
 }> = [
-  { value: "11", label: "Bölge", icon: MapPin, tone: "steel" },
-  { value: "30", label: "Senaryo", icon: ClipboardList, tone: "kkd" },
-  { value: "4", label: "Karar", icon: HardHat, tone: "kkd" },
+  {
+    id: "self",
+    num: "01",
+    title: "Ben ne kullanmalıyım?",
+    body: "Kendi KKD ve hazırlığını doğru seç.",
+  },
+  {
+    id: "contractor",
+    num: "02",
+    title: "Yüklenici ne kullanmalı?",
+    body: "Yüklenicinin eksiklerini belirle.",
+  },
+  {
+    id: "operator",
+    num: "03",
+    title: "İşletmede ne eksik?",
+    body: "İşletme uygunsuzluklarını analiz et.",
+  },
+  {
+    id: "action",
+    num: "04",
+    title: "Nasıl müdahale etmeliyim?",
+    body: "Doğru kontrollük kararını ver.",
+  },
 ];
 
 export default function HomePage() {
-  const { scenarios, source, sourceDetail } = useSafeWatchData();
+  const { scenarios, zones } = useSafeWatchData();
   const { progress } = useProgress();
   const { displayName } = useAuth();
 
   const total = scenarios.length || 30;
   const done = completedCount(progress);
+  const completed = Object.values(progress).filter(
+    (entry) => entry.status === "tamamlandi"
+  );
+  const avgTechnical =
+    completed.length > 0
+      ? Math.round(
+          completed.reduce((sum, entry) => sum + entry.best_technical, 0) /
+            completed.length
+        )
+      : null;
+  const avgBehavior =
+    completed.length > 0
+      ? Math.round(
+          completed.reduce((sum, entry) => sum + entry.best_behavior, 0) /
+            completed.length
+        )
+      : null;
+
+  const lastCompleted = Object.entries(progress)
+    .filter(([, entry]) => entry.status === "tamamlandi")
+    .sort((a, b) => b[1].updated_at.localeCompare(a[1].updated_at))[0];
+  const lastTitle = lastCompleted
+    ? findScenario(scenarios, lastCompleted[0])?.title ?? lastCompleted[0]
+    : null;
 
   const lastSlug = Object.entries(progress).sort((a, b) =>
     b[1].updated_at.localeCompare(a[1].updated_at)
@@ -56,109 +101,190 @@ export default function HomePage() {
       ? `/senaryo/${nextScenario.slug}`
       : "/saha";
 
+  const catalog = [
+    { value: String(zones.length || 11), label: "Bölge", icon: MapPin, tone: "steel" as const },
+    { value: String(total), label: "Senaryo", icon: ClipboardList, tone: "kkd" as const },
+    { value: "4", label: "Kritik Karar", icon: HardHat, tone: "kkd" as const },
+  ];
+
   return (
     <div className="relative flex min-h-[calc(100dvh-4.5rem)] flex-col overflow-hidden bg-erd-light">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(225,37,27,0.08),_transparent_55%),linear-gradient(180deg,#ffffff_0%,#f4f4f4_55%,#ececec_100%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(225,37,27,0.06),_transparent_48%),linear-gradient(180deg,#ffffff_0%,#f7f7f7_42%,#f0f0f0_100%)]" />
       <FactorySilhouette />
 
-      <div className="relative z-10 mx-auto grid w-full max-w-6xl flex-1 items-center gap-8 px-4 py-8 sm:py-12 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]">
-        <div className="w-full rounded-2xl border border-erd-line bg-white p-6 shadow-sm sm:p-8">
-          <p className="text-center text-sm text-erd-gray">
-            Hoş geldiniz,{" "}
-            <span className="font-semibold text-erd-charcoal">{displayName}</span>
-          </p>
+      <div className="relative z-10 mx-auto grid w-full max-w-6xl flex-1 items-start gap-8 px-4 py-7 sm:px-6 sm:py-10 lg:grid-cols-[minmax(17.5rem,20.5rem)_minmax(0,1fr)] lg:gap-10 lg:py-12">
+        <aside className="lg:sticky lg:top-[5.25rem]">
+          <div className="rounded-3xl border border-erd-line/90 bg-white/95 p-6 shadow-[0_16px_48px_rgba(46,46,46,0.06)] backdrop-blur-sm sm:p-7">
+            <p className="text-center text-[11px] font-semibold uppercase tracking-[0.18em] text-erd-gray">
+              Kontrollük antrenmanı
+            </p>
+            <p className="mt-2 text-center text-sm text-erd-gray">
+              Hoş geldiniz,{" "}
+              <span className="font-semibold text-erd-charcoal">{displayName}</span>
+            </p>
 
-          <div className="mt-4 flex flex-col items-center gap-4">
-            <OyakMark size="hero" />
-            <BrandMark size="hero" dark />
-          </div>
+            <div className="mt-5 flex flex-col items-center gap-3">
+              <OyakMark size="hero" />
+              <BrandMark size="hero" dark />
+            </div>
 
-          <div className="mt-8 space-y-2.5">
-            <HomeButton
-              href={continueHref}
-              label="Oyuna Başla"
-              icon={Play}
-              tone="kkd"
-              primary
-            />
-            <HomeButton href="/saha" label="Saha Seçimi" icon={MapPin} tone="steel" />
-            <HomeButton
-              href="/ilerlemem"
-              label="Gelişim Raporum"
-              icon={BarChart3}
-              tone="nav"
-            />
-            <HomeButton
-              href="/yardim"
-              label="Nasıl Oynanır"
-              icon={BookOpen}
-              tone="port"
-            />
-          </div>
+            <nav className="mt-8 space-y-2" aria-label="Öğrenme menüsü">
+              <HomeButton
+                href={continueHref}
+                label="Oyuna Başla"
+                icon={Play}
+                tone="kkd"
+                primary
+              />
+              <HomeButton href="/saha" label="Saha Seçimi" icon={MapPin} tone="steel" />
+              <HomeButton
+                href="/ilerlemem"
+                label="Gelişim Raporum"
+                icon={BarChart3}
+                tone="nav"
+              />
+              <HomeButton
+                href="/yardim"
+                label="Nasıl Oynanır"
+                icon={BookOpen}
+                tone="port"
+              />
+            </nav>
 
-          <div className="mt-7 flex items-center gap-4 border-t border-erd-line pt-5">
-            <CircularProgress value={done} total={total} />
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-bold text-erd-red">
-                Tamamlanan: {done}/{total} senaryo
-              </p>
-              <div className="mt-2 h-2 overflow-hidden rounded-full bg-erd-line">
-                <div
-                  className="h-full rounded-full bg-erd-red"
-                  style={{ width: `${total ? Math.round((done / total) * 100) : 0}%` }}
-                />
+            <div className="mt-7 flex items-center gap-4 border-t border-erd-line pt-5">
+              <CircularProgress value={done} total={total} />
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-bold text-erd-charcoal">
+                  {done}/{total} senaryo
+                </p>
+                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-erd-line">
+                  <div
+                    className="h-full rounded-full bg-erd-red"
+                    style={{
+                      width: `${total ? Math.round((done / total) * 100) : 0}%`,
+                    }}
+                  />
+                </div>
+                <p className="mt-2 text-xs leading-snug text-erd-gray">
+                  Gelişiminiz kayıtlıdır; kaldığınız yerden devam edebilirsiniz.
+                </p>
               </div>
-              <p className="mt-2 text-xs text-erd-gray">
-                Devam et, gelişimini birlikte takip edelim.
-              </p>
             </div>
           </div>
+        </aside>
 
-          <div className="mt-4">
-            <DataSourceNote source={source} detail={sourceDetail} />
-          </div>
-        </div>
+        <div className="flex min-w-0 flex-col gap-8 pb-2 lg:pt-1">
+          <section>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-erd-red">
+              SafeWatch metodolojisi
+            </p>
+            <h1 className="mt-2 text-2xl font-bold tracking-tight text-erd-charcoal sm:text-3xl">
+              Dört Karar Metodolojisi
+            </h1>
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-erd-gray">
+              Her senaryoda aynı dört kararı çalışırsınız. Sistem tanı koymaz;
+              yalnızca gelişim göstergesi üretir.
+            </p>
 
-        <div className="flex flex-col justify-end pb-2 lg:min-h-[28rem] lg:pb-10">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-erd-red">
-            Dört karar
-          </p>
-          <ul className="mt-3 space-y-2">
-            {DECISION_TABS.map((tab) => (
-              <li
-                key={tab.id}
-                className="text-xl font-bold tracking-tight text-erd-charcoal sm:text-2xl"
-              >
-                {tab.label}
-              </li>
-            ))}
-          </ul>
-          <p className="mt-4 max-w-md text-sm leading-relaxed text-erd-gray">
-            Kendi donanımınızı, yüklenici eksiğini, işletme uygunsuzluğunu ve
-            müdahaleyi sahaya çıkmadan çalışırsınız. Sistem tanı koymaz;
-            yalnızca gelişim göstergesi üretir.
-          </p>
-          <ul className="mt-6 grid max-w-md grid-cols-3 gap-2">
-            {HOME_FACTS.map((fact) => (
-              <li
-                key={fact.label}
-                className="relative overflow-hidden rounded-xl border border-erd-line/80 bg-white/80 px-3 py-3 text-center backdrop-blur-sm"
-              >
-                <IconWatermark icon={fact.icon} tone={fact.tone} />
-                <p className="relative text-xl font-bold tabular-nums text-erd-charcoal">
-                  {fact.value}
-                </p>
-                <p className="relative mt-0.5 text-[11px] font-medium text-erd-gray">
-                  {fact.label}
-                </p>
-              </li>
-            ))}
-          </ul>
+            <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+              {METHODOLOGY.map((item) => {
+                const glyph = tabGlyph(item.id);
+                return (
+                  <li
+                    key={item.id}
+                    className="sw-lift sw-card relative min-h-[11.5rem] overflow-hidden p-5 sm:min-h-[13rem] sm:p-6"
+                  >
+                    <span className="absolute inset-y-0 left-0 w-1 bg-erd-red/80" aria-hidden />
+                    <div className="flex items-start justify-between gap-3">
+                      <AppIcon icon={glyph.icon} tone={glyph.tone} size="md" />
+                      <span className="text-2xl font-light tabular-nums tracking-tight text-erd-red/70">
+                        {item.num}
+                      </span>
+                    </div>
+                    <h2 className="mt-5 text-base font-bold leading-snug text-erd-charcoal sm:text-lg">
+                      {item.title}
+                    </h2>
+                    <p className="mt-1.5 text-sm leading-relaxed text-erd-gray">
+                      {item.body}
+                    </p>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+
+          <section>
+            <ul className="grid grid-cols-3 gap-3">
+              {catalog.map((fact) => (
+                <li
+                  key={fact.label}
+                  className="sw-lift sw-card relative overflow-hidden px-3 py-7 text-center sm:px-5 sm:py-10"
+                >
+                  <span className="mx-auto mb-4 hidden sm:flex sm:justify-center">
+                    <AppIcon icon={fact.icon} tone={fact.tone} size="md" />
+                  </span>
+                  <p className="text-4xl font-bold tabular-nums tracking-tight text-erd-charcoal sm:text-6xl">
+                    {fact.value}
+                  </p>
+                  <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-erd-gray sm:text-xs">
+                    {fact.label}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <section>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-erd-gray">
+              Gelişiminiz
+            </p>
+            <ul className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
+              <MetricCard
+                label="Son tamamlanan"
+                value={lastTitle ?? "Henüz yok"}
+                compact
+              />
+              <MetricCard label="Tamamlanan senaryo" value={`${done}/${total}`} />
+              <MetricCard
+                label="Ortalama teknik doğruluk"
+                value={avgTechnical == null ? "—" : String(avgTechnical)}
+              />
+              <MetricCard
+                label="Ortalama kontrollük davranışı"
+                value={avgBehavior == null ? "—" : String(avgBehavior)}
+              />
+            </ul>
+          </section>
         </div>
       </div>
 
       <PrinciplesBar />
     </div>
+  );
+}
+
+function MetricCard({
+  label,
+  value,
+  compact = false,
+}: {
+  label: string;
+  value: string;
+  compact?: boolean;
+}) {
+  return (
+    <li className="sw-card min-h-[5.5rem] px-4 py-5">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-erd-gray">
+        {label}
+      </p>
+      <p
+        className={`mt-2 font-bold leading-snug text-erd-charcoal ${
+          compact ? "text-sm" : "text-lg sm:text-xl"
+        }`}
+      >
+        {value}
+      </p>
+    </li>
   );
 }
 
@@ -178,20 +304,22 @@ function HomeButton({
   return (
     <Link
       href={href}
-      className={`flex w-full items-center gap-3 rounded-xl px-4 py-3.5 text-sm font-semibold transition-colors ${
+      className={`sw-nav-item flex w-full items-center gap-3 rounded-2xl px-3.5 py-3.5 text-sm font-semibold ${
         primary
-          ? "bg-erd-red text-white hover:bg-erd-red-dark"
-          : "border border-erd-red/70 bg-white text-erd-charcoal hover:bg-red-50/50"
+          ? "bg-erd-red text-white shadow-[0_8px_24px_rgba(225,37,27,0.28)] hover:bg-erd-red-dark"
+          : "border border-erd-line bg-erd-light/60 text-erd-charcoal hover:border-erd-red/35 hover:bg-white"
       }`}
     >
       {primary ? (
-        <Icon
-          size={22}
-          strokeWidth={1.7}
-          fill="currentColor"
-          fillOpacity={0.28}
-          className="text-white"
-        />
+        <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/15">
+          <Icon
+            size={20}
+            strokeWidth={1.7}
+            fill="currentColor"
+            fillOpacity={0.28}
+            className="text-white"
+          />
+        </span>
       ) : (
         <AppIcon icon={Icon} tone={tone} size="sm" />
       )}

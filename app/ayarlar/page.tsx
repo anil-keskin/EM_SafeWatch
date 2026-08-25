@@ -2,13 +2,16 @@
 
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
+import DataSourceNote from "@/components/DataSourceNote";
 import { useAuth } from "@/lib/auth";
+import { useSafeWatchData } from "@/lib/data";
 import { useProgress } from "@/lib/progress";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
 
 export default function AyarlarPage() {
   const { displayName, isGuest, signOut } = useAuth();
   const { reset } = useProgress();
+  const { source, sourceDetail } = useSafeWatchData();
 
   return (
     <PageShell>
@@ -68,6 +71,10 @@ export default function AyarlarPage() {
         >
           İlerlemeyi Sıfırla
         </button>
+      </section>
+
+      <section className="mt-4">
+        <DataSourceNote source={source} detail={sourceDetail} />
       </section>
     </PageShell>
   );

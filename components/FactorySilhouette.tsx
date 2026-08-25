@@ -1,58 +1,77 @@
-/** Demir çelik tesis silüeti — ana sayfa arka planı. */
+/** Demir çelik tesis silüeti — düşük opaklıkta kurumsal atmosfer. */
 export default function FactorySilhouette() {
   return (
     <svg
-      className="pointer-events-none absolute inset-x-0 bottom-0 h-[62%] w-full text-erd-charcoal/25"
-      viewBox="0 0 1200 420"
+      className="pointer-events-none absolute inset-x-0 bottom-0 h-[58%] w-full text-erd-charcoal/[0.13]"
+      viewBox="0 0 1440 480"
       preserveAspectRatio="xMidYMax slice"
       aria-hidden="true"
     >
       <defs>
-        <linearGradient id="sw-stack-glow" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stopColor="#e1251b" stopOpacity="0.35" />
+        <linearGradient id="sw-skyline-fade" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor="#2e2e2e" stopOpacity="0.04" />
           <stop offset="100%" stopColor="#2e2e2e" stopOpacity="0" />
         </linearGradient>
+        <linearGradient id="sw-stack-ember" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor="#e1251b" stopOpacity="0.18" />
+          <stop offset="100%" stopColor="#e1251b" stopOpacity="0" />
+        </linearGradient>
       </defs>
+
+      <rect x="0" y="0" width="1440" height="480" fill="url(#sw-skyline-fade)" />
+
       <g fill="currentColor">
-        <path d="M70 420 L110 170 H170 L210 420 Z" />
-        <ellipse cx="140" cy="170" rx="32" ry="10" />
-        <path d="M230 420 L265 210 H315 L350 420 Z" />
-        <ellipse cx="290" cy="210" rx="26" ry="8" />
+        {/* Yüksek fırın ve cowper */}
+        <path d="M92 480 L128 210 H188 L224 480 Z" />
+        <ellipse cx="158" cy="208" rx="34" ry="11" />
+        <rect x="142" y="168" width="14" height="42" />
+        <path d="M248 480 L278 248 H322 L352 480 Z" />
+        <ellipse cx="300" cy="246" rx="24" ry="8" />
+        <rect x="268" y="300" width="18" height="8" opacity="0.45" />
+        <rect x="268" y="340" width="18" height="8" opacity="0.45" />
 
-        <path d="M390 420 V210 L430 150 H510 L550 210 V420 Z" />
-        <rect x="430" y="120" width="18" height="40" />
-        <rect x="492" y="95" width="16" height="65" />
-        <rect x="425" y="88" width="28" height="10" />
-        <rect x="487" y="86" width="26" height="10" />
+        {/* Gaz hattı / boru köprüsü */}
+        <rect x="360" y="268" width="210" height="8" />
+        <rect x="360" y="292" width="210" height="5" opacity="0.55" />
+        <rect x="392" y="276" width="7" height="204" />
+        <rect x="456" y="276" width="7" height="204" />
+        <rect x="528" y="276" width="7" height="204" />
+        <circle cx="372" cy="272" r="7" />
+        <circle cx="558" cy="272" r="7" />
 
-        <rect x="580" y="70" width="22" height="350" />
-        <rect x="616" y="110" width="18" height="310" />
-        <rect x="648" y="50" width="26" height="370" />
-        <rect x="574" y="62" width="34" height="12" />
-        <rect x="642" y="42" width="38" height="12" />
+        {/* Baca grubu */}
+        <rect x="590" y="86" width="20" height="394" />
+        <rect x="622" y="132" width="16" height="348" />
+        <rect x="650" y="64" width="24" height="416" />
+        <rect x="584" y="78" width="32" height="10" />
+        <rect x="644" y="56" width="36" height="10" />
+        <rect x="648" y="0" width="28" height="72" fill="url(#sw-stack-ember)" />
 
-        <rect x="690" y="240" width="220" height="14" />
-        <rect x="710" y="254" width="10" height="166" />
-        <rect x="800" y="254" width="10" height="166" />
-        <rect x="880" y="254" width="10" height="166" />
+        {/* Haddehane — testere çatı */}
+        <rect x="700" y="268" width="268" height="212" />
+        <path d="M700 268 L746 214 L792 268 L838 214 L884 268 L930 214 L968 268 Z" />
+        <rect x="728" y="312" width="36" height="52" opacity="0.38" />
+        <rect x="788" y="312" width="36" height="52" opacity="0.38" />
+        <rect x="848" y="312" width="36" height="52" opacity="0.38" />
+        <rect x="908" y="312" width="28" height="52" opacity="0.38" />
 
-        <rect x="700" y="280" width="160" height="140" />
-        <polygon points="700,280 780,230 860,280" />
-        <rect x="720" y="310" width="28" height="40" opacity="0.4" />
-        <rect x="760" y="310" width="28" height="40" opacity="0.4" />
-        <rect x="800" y="310" width="28" height="40" opacity="0.4" />
+        {/* Vinç köprüsü */}
+        <rect x="990" y="148" width="10" height="332" />
+        <rect x="1388" y="148" width="10" height="332" />
+        <rect x="990" y="148" width="408" height="9" />
+        <rect x="1178" y="157" width="8" height="86" />
+        <rect x="1164" y="239" width="36" height="12" />
+        <rect x="1148" y="157" width="68" height="6" opacity="0.5" />
 
-        <rect x="920" y="160" width="12" height="260" />
-        <rect x="900" y="160" width="180" height="10" />
-        <rect x="1060" y="170" width="6" height="90" />
-        <rect x="1048" y="256" width="30" height="14" />
+        {/* Gazometre / tank ve atölye */}
+        <rect x="1024" y="292" width="88" height="188" />
+        <path d="M1024 292 L1068 248 L1112 292 Z" />
+        <rect x="1136" y="332" width="118" height="148" />
+        <path d="M1136 332 L1195 286 L1254 332 Z" />
+        <rect x="1284" y="368" width="72" height="112" />
 
-        <rect x="980" y="250" width="70" height="170" />
-        <rect x="1060" y="300" width="90" height="120" />
-        <path d="M1070 300 L1110 250 L1145 300 Z" />
-        <path d="M200 400 H1100 V420 H200 Z" opacity="0.5" />
+        <path d="M60 456 H1380 V480 H60 Z" opacity="0.55" />
       </g>
-      <rect x="572" y="0" width="110" height="80" fill="url(#sw-stack-glow)" />
     </svg>
   );
 }

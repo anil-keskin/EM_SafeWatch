@@ -88,8 +88,41 @@ body {
   animation: sw-pulse 2.4s ease-out infinite;
 }
 
+/* Ana sayfa KPI / metodoloji kartları: kısa ve sakin yükselme */
+.sw-lift {
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    border-color 0.22s ease;
+}
+
+.sw-lift:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--color-erd-red) 28%, var(--color-erd-line));
+  box-shadow: 0 18px 40px rgba(46, 46, 46, 0.08);
+}
+
+.sw-nav-item {
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.sw-nav-item:hover {
+  transform: translateX(2px);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .sw-hotspot-idle {
     animation: none;
+  }
+
+  .sw-lift,
+  .sw-lift:hover,
+  .sw-nav-item,
+  .sw-nav-item:hover {
+    transform: none;
+    transition: none;
   }
 }
