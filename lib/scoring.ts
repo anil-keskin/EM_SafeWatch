@@ -23,10 +23,17 @@ import type {
 
 /** Her senaryo ipucu kademesinin düşürdüğü puan. */
 export const HINT_PENALTY_PER_LEVEL = 3;
-/** Bir aile veya müdahale grubunu giydirme (TAK / SEÇ). */
-export const SOLUTION_CATEGORY_PENALTY = 6;
-/** Sekmenin veya sahnenin tam çözümünü giydirme. */
-export const SOLUTION_FULL_PENALTY = 10;
+/**
+ * Bir aile / müdahale grubu (TAK, İŞARETLE, SEÇ).
+ * Tek ailede takılınca ucuz yardım: 6 kez kullanmak 6 puan, eski 36 değil.
+ */
+export const SOLUTION_CATEGORY_PENALTY = 1;
+/**
+ * Sekmenin veya sahnenin tamamı (HEPSİNİ TAK / SEÇ / BELİRLE).
+ * Altı ailelik TAK ile aynı maliyet; 1–5 ailede aile çözümü daha ucuz,
+ * tüm sekmeyi tek tıkta teslim etmek altı aileden pahalıya gelmez.
+ */
+export const SOLUTION_FULL_PENALTY = 6;
 /** KKD / sahne çözümü kontrollük davranışını daha az etkiler. */
 const BEHAVIOR_SOLUTION_FACTOR = 0.4;
 

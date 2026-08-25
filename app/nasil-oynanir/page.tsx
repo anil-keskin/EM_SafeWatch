@@ -37,7 +37,7 @@ const RULES = [
   },
   {
     title: "Kart rehberi ve kademeli ipucu ayrıdır",
-    body: "Hazırlık panelindeki (i) hangi durumda seçeceğinizi anlatır, puanınızı düşürmez. TAK / HEPSİNİ TAK ve sahnedeki HEPSİNİ BELİRLE doğru cevabı giydirir; her kullanım puanı düşürür ve gelişime açık alanı belirginleştirir. Senaryo ipucu da puan düşürür ama ilerlemeyi engellemez.",
+    body: "Hazırlık panelindeki (i) hangi durumda seçeceğinizi anlatır, puanınızı düşürmez. Bir koruma ailesini çözmek 1 puan, sekmenin veya sahnenin tamamını çözmek 6 puan düşürür. Böylece tek ailede takılınca TAK ucuz kalır; tüm sekmeyi teslim etmek altı ailelik yardımdan pahalıya gelmez. Senaryo ipucu kademesi 3 puan düşürür ama ilerlemeyi engellemez.",
   },
   {
     title: "Gereksiz KKD de bir uygunsuzluktur",
