@@ -28,6 +28,12 @@ jobs:
       - name: Install
         run: npm ci
 
+      - name: Hide API routes for static export
+        run: |
+          if [ -d app/api ]; then
+            mv app/api /tmp/safewatch-api
+          fi
+
       - name: Build static export
         run: npm run build
         env:
