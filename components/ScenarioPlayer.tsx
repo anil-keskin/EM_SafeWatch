@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ClipboardList, HardHat, TriangleAlert } from "lucide-react";
 import BriefingCard from "@/components/BriefingCard";
 import DecisionPanel, {
@@ -13,6 +13,10 @@ import HazardScene from "@/components/HazardScene";
 import HintBox from "@/components/HintBox";
 import SolutionAssist from "@/components/SolutionAssist";
 import { useSafeWatchData, findScenario } from "@/lib/data";
+import {
+  createHazardLayoutSeed,
+  scatterHazards,
+} from "@/lib/hazard-layout";
 import { useProgress } from "@/lib/progress";
 import {
   HINT_PENALTY_PER_LEVEL,
@@ -58,12 +62,22 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
   const [activeTab, setActiveTab] = useState<DecisionTab>("self");
   const [hintsUsed, setHintsUsed] = useState(0);
   const [usedKeys, setUsedKeys] = useState<Set<string>>(() => new Set());
+  const [layoutSeed, setLayoutSeed] = useState<number | null>(null);
 
   const scenario = useMemo(
     () => findScenario(scenarios, slug),
     [scenarios, slug]
   );
   const zone = zones.find((z) => z.id === scenario?.zone_id);
+
+  useEffect(() => {
+    setLayoutSeed(createHazardLayoutSeed(slug));
+  }, [slug]);
+
+  const sceneHazards = useMemo(() => {
+    if (!scenario || layoutSeed == null) return [];
+    return scatterHazards(scenario.hazards, layoutSeed);
+  }, [scenario, layoutSeed]);
 
   if (!scenario) {
     return (
@@ -207,7 +221,7 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
 
               <HazardScene
                 zoneId={scenario.zone_id}
-                hazards={scenario.hazards}
+                hazards={sceneHazards}
                 selected={answers.hazards}
                 onToggle={handleHazardToggle}
               />

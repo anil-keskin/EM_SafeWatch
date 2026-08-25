@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import HazardScene from "@/components/HazardScene";
 import ScoreMeter from "@/components/ScoreMeter";
 import AppIcon, { IconWatermark } from "@/components/AppIcon";
 import { actionLabel } from "@/content/actions";
 import { competencyLabel } from "@/content/scenarios";
 import { useSafeWatchData, findScenario, scenariosOfZone } from "@/lib/data";
+import { readHazardLayoutSeed, scatterHazards } from "@/lib/hazard-layout";
 import { zoneGlyph, zoneTone } from "@/lib/icon-theme";
 import { assistAxisPenalties } from "@/lib/scoring";
 import { loadLastResult } from "@/lib/progress";
@@ -22,15 +23,26 @@ type LabelFn = (code: string) => string;
 export default function ResultView({ slug }: { slug: string }) {
   const { zones, scenarios, equipment } = useSafeWatchData();
   const [result, setResult] = useState<ScenarioResult | null>(null);
+  const [layoutSeed, setLayoutSeed] = useState<number | null>(null);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     setResult(loadLastResult(slug));
+    setLayoutSeed(readHazardLayoutSeed(slug));
     setReady(true);
   }, [slug]);
 
   const scenario = findScenario(scenarios, slug);
   const zone = zones.find((z) => z.id === scenario?.zone_id);
+  const sceneHazards = useMemo(
+    () =>
+      scenario
+        ? layoutSeed
+          ? scatterHazards(scenario.hazards, layoutSeed)
+          : scenario.hazards
+        : [],
+    [scenario, layoutSeed]
+  );
   const zoneScenarios = scenario
     ? scenariosOfZone(scenarios, scenario.zone_id)
     : [];
@@ -119,7 +131,7 @@ export default function ResultView({ slug }: { slug: string }) {
         </h2>
         <HazardScene
           zoneId={scenario.zone_id}
-          hazards={scenario.hazards}
+          hazards={sceneHazards}
           selected={[
             ...result.sections.hazards.hits,
             ...result.sections.hazards.extras,

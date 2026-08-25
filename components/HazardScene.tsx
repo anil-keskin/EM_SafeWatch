@@ -15,8 +15,9 @@ interface HazardSceneProps {
 
 /**
  * Tehlike tanıma sahnesi.
- * Oyuncu sahnedeki risk noktalarını işaretler. Bazı noktalar bilinçli olarak
- * sahtedir; gereksiz işaretleme puanı düşürür.
+ * Oyuncu sahnedeki risk noktalarını işaretler. Konumlar her denemede
+ * rastgele dağılır; gerçek/sahte ayrımı değişmez. Etiket, işaretlenene
+ * veya değerlendirme açılana kadar gizlenir.
  */
 export default function HazardScene({
   zoneId,
@@ -81,15 +82,15 @@ export default function HazardScene({
               )}
             </span>
 
-            {/* Etiket, değerlendirme sonrası veya üzerine gelince görünür */}
-            <span
-              className={`pointer-events-none absolute left-1/2 top-full z-10 mt-2 w-40 -translate-x-1/2
-                          rounded-lg bg-erd-charcoal/95 px-2.5 py-1.5 text-center text-[11px]
-                          font-medium leading-snug text-white shadow-lg transition-opacity
-                          ${revealed ? "opacity-100" : "opacity-0 group-hover:opacity-100 group-focus:opacity-100"}`}
-            >
-              {hazard.label}
-            </span>
+            {(revealed || isSelected) && (
+              <span
+                className="pointer-events-none absolute left-1/2 top-full z-10 mt-2 w-40 -translate-x-1/2
+                           rounded-lg bg-erd-charcoal/95 px-2.5 py-1.5 text-center text-[11px]
+                           font-medium leading-snug text-white shadow-lg"
+              >
+                {hazard.label}
+              </span>
+            )}
           </button>
         );
       })}
