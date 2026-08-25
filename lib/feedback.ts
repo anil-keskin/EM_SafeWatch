@@ -7,8 +7,9 @@ export const FEEDBACK_CATEGORIES = [
 
 export type FeedbackCategory = (typeof FEEDBACK_CATEGORIES)[number];
 
-export const FEEDBACK_TO = "ankeskin@erdemir.com.tr";
+export const FEEDBACK_TO = "anil.keskin@hotmail.com";
 export const FEEDBACK_SUBJECT = "[SafeWatch] Yeni Geri Bildirim";
+export const FEEDBACK_ENDPOINT = "/.netlify/functions/send-feedback";
 
 export interface FeedbackPayload {
   category: FeedbackCategory;
@@ -17,57 +18,47 @@ export interface FeedbackPayload {
   message: string;
 }
 
-function escapeMailto(value: string): string {
-  return encodeURIComponent(value);
+export function isFeedbackCategory(value: string): value is FeedbackCategory {
+  return (FEEDBACK_CATEGORIES as readonly string[]).includes(value);
 }
 
-export function buildFeedbackBody(payload: FeedbackPayload, sentAt: Date): string {
-  const user = payload.name.trim() || "Belirtilmedi";
-  const mail = payload.email.trim() || "Belirtilmedi";
+export function parseFeedbackPayload(input: unknown): FeedbackPayload | null {
+  if (!input || typeof input !== "object") return null;
+  const data = input as Record<string, unknown>;
+  const category = typeof data.category === "string" ? data.category.trim() : "";
+  const name = typeof data.name === "string" ? data.name.trim() : "";
+  const email = typeof data.email === "string" ? data.email.trim() : "";
+  const message = typeof data.message === "string" ? data.message.trim() : "";
+  if (!isFeedbackCategory(category)) return null;
+  if (message.length < 8) return null;
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return null;
+  return { category, name, email, message };
+}
+
+export function buildFeedbackEmail(
+  payload: FeedbackPayload,
+  sentAt = new Date()
+): string {
   return [
     `Kategori: ${payload.category}`,
-    `Kullanıcı: ${user}`,
-    `E-posta: ${mail}`,
+    `Kullanıcı: ${payload.name || "Belirtilmedi"}`,
+    `E-posta: ${payload.email || "Belirtilmedi"}`,
     `Tarih: ${sentAt.toISOString()}`,
     "",
     "Mesaj:",
-    payload.message.trim(),
+    payload.message,
   ].join("\n");
 }
 
-export function mailtoFeedbackUrl(payload: FeedbackPayload, sentAt = new Date()): string {
-  const body = buildFeedbackBody(payload, sentAt);
-  return `mailto:${FEEDBACK_TO}?subject=${escapeMailto(FEEDBACK_SUBJECT)}&body=${escapeMailto(body)}`;
-}
-
-/**
- * Statik GitHub Pages'te API rotası olmadığı için FormSubmit kullanılır.
- * İlk gönderimde alıcı adresinin e-postadan onay vermesi gerekebilir.
- */
-export async function sendFeedback(payload: FeedbackPayload): Promise<void> {
-  const sentAt = new Date();
-  const body = {
-    _subject: FEEDBACK_SUBJECT,
-    _template: "table",
-    _captcha: "false",
-    Kategori: payload.category,
-    Kullanıcı: payload.name.trim() || "Belirtilmedi",
-    "E-posta": payload.email.trim() || "Belirtilmedi",
-    Tarih: sentAt.toISOString(),
-    Mesaj: payload.message.trim(),
-  };
-
-  const response = await fetch(
-    `https://formsubmit.co/ajax/${FEEDBACK_TO}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify(body),
-    }
-  );
+export async function sendFeedback(
+  payload: FeedbackPayload,
+  honey = ""
+): Promise<void> {
+  const response = await fetch(FEEDBACK_ENDPOINT, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ...payload, honey }),
+  });
 
   if (!response.ok) {
     throw new Error("Gönderilemedi");

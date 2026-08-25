@@ -5,7 +5,7 @@
  * registration.scope üzerinden türetilir.
  */
 
-const CACHE = "safewatch-v8";
+const CACHE = "safewatch-v10";
 
 function scoped(path) {
   const base = self.registration.scope.replace(/\/$/, "");

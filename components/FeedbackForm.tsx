@@ -4,15 +4,11 @@ import { FormEvent, useState } from "react";
 import { MessageSquare } from "lucide-react";
 import {
   FEEDBACK_CATEGORIES,
-  mailtoFeedbackUrl,
   sendFeedback,
   type FeedbackCategory,
 } from "@/lib/feedback";
 
-/**
- * Ana ekran geri bildirim formu.
- * Projede SMTP yoktur; GitHub Pages statik olduğu için FormSubmit kullanılır.
- */
+/** Ana ekran geri bildirim formu. Gönderim Resend Netlify Function ile yapılır. */
 export default function FeedbackForm() {
   const [open, setOpen] = useState(false);
   const [category, setCategory] = useState<FeedbackCategory>("Hata Bildirimi");
@@ -33,7 +29,7 @@ export default function FeedbackForm() {
     setHoney("");
   };
 
-  const handleSubmit = async (event: FormEvent) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (honey.trim()) return;
     const trimmed = message.trim();
@@ -48,22 +44,23 @@ export default function FeedbackForm() {
       return;
     }
 
-    const payload = { category, name, email, message: trimmed };
     setStatus("sending");
     setError("");
     try {
-      await sendFeedback(payload);
+      await sendFeedback(
+        { category, name, email, message: trimmed },
+        honey
+      );
       setStatus("sent");
       reset();
     } catch {
-      window.location.href = mailtoFeedbackUrl(payload);
-      setStatus("sent");
-      reset();
+      setStatus("error");
+      setError("Gönderilemedi. Lütfen biraz sonra yeniden deneyin.");
     }
   };
 
   return (
-    <div className="rounded-2xl border border-erd-line/90 bg-white/95 p-4">
+    <div className="rounded-2xl border border-erd-line/90 bg-white p-4">
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
@@ -109,7 +106,8 @@ export default function FeedbackForm() {
 
           <label className="block">
             <span className="text-[11px] font-semibold uppercase tracking-wide text-erd-gray">
-              Ad Soyad <span className="font-medium normal-case">(opsiyonel)</span>
+              Ad Soyad{" "}
+              <span className="font-medium normal-case">(opsiyonel)</span>
             </span>
             <input
               type="text"
@@ -122,7 +120,8 @@ export default function FeedbackForm() {
 
           <label className="block">
             <span className="text-[11px] font-semibold uppercase tracking-wide text-erd-gray">
-              E-posta <span className="font-medium normal-case">(opsiyonel)</span>
+              E-posta{" "}
+              <span className="font-medium normal-case">(opsiyonel)</span>
             </span>
             <input
               type="email"
@@ -146,18 +145,21 @@ export default function FeedbackForm() {
             />
           </label>
 
-          <div className="hidden" aria-hidden>
-            <input
-              tabIndex={-1}
-              autoComplete="off"
-              value={honey}
-              onChange={(e) => setHoney(e.target.value)}
-            />
-          </div>
+          <p className="hidden" aria-hidden>
+            <label>
+              Bot alanı
+              <input
+                tabIndex={-1}
+                autoComplete="off"
+                value={honey}
+                onChange={(e) => setHoney(e.target.value)}
+              />
+            </label>
+          </p>
 
           {status === "sent" && (
             <p className="text-xs leading-relaxed text-emerald-700">
-              Teşekkürler. Geri bildiriminiz iletildi.
+              Geri bildiriminiz alınmıştır.
             </p>
           )}
           {status === "error" && error && (
