@@ -34,9 +34,18 @@ interface EquipmentPickerProps {
 const TAB_NOTE: Record<Exclude<DecisionTab, "action">, string> = {
   self: "Açık ailede TAK yalnızca o koruma ailesinin doğrularını giydirir. HEPSİNİ TAK tüm sekmenin doğru donanımını yazar. Çözüm puan düşürür.",
   contractor:
-    "Açık ailede TAK, yüklenicide o ailedeki eksikleri işaretler. HEPSİNİ TAK tüm eksikleri yazar. Çözüm puan düşürür.",
+    "Açık ailede İŞARETLE, yüklenicide o ailedeki eksikleri yazar — ona giydirmez. HEPSİNİ İŞARETLE tüm eksikleri yazar. Çözüm puan düşürür.",
   operator:
-    "Açık ailede TAK, işletmede o ailedeki uygunsuzlukları işaretler. HEPSİNİ TAK tüm eksikleri yazar. Çözüm puan düşürür.",
+    "Siz işletme personeline KKD giydirmezsiniz. İŞARETLE gördüğünüz eksiği tespit eder. Müdahale yetkisi bildirim sekmesindedir. Çözüm puan düşürür.",
+};
+
+const FILL_LABEL: Record<
+  Exclude<DecisionTab, "action">,
+  { fill: string; fillAll: string }
+> = {
+  self: { fill: "TAK", fillAll: "HEPSİNİ TAK" },
+  contractor: { fill: "İŞARETLE", fillAll: "HEPSİNİ İŞARETLE" },
+  operator: { fill: "İŞARETLE", fillAll: "HEPSİNİ İŞARETLE" },
 };
 
 /**
@@ -141,8 +150,8 @@ export default function EquipmentPicker({
   return (
     <div className="space-y-3">
       <SolutionAssist
-        fillLabel={activeCategory === "all" ? undefined : "TAK"}
-        fillAllLabel="HEPSİNİ TAK"
+        fillLabel={activeCategory === "all" ? undefined : FILL_LABEL[tab].fill}
+        fillAllLabel={FILL_LABEL[tab].fillAll}
         onFill={
           activeCategory === "all"
             ? undefined

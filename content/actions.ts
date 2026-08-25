@@ -16,7 +16,7 @@ export const ACTIONS: ActionOption[] = [
     code: "durdur_muteahhit",
     label: "Müteahhit işini durdur",
     description:
-      "Sözleşme kapsamındaki yetkinizle yüklenici çalışmasını durdurursunuz. Anlık ve ciddi risklerde kullanılır.",
+      "Sözleşme kapsamındaki yetkinizle yüklenici çalışmasını durdurursunuz. Anlık ve ciddi risklerde kullanılır. İşletme personelinin işini durduramazsınız.",
     kind: "durdurma",
   },
   {
@@ -30,7 +30,7 @@ export const ACTIONS: ActionOption[] = [
     code: "bildir_isletme",
     label: "İşletme sorumlusuna bildir",
     description:
-      "İşletme personeline doğrudan talimat veremezsiniz; tespiti ilgili işletme birim sorumlusuna iletirsiniz.",
+      "İşletme personeline KKD giydiremez, doğrudan talimat veremezsiniz; tespiti ilgili işletme birim sorumlusuna iletirsiniz.",
     kind: "bildirim",
   },
   {

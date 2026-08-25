@@ -216,7 +216,7 @@ insert into scenarios (
   $j$[]$j$::jsonb,
   $j$["aluminize_giysi","yuz_siperi","cizme_isi_hi3","eldiven_isi"]$j$::jsonb,
   $j$["bildir_isletme","bildir_isg","ekibi_cikar","kayit_al"]$j$::jsonb,
-  $j$["gozleme_devam","durdur_muteahhit"]$j$::jsonb,
+  $j$["gozleme_devam","durdur_muteahhit","bildir_firma"]$j$::jsonb,
   $j$[
     "Gördüğünüz uygunsuzluk sizde değil, karşınızdaki kişide. Önce şunu sorun: bu kişi kimin çalışanı?",
     "Alüminize giysi sıvı metale doğrudan müdahale edenin kıyafetidir. Siz müdahale etmiyorsunuz — onu kendinize giymek çözüm değildir.",

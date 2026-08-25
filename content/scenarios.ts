@@ -429,7 +429,7 @@ export const SCENARIOS: Scenario[] = [
       "ekibi_cikar",
       "kayit_al",
     ],
-    wrong_actions: ["gozleme_devam", "durdur_muteahhit"],
+    wrong_actions: ["gozleme_devam", "durdur_muteahhit", "bildir_firma"],
     hints: [
       "Gördüğünüz uygunsuzluk sizde değil, karşınızdaki kişide. Önce şunu sorun: bu kişi kimin çalışanı?",
       "Alüminize giysi sıvı metale doğrudan müdahale edenin kıyafetidir. Siz müdahale etmiyorsunuz — onu kendinize giymek çözüm değildir.",

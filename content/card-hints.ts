@@ -11,7 +11,7 @@ export const TAB_SELECT_CONTEXT: Record<DecisionTab, string> = {
   contractor:
     "Yüklenicide EKSİK veya uygunsuz gördüğünüzde işaretleyin. Sizde olanı değil, onda olmayanı seçin. Hepsi yerindeyse bu sekmeyi boş bırakın.",
   operator:
-    "İşletme sahasında eksik veya uygunsuz gördüğünüzde işaretleyin. İşletmeye talimat vermezsiniz; tespiti işaretlersiniz. Uygunsuzluk yoksa boş bırakın.",
+    "İşletmede EKSİK gördüğünüzde işaretleyin. Bu sekme giydirme değildir; onlara KKD takmaz, talimat vermezsiniz. Uygunsuzluk yoksa boş bırakın.",
   action:
     "Tespitten sonra sizin atacağınız adım buysa seçin. Yetkiniz yoksa, risk yoksa veya başka bir kanal doğruysa seçmeyin.",
 };
@@ -123,11 +123,11 @@ export const ACTION_WHY_SELECT: Record<string, string> = {
   gozleme_devam:
     "Kayda değer bir eksik veya anlık tehlike yoksa seçin. Ciddi risk varken 'biraz daha bakayım' demek müdahale değildir.",
   durdur_muteahhit:
-    "Yüklenici işinde anlık ciddi risk varsa ve sözleşmede durdurma yetkiniz varsa seçin. İşletme personeline bu kartı kullanmayın.",
+    "Yüklenici işinde anlık ciddi risk varsa ve sözleşmede durdurma yetkiniz varsa seçin. İşletme personelinin işini bu kartla durduramazsınız.",
   bildir_firma:
-    "Yüklenicideki eksiği firmanın kendi saha sorumlusu giderecekse seçin. Siz takımı dağıtmak yerine sorumluluğu ona verin.",
+    "Yüklenicideki eksiği firmanın kendi saha sorumlusu giderecekse seçin. İşletme personeli için bu kartı kullanmayın.",
   bildir_isletme:
-    "Uygunsuzluk işletme personelindeyse seçin. Bu kişilere doğrudan talimat veremezsiniz; ilgili işletme sorumlusuna iletin.",
+    "Uygunsuzluk işletme personelindeyse seçin. KKD giydirmez, doğrudan talimat vermezsiniz; işletme sorumlusuna iletirsiniz.",
   bildir_isg:
     "İşletme kaynaklı ciddi veya tekrarlayan risk tesis İSG'sini ilgilendiriyorsa seçin. Küçük yüklenici eksiğinde ilk adım bu değildir.",
   ekibi_cikar:

@@ -69,7 +69,7 @@ const STEPS: Array<{
   {
     step: "3",
     title: "Hazırlık ve Denetim",
-    body: "Dört karar sekmesini doldurursunuz: kendi donanımınız, yüklenicideki eksikler, işletmedeki uygunsuzluklar ve müdahale kararınız. Her sekmede koruma ailelerini İleri ile sırayla gezersiniz; bir kart seçince sonraki aileye geçilir. (i) rehberdir, puan düşürmez. TAK açık ailedeki doğruları, HEPSİNİ TAK tüm sekmenin doğrularını giydirir; çözüm puan düşürür.",
+    body: "Dört karar sekmesini doldurursunuz: kendi donanımınız, yüklenicideki eksikler, işletmedeki uygunsuzluklar ve müdahale kararınız. İşletme sekmesi giydirme değil tespittir; durdurma kartı yalnızca müteahhit içindir. Her sekmede koruma ailelerini İleri ile sırayla gezersiniz. (i) rehberdir, puan düşürmez. Kendi donanımınızda TAK, diğer sekmelerde İŞARETLE çözümdür ve puan düşürür.",
     icon: HardHat,
     tone: "kkd",
   },
@@ -96,7 +96,7 @@ const ROLES = [
   {
     label: "İşletme",
     className: "bg-red-50 text-erd-red border border-red-200",
-    body: "Demir çelik fabrika personeli. Doğrudan emir verme yetkiniz YOKTUR; ilgili işletme birimine veya İSG'ye bildirirsiniz.",
+    body: "Demir çelik fabrika personeli. KKD giydiremez, doğrudan emir veremezsiniz. Eksiği tespit eder, işletme birimine veya İSG'ye bildirirsiniz. Durdurma yetkisi yalnızca yüklenici içindir.",
   },
 ];
 

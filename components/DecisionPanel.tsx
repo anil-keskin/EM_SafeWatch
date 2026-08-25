@@ -45,11 +45,21 @@ export function decisionTabShort(id: DecisionTab): string {
 const TAB_HELP: Record<DecisionTab, string> = {
   self: "İki katman vardır. Ortam (ortak): alandaki gaz, gürültü, ısı, toz, trafik veya temel saha riski — kim olursa olsun o alana giren herkes. İşe özel: yalnızca o işi fiilen yapan kişide (kaynak, sıvı metal müdahalesi, yüksekte çalışma, kimyasal temas, kapalı hacme giriş, su kenarı, sıcak iş ekibi tedbiri ve senaryodaki diğer özel işler). Siz gözlem/denetim yapıyorsanız işe özel kartı kendinize takmayın.",
   contractor:
-    "Denetlediğiniz müteahhit çalışanında EKSİK olan koruyucuları işaretleyin. Eksiği yoksa hiçbir şey seçmeyin.",
+    "Denetlediğiniz müteahhit çalışanında EKSİK olan koruyucuları işaretleyin. Bu sekme giydirme değil tespittir. Anlık ciddi ihlalde durdurma yetkiniz müdahale sekmesindedir. Eksiği yoksa hiçbir şey seçmeyin.",
   operator:
-    "İşletme personelinde gözlemlediğiniz uygunsuzlukları işaretleyin. Bu kişilere doğrudan talimat veremezsiniz, ancak tespiti doğru kanala iletmelisiniz. Uygunsuzluk yoksa boş bırakın.",
+    "İşletme personelinde gördüğünüz eksiği işaretleyin. Bu sekme doğru donanımı bilmek ve tespiti kaydetmek içindir; siz onlara KKD giydirmez, talimat vermezsiniz. Müdahale: işletme sorumlusu / İSG bildirimi, gerekirse kendi ekibinizi çıkarma ve kayıt. Durdurma kartı işletme için kullanılmaz.",
   action:
     "Tespitleriniz karşısında hangi adımları atacağınızı seçin. Birden fazla aksiyon seçebilirsiniz; yetki sınırınızı gözetin.",
+};
+
+const ASSIST_LINE: Record<DecisionTab, string> = {
+  self: "Takıldığınız kartta (i) puan düşürmez. TAK / HEPSİNİ TAK kendi donanımınızı giydirir ve puanınızı düşürür.",
+  contractor:
+    "Takıldığınız kartta (i) puan düşürmez. İŞARETLE yüklenicideki eksiği yazar, ona KKD giydirmez. Çözüm puan düşürür.",
+  operator:
+    "Takıldığınız kartta (i) puan düşürmez. İŞARETLE işletmedeki eksiği tespit eder; personeli giydirmezsiniz. Çözüm puan düşürür.",
+  action:
+    "Takıldığınız kartta (i) puan düşürmez. SEÇ / HEPSİNİ SEÇ doğru müdahaleyi yazar ve puanınızı düşürür.",
 };
 
 export default function DecisionPanel({
@@ -113,10 +123,7 @@ export default function DecisionPanel({
           {TAB_HELP[activeTab]}
         </p>
         <p className="text-[11px] leading-snug text-erd-gray">
-          Takıldığınız kartta{" "}
-          <span className="font-semibold text-erd-charcoal">(i)</span> puan
-          düşürmez. TAK / SEÇ / HEPSİNİ TAK doğru cevabı giydirir ve puanınızı
-          düşürür.
+          {ASSIST_LINE[activeTab]}
         </p>
 
         {activeTab === "contractor" && contractor && (

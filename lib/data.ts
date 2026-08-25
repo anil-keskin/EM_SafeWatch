@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { getSupabase, isSupabaseConfigured } from "@/lib/supabase/client";
 import { EQUIPMENT_WHY_SELECT } from "@/content/card-hints";
 import { riskLayerFor } from "@/lib/equipment-layers";
+import { applyOperatorAuthority } from "@/lib/action-authority";
 import { applyLayerConsistency } from "@/lib/ppe-consistency";
 import { ZONES } from "@/content/zones";
 import { EQUIPMENT_CATEGORIES, EQUIPMENT_ITEMS } from "@/content/equipment";
@@ -66,26 +67,28 @@ function normalizeScenario(
 ): Scenario | null {
   const slug = row.slug?.trim();
   if (!slug) return null;
-  return applyLayerConsistency({
-    slug,
-    zone_id: row.zone_id ?? "",
-    order_index: Number(row.order_index) || 0,
-    title: row.title ?? slug,
-    is_draft: false,
-    briefing: parseJson<Briefing>(row.briefing, {}),
-    hazards: parseJson<Hazard[]>(row.hazards, []),
-    actors: parseJson<Actor[]>(row.actors, []),
-    required_self: asList(row.required_self),
-    forbidden_self: asList(row.forbidden_self),
-    contractor_gaps: asList(row.contractor_gaps),
-    operator_gaps: asList(row.operator_gaps),
-    correct_actions: asList(row.correct_actions),
-    wrong_actions: asList(row.wrong_actions),
-    hints: asList(row.hints),
-    competency_tags: asList(row.competency_tags),
-    explanation: row.explanation ?? "",
-    id: row.id,
-  });
+  return applyOperatorAuthority(
+    applyLayerConsistency({
+      slug,
+      zone_id: row.zone_id ?? "",
+      order_index: Number(row.order_index) || 0,
+      title: row.title ?? slug,
+      is_draft: false,
+      briefing: parseJson<Briefing>(row.briefing, {}),
+      hazards: parseJson<Hazard[]>(row.hazards, []),
+      actors: parseJson<Actor[]>(row.actors, []),
+      required_self: asList(row.required_self),
+      forbidden_self: asList(row.forbidden_self),
+      contractor_gaps: asList(row.contractor_gaps),
+      operator_gaps: asList(row.operator_gaps),
+      correct_actions: asList(row.correct_actions),
+      wrong_actions: asList(row.wrong_actions),
+      hints: asList(row.hints),
+      competency_tags: asList(row.competency_tags),
+      explanation: row.explanation ?? "",
+      id: row.id,
+    })
+  );
 }
 
 function mergeById<T extends { id: string }>(remote: T[], local: T[]): T[] {
