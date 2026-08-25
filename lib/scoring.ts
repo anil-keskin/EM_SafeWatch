@@ -1,4 +1,5 @@
 import { matchSelectedToCorrect } from "@/lib/equipment-families";
+import { taskSpecificExtrasForSelf } from "@/lib/equipment-layers";
 import type {
   AssistUsage,
   Scenario,
@@ -166,7 +167,10 @@ export function evaluateScenario(
     self: scoreSection(
       answers.self,
       scenario.required_self,
-      scenario.forbidden_self
+      [
+        ...scenario.forbidden_self,
+        ...taskSpecificExtrasForSelf(scenario.required_self),
+      ]
     ),
     contractor: scoreSection(answers.contractor, scenario.contractor_gaps),
     operator: scoreSection(answers.operator, scenario.operator_gaps),

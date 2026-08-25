@@ -12,6 +12,7 @@ import {
   SOLUTION_FULL_PENALTY,
 } from "@/lib/scoring";
 import { codesInCategory, isExactSolved, isScopeSolved } from "@/lib/solutions";
+import { riskLayerFor, riskLayerLabel } from "@/lib/equipment-layers";
 import { equipmentGlyph } from "@/lib/icon-theme";
 import type { DecisionTab, EquipmentCategory, EquipmentItem } from "@/lib/types";
 
@@ -241,6 +242,9 @@ export default function EquipmentPicker({
                         {item.standard}
                       </span>
                     )}
+                    <span className="mt-0.5 block text-[10px] font-medium text-erd-gray">
+                      {riskLayerLabel(item.risk_layer ?? riskLayerFor(item.code))}
+                    </span>
                   </span>
                 </button>
                 <CardHint

@@ -1,4 +1,5 @@
 import type { EquipmentCategory, EquipmentItem } from "@/lib/types";
+import { riskLayerFor } from "@/lib/equipment-layers";
 
 /**
  * Ekipman kategorileri ve kartları.
@@ -18,7 +19,7 @@ export const EQUIPMENT_CATEGORIES: EquipmentCategory[] = [
   { id: "dokuman", name: "Doküman ve İzin", order_index: 11 },
 ];
 
-export const EQUIPMENT_ITEMS: EquipmentItem[] = [
+const RAW_EQUIPMENT: Omit<EquipmentItem, "risk_layer">[] = [
   // --- Baş -----------------------------------------------------------------
   {
     code: "baret_en397",
@@ -611,7 +612,24 @@ export const EQUIPMENT_ITEMS: EquipmentItem[] = [
     icon: "🗣️",
     order_index: 5,
   },
+  {
+    code: "can_yelegi",
+    name: "Can Yeleği / Suya Düşme Koruması",
+    category_id: "govde",
+    standard: "EN ISO 12402",
+    description:
+      "Su kenarı, rıhtım ve iskele üstü liman işinde suya düşmeye karşı yüzerlik sağlar.",
+    used_by: "hepsi",
+    not_for: "Kara sahasında ve döküm alanında gerekli değildir.",
+    icon: "🛟",
+    order_index: 7,
+  },
 ];
+
+export const EQUIPMENT_ITEMS: EquipmentItem[] = RAW_EQUIPMENT.map((item) => ({
+  ...item,
+  risk_layer: riskLayerFor(item.code),
+}));
 
 export const EQUIPMENT_BY_CODE = new Map(
   EQUIPMENT_ITEMS.map((item) => [item.code, item])

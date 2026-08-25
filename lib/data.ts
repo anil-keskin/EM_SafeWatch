@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { getSupabase, isSupabaseConfigured } from "@/lib/supabase/client";
 import { EQUIPMENT_WHY_SELECT } from "@/content/card-hints";
+import { riskLayerFor } from "@/lib/equipment-layers";
 import { ZONES } from "@/content/zones";
 import { EQUIPMENT_CATEGORIES, EQUIPMENT_ITEMS } from "@/content/equipment";
 import { SCENARIOS } from "@/content/scenarios";
@@ -136,6 +137,7 @@ function normalizeEquipment(row: Partial<EquipmentItem> & { id?: string }): Equi
     not_for: row.not_for ?? "",
     why_select:
       (row.why_select ?? "").trim() || EQUIPMENT_WHY_SELECT[code] || "",
+    risk_layer: row.risk_layer === "ise_ozgu" ? "ise_ozgu" : riskLayerFor(code),
     icon: row.icon ?? "",
     order_index: Number(row.order_index) || 0,
   };

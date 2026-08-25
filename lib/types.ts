@@ -21,6 +21,9 @@ export interface EquipmentCategory {
   order_index: number;
 }
 
+/** Ortam riski herkes için ortak; işe özel donanım yalnızca işi yapan kişidedir. */
+export type RiskLayer = "cevresel" | "ise_ozgu";
+
 export interface EquipmentItem {
   code: string;
   name: string;
@@ -31,6 +34,8 @@ export interface EquipmentItem {
   not_for: string;
   /** Kart (i) rehberi. Boşsa uygulama yerel card-hints metnini kullanır. */
   why_select?: string;
+  /** cevresel = alandaki herkes; ise_ozgu = yalnızca işi fiilen yapan. */
+  risk_layer?: RiskLayer;
   icon: string;
   order_index: number;
 }

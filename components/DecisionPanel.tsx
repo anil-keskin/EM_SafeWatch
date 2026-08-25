@@ -43,7 +43,7 @@ export function decisionTabShort(id: DecisionTab): string {
 }
 
 const TAB_HELP: Record<DecisionTab, string> = {
-  self: "Bu göreve çıkarken kendi üzerinizde bulunması gereken koruyucuları işaretleyin. Ortamda özel bir risk yoksa standart saha seti (iş kıyafeti, baret, ayakkabı) yeter; ısı, gaz veya yükseklik varsa ortama göre seçin. Gereksiz seçim de bir uygunsuzluktur.",
+  self: "İki katman vardır. Ortam (ortak): gaz, gürültü, ısı, toz, baret/gözlük/ayakkabı — alana giren herkes için. İşe özel: kaynak maskesi, alüminize giysi, kemer — yalnızca o işi fiilen yapan kişide. Siz gözlemliyorsanız işe özel kartı kendinize takmayın.",
   contractor:
     "Denetlediğiniz müteahhit çalışanında EKSİK olan koruyucuları işaretleyin. Eksiği yoksa hiçbir şey seçmeyin.",
   operator:

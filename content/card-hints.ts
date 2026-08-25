@@ -7,7 +7,7 @@ import type { DecisionTab } from "@/lib/types";
  */
 
 export const TAB_SELECT_CONTEXT: Record<DecisionTab, string> = {
-  self: "Kendi üzerinizde veya sizin aldığınız tedbir olarak işaretleyin. Maruziyetiniz bu kartla kesiliyorsa seçin; görevinizde yoksa seçmeyin.",
+  self: "Ortam riski sizi de etkiliyorsa seçin. Kaynak, sıvı metal müdahalesi veya yüksekte çalışma sizin işiniz değilse o karta dokunmayın.",
   contractor:
     "Yüklenicide EKSİK veya uygunsuz gördüğünüzde işaretleyin. Sizde olanı değil, onda olmayanı seçin. Hepsi yerindeyse bu sekmeyi boş bırakın.",
   operator:
