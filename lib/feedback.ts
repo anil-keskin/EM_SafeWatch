@@ -10,6 +10,9 @@ export type FeedbackCategory = (typeof FEEDBACK_CATEGORIES)[number];
 export const FEEDBACK_TO = "anil.keskin@hotmail.com";
 export const FEEDBACK_SUBJECT = "[SafeWatch] Yeni Geri Bildirim";
 export const FEEDBACK_ENDPOINT = "/.netlify/functions/send-feedback";
+export const FEEDBACK_SUCCESS =
+  "Geri bildiriminiz alınmıştır.\nTeşekkür ederiz.";
+export const FEEDBACK_ERROR = "Gönderim sırasında bir sorun oluştu.";
 
 export interface FeedbackPayload {
   category: FeedbackCategory;
@@ -35,15 +38,30 @@ export function parseFeedbackPayload(input: unknown): FeedbackPayload | null {
   return { category, name, email, message };
 }
 
+export function formatFeedbackDate(sentAt = new Date()): string {
+  return new Intl.DateTimeFormat("tr-TR", {
+    dateStyle: "short",
+    timeStyle: "short",
+    timeZone: "Europe/Istanbul",
+  }).format(sentAt);
+}
+
 export function buildFeedbackEmail(
   payload: FeedbackPayload,
   sentAt = new Date()
 ): string {
   return [
-    `Kategori: ${payload.category}`,
-    `Kullanıcı: ${payload.name || "Belirtilmedi"}`,
-    `E-posta: ${payload.email || "Belirtilmedi"}`,
-    `Tarih: ${sentAt.toISOString()}`,
+    "Kategori:",
+    payload.category,
+    "",
+    "Ad Soyad:",
+    payload.name || "Belirtilmedi",
+    "",
+    "E-posta:",
+    payload.email || "Belirtilmedi",
+    "",
+    "Tarih:",
+    formatFeedbackDate(sentAt),
     "",
     "Mesaj:",
     payload.message,

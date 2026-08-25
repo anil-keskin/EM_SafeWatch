@@ -2,11 +2,12 @@ import { describe, expect, it } from "vitest";
 import {
   FEEDBACK_TO,
   buildFeedbackEmail,
+  formatFeedbackDate,
   parseFeedbackPayload,
 } from "@/lib/feedback";
 
 describe("geri bildirim", () => {
-  it("e-posta gövdesinde kategori, kullanıcı, tarih ve mesajı taşır", () => {
+  it("e-posta gövdesinde kategori, ad soyad, tarih ve mesajı taşır", () => {
     const sentAt = new Date("2026-08-25T12:00:00.000Z");
     const body = buildFeedbackEmail(
       {
@@ -17,11 +18,24 @@ describe("geri bildirim", () => {
       },
       sentAt
     );
-    expect(body).toContain("Kategori: İçerik Hatası");
-    expect(body).toContain("Kullanıcı: Anıl");
-    expect(body).toContain("a@example.com");
-    expect(body).toContain("2026-08-25T12:00:00.000Z");
-    expect(body).toContain("Sahne metni eksik.");
+    expect(body).toBe(
+      [
+        "Kategori:",
+        "İçerik Hatası",
+        "",
+        "Ad Soyad:",
+        "Anıl",
+        "",
+        "E-posta:",
+        "a@example.com",
+        "",
+        "Tarih:",
+        formatFeedbackDate(sentAt),
+        "",
+        "Mesaj:",
+        "Sahne metni eksik.",
+      ].join("\n")
+    );
   });
 
   it("alıcı Hotmail adresidir", () => {

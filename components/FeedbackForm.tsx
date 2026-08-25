@@ -4,6 +4,8 @@ import { FormEvent, useState } from "react";
 import { MessageSquare } from "lucide-react";
 import {
   FEEDBACK_CATEGORIES,
+  FEEDBACK_ERROR,
+  FEEDBACK_SUCCESS,
   sendFeedback,
   type FeedbackCategory,
 } from "@/lib/feedback";
@@ -55,7 +57,7 @@ export default function FeedbackForm() {
       reset();
     } catch {
       setStatus("error");
-      setError("Gönderilemedi. Lütfen biraz sonra yeniden deneyin.");
+      setError(FEEDBACK_ERROR);
     }
   };
 
@@ -158,8 +160,8 @@ export default function FeedbackForm() {
           </p>
 
           {status === "sent" && (
-            <p className="text-xs leading-relaxed text-emerald-700">
-              Geri bildiriminiz alınmıştır.
+            <p className="whitespace-pre-line text-xs leading-relaxed text-emerald-700">
+              {FEEDBACK_SUCCESS}
             </p>
           )}
           {status === "error" && error && (
