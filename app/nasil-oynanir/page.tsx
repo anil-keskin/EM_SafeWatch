@@ -69,7 +69,7 @@ const STEPS: Array<{
   {
     step: "3",
     title: "Hazırlık ve Denetim",
-    body: "Dört karar sekmesini doldurursunuz: kendi donanımınız (20), yüklenicideki eksikler (20), işletmedeki gözlem ve müdahale kararınız (25). İşletme sekmesi giydirme ve bağımsız puan değildir; durdurma kartı yalnızca müteahhit içindir. Her sekmede koruma ailelerini İleri ile sırayla gezersiniz. (i) rehberdir, puan düşürmez.",
+    body: "Dört karar sekmesini doldurursunuz: kendi donanımınız (20), yüklenicideki eksikler (20), işletmedeki gözlem ve müdahale kararınız (25). İşletme sekmesi giydirme, işaretleme ve bağımsız puan değildir; yalnızca incelemedir. Durdurma kartı yalnızca müteahhit içindir. Her sekmede koruma ailelerini İleri ile sırayla gezersiniz. (i) rehberdir, puan düşürmez.",
     icon: HardHat,
     tone: "kkd",
   },

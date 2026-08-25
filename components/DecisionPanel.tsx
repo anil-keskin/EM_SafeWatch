@@ -47,17 +47,16 @@ const TAB_HELP: Record<DecisionTab, string> = {
   contractor:
     "Denetlediğiniz müteahhit çalışanında EKSİK olan koruyucuları işaretleyin. Bu sekme giydirme değil tespittir. Anlık ciddi ihlalde durdurma yetkiniz müdahale sekmesindedir. Eksiği yoksa hiçbir şey seçmeyin.",
   operator:
-    "İşletme personelinde gördüğünüz eksiği işaretleyin. Bu sekme doğru donanımı bilmek ve tespiti kaydetmek içindir; siz onlara KKD giydirmez, talimat vermezsiniz. Müdahale: işletme sorumlusu / İSG bildirimi, gerekirse kendi ekibinizi çıkarma ve kayıt. Durdurma kartı işletme için kullanılmaz.",
+    "İşletme personeline KKD giydirmezsiniz. Bu sekme bağımsız puan üretmez; gördüğünüz eksiği kayda geçirir ve müdahale kararına bağlam sağlar.",
   action:
     "Tespitleriniz karşısında hangi adımları atacağınızı seçin. Birden fazla aksiyon seçebilirsiniz; yetki sınırınızı gözetin.",
 };
 
-const ASSIST_LINE: Record<DecisionTab, string> = {
+const ASSIST_LINE: Record<DecisionTab, string | null> = {
   self: "Takıldığınız kartta (i) puan düşürmez. Karta kendiniz tıklamak da sabit kesinti üretmez. TAK aile başına 1, HEPSİNİ TAK kesintiyi 8’e tamamlar.",
   contractor:
     "Takıldığınız kartta (i) puan düşürmez. İŞARETLE yüklenicideki eksiği yazar, ona KKD giydirmez. Aile 1, tüm sekme 8 puanlık yardım etkisidir.",
-  operator:
-    "Takıldığınız kartta (i) puan düşürmez. Bu sekme bağımsız puan veya yardım kesintisi üretmez. Müdahale yetkisi bildirim sekmesindedir.",
+  operator: null,
   action:
     "Takıldığınız kartta (i) puan düşürmez. Karta kendiniz tıklamak kesinti üretmez. SEÇ grup başına 1, HEPSİNİ SEÇ kesintiyi 8’e tamamlar.",
 };
@@ -85,7 +84,7 @@ export default function DecisionPanel({
         className="sticky top-[4.5rem] z-30 flex scroll-mt-[4.75rem] overflow-x-auto border-b border-erd-line bg-erd-light/95 backdrop-blur-sm"
       >
         {DECISION_TABS.map((tab) => {
-          const count = answers[tab.id].length;
+          const count = tab.id === "operator" ? 0 : answers[tab.id].length;
           const active = activeTab === tab.id;
           return (
             <button
@@ -122,21 +121,17 @@ export default function DecisionPanel({
         <p className="text-xs leading-snug text-erd-gray">
           {TAB_HELP[activeTab]}
         </p>
-        <p className="text-[11px] leading-snug text-erd-gray">
-          {ASSIST_LINE[activeTab]}
-        </p>
+        {ASSIST_LINE[activeTab] && (
+          <p className="text-[11px] leading-snug text-erd-gray">
+            {ASSIST_LINE[activeTab]}
+          </p>
+        )}
 
         {activeTab === "contractor" && contractor && (
           <ObservedActor actor={contractor} equipment={equipment} />
         )}
-        {activeTab === "operator" && operator && (
-          <ObservedActor actor={operator} equipment={equipment} />
-        )}
         {activeTab === "contractor" && !contractor && (
           <EmptyActorNote text="Bu senaryoda sahada müteahhit çalışanı bulunmuyor." />
-        )}
-        {activeTab === "operator" && !operator && (
-          <EmptyActorNote text="Bu senaryoda sahada işletme personeli bulunmuyor." />
         )}
 
         {activeTab === "action" ? (
@@ -147,6 +142,12 @@ export default function DecisionPanel({
             usedKeys={usedKeys}
             onFillScope={(kind) => onFillScope("action", kind)}
             onFillAll={() => onFillTab("action")}
+          />
+        ) : activeTab === "operator" ? (
+          <OperatorInspectPanel
+            actor={operator}
+            equipment={equipment}
+            gaps={correctByTab.operator}
           />
         ) : (
           <EquipmentPicker
@@ -226,5 +227,67 @@ function EmptyActorNote({ text }: { text: string }) {
     <p className="rounded-xl bg-erd-light px-3.5 py-3 text-sm text-erd-gray">
       {text} Bu sekmede seçim yapmadan devam edebilirsiniz.
     </p>
+  );
+}
+
+/** İşletme sekmesi salt okunur incelemedir; seçim veya yardım butonu yoktur. */
+function OperatorInspectPanel({
+  actor,
+  equipment,
+  gaps,
+}: {
+  actor: Actor | undefined;
+  equipment: EquipmentItem[];
+  gaps: string[];
+}) {
+  if (!actor) {
+    return (
+      <EmptyActorNote text="Bu senaryoda sahada işletme personeli bulunmuyor." />
+    );
+  }
+
+  const byCode = new Map(equipment.map((item) => [item.code, item]));
+  const missing = gaps;
+
+  return (
+    <div className="space-y-3">
+      <ObservedActor actor={actor} equipment={equipment} />
+      <div className="rounded-xl border border-erd-line bg-white p-3.5">
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-erd-gray">
+          Gözlemlenen eksikler
+        </p>
+        {missing.length === 0 ? (
+          <p className="mt-2 text-sm leading-relaxed text-erd-gray">
+            Bu sahnede işletme personelinde işaretlenecek bir eksik
+            bulunmuyor. Müdahale kararını buna göre verin.
+          </p>
+        ) : (
+          <ul className="mt-2 flex flex-wrap gap-1.5">
+            {missing.map((code) => {
+              const item = byCode.get(code);
+              return (
+                <li
+                  key={code}
+                  className="flex items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-2 py-1 text-[11px] font-medium text-amber-900"
+                >
+                  {item && (
+                    <EquipmentGlyph
+                      code={item.code}
+                      categoryId={item.category_id}
+                      size="xs"
+                    />
+                  )}
+                  {item?.name ?? code}
+                </li>
+              );
+            })}
+          </ul>
+        )}
+        <p className="mt-3 text-xs leading-relaxed text-erd-gray">
+          Bu liste yalnızca incelemedir. Kart seçmek veya giydirmek yoktur;
+          doğru adımı müdahale sekmesinde verirsiniz.
+        </p>
+      </div>
+    </div>
   );
 }

@@ -400,30 +400,36 @@ function SectionCard({
               hesaplanır.
             </p>
           )}
+          {!unscoreable && (
+            <CodeList
+              title="Doğru belirledikleriniz"
+              codes={section.hits}
+              labelFn={labelFn}
+              tone="good"
+            />
+          )}
           <CodeList
-            title="Doğru belirledikleriniz"
-            codes={section.hits}
-            labelFn={labelFn}
-            tone="good"
-          />
-          <CodeList
-            title="Gözden kaçanlar"
+            title={unscoreable ? "Gözlemlenen eksikler" : "Gözden kaçanlar"}
             codes={section.misses}
             labelFn={labelFn}
             tone="miss"
           />
-          <CodeList
-            title={criticalTitle}
-            codes={section.criticalExtras}
-            labelFn={labelFn}
-            tone="bad"
-          />
-          <CodeList
-            title={extrasTitle}
-            codes={mildExtras}
-            labelFn={labelFn}
-            tone="extra"
-          />
+          {!unscoreable && (
+            <>
+              <CodeList
+                title={criticalTitle}
+                codes={section.criticalExtras}
+                labelFn={labelFn}
+                tone="bad"
+              />
+              <CodeList
+                title={extrasTitle}
+                codes={mildExtras}
+                labelFn={labelFn}
+                tone="extra"
+              />
+            </>
+          )}
         </div>
       )}
     </div>

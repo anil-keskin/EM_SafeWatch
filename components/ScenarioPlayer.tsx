@@ -96,6 +96,7 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
   }
 
   const handleToggle = (tab: DecisionTab, code: string) => {
+    if (tab === "operator") return;
     const wasSelected = answers[tab].includes(code);
     setAnswers((prev) => ({ ...prev, [tab]: toggle(prev[tab], code) }));
     setAssist((prev) =>
@@ -109,7 +110,12 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
 
   const handleEvaluate = () => {
     if (!isScenarioScorable(scenario)) return;
-    const result = evaluateScenario(scenario, answers, assist, equipment);
+    const result = evaluateScenario(
+      scenario,
+      { ...answers, operator: [] },
+      assist,
+      equipment
+    );
     recordResult(scenario, result);
     router.push(`/sonuc/${scenario.slug}`);
   };
@@ -124,6 +130,7 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
   };
 
   const handleFillScope = (tab: DecisionTab, scopeId: string) => {
+    if (tab === "operator") return;
     const correct = correctCodesForTab(scenario, tab);
     const scopeCodes =
       tab === "action"
@@ -142,6 +149,7 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
   };
 
   const handleFillTab = (tab: DecisionTab) => {
+    if (tab === "operator") return;
     const correct = correctCodesForTab(scenario, tab);
     setAnswers((prev) => ({
       ...prev,
@@ -186,10 +194,7 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
   const scorable = isScenarioScorable(scenario);
 
   const totalSelections =
-    answers.self.length +
-    answers.contractor.length +
-    answers.operator.length +
-    answers.action.length;
+    answers.self.length + answers.contractor.length + answers.action.length;
 
   return (
     <div className="space-y-4">
@@ -236,6 +241,13 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
                   {answers.hazards.length} risk işaretlendi
                 </span>
               </div>
+
+              {scenario.hazards.length > 0 && (
+                <p className="mb-3 text-xs leading-relaxed text-erd-gray">
+                  Sahnedeki risk noktalarına dokunarak işaretleyin. Bazı
+                  noktalar gerçek bir tehlike içermiyor olabilir.
+                </p>
+              )}
 
               <HazardScene
                 zoneId={scenario.zone_id}

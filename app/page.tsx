@@ -13,6 +13,7 @@ import {
 import AppIcon from "@/components/AppIcon";
 import BrandMark from "@/components/BrandMark";
 import CircularProgress from "@/components/CircularProgress";
+import FeedbackForm from "@/components/FeedbackForm";
 import FactorySilhouette from "@/components/FactorySilhouette";
 import OyakMark from "@/components/OyakMark";
 import PrinciplesBar from "@/components/PrinciplesBar";
@@ -169,6 +170,10 @@ export default function HomePage() {
                   Gelişiminiz kayıtlıdır; kaldığınız yerden devam edebilirsiniz.
                 </p>
               </div>
+            </div>
+
+            <div className="mt-4">
+              <FeedbackForm />
             </div>
           </div>
         </aside>

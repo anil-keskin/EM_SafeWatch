@@ -21,7 +21,7 @@ interface EquipmentPickerProps {
   items: EquipmentItem[];
   selected: string[];
   onToggle: (code: string) => void;
-  tab: Exclude<DecisionTab, "action">;
+  tab: Exclude<DecisionTab, "action" | "operator">;
   correctCodes: string[];
   /** Kontrollüğün required_self listesi; kızgın zemin botu gibi çift katmanlı kartların etiketini belirler. */
   requiredSelf?: string[];
@@ -31,21 +31,18 @@ interface EquipmentPickerProps {
   disabled?: boolean;
 }
 
-const TAB_NOTE: Record<Exclude<DecisionTab, "action">, string> = {
+const TAB_NOTE: Record<Exclude<DecisionTab, "action" | "operator">, string> = {
   self: "Karta sizin tıklamanız puan düşürmez. Açık ailede TAK o ailenin doğrularını giydirir (−1, aynı aileye tekrar basmak ek kesinti üretmez). HEPSİNİ TAK sekmenin doğrularını yazar ve kesintiyi 8’e tamamlar; TAK toplamına eklenmez.",
   contractor:
     "Karta sizin tıklamanız puan düşürmez. İŞARETLE yüklenicide o ailedeki eksikleri yazar — ona giydirmez (−1). HEPSİNİ İŞARETLE tüm eksikleri yazar ve kesintiyi 8’e tamamlar.",
-  operator:
-    "Siz işletme personeline KKD giydirmezsiniz. Bu sekme bağımsız puan üretmez; gördüğünüz eksiği kayda geçirir ve müdahale kararına bağlam sağlar.",
 };
 
 const FILL_LABEL: Record<
-  Exclude<DecisionTab, "action">,
+  Exclude<DecisionTab, "action" | "operator">,
   { fill: string; fillAll: string }
 > = {
   self: { fill: "TAK", fillAll: "HEPSİNİ TAK" },
   contractor: { fill: "İŞARETLE", fillAll: "HEPSİNİ İŞARETLE" },
-  operator: { fill: "İŞARETLE", fillAll: "HEPSİNİ İŞARETLE" },
 };
 
 /**
@@ -126,7 +123,6 @@ export default function EquipmentPicker({
   const scopeSolved =
     activeCategory !== "all" &&
     isScopeSolved(selected, correctCodes, scopeCodes);
-  const scored = tab !== "operator";
   const fillAllUsed = usedKeys.has(`${tab}:all`);
   const fillUsed =
     activeCategory !== "all" &&
@@ -170,8 +166,8 @@ export default function EquipmentPicker({
         fillAllDisabled={disabled || tabSolved}
         fillUsed={fillUsed}
         fillAllUsed={fillAllUsed}
-        categoryPenalty={scored ? SOLUTION_CATEGORY_PENALTY : 0}
-        fullPenalty={scored ? SOLUTION_FULL_PENALTY : 0}
+        categoryPenalty={SOLUTION_CATEGORY_PENALTY}
+        fullPenalty={SOLUTION_FULL_PENALTY}
         note={TAB_NOTE[tab]}
       />
 

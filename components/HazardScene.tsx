@@ -94,13 +94,6 @@ export default function HazardScene({
           </button>
         );
       })}
-
-      {!revealed && (
-        <p className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-4 pb-3 pt-8 text-xs text-white/90 sm:text-sm">
-          Sahnedeki risk noktalarına dokunarak işaretleyin. Bazı noktalar
-          gerçek bir tehlike içermiyor olabilir.
-        </p>
-      )}
     </div>
   );
 }
