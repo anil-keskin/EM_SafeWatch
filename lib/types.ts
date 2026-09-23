@@ -179,6 +179,18 @@ export interface ScoreBreakdown {
   contractorRaw: number;
   interventionRaw: number;
   totalRaw: number;
+  /**
+   * Puanlanan bölümlerin tavanları. Doğru cevap kümesi boş olan bölüm
+   * puanlanmaz ve tavanı 0 olur; teknik bar kalan tavan üzerinden normalize
+   * edilir. Eski kayıtlarda bulunmadığı için opsiyoneldir.
+   */
+  riskMax?: number;
+  selfMax?: number;
+  contractorMax?: number;
+  /** riskMax + selfMax + contractorMax (hepsi doluyken 75). */
+  technicalMax?: number;
+  /** technicalMax + müdahale tavanı (hepsi doluyken 100). */
+  totalMax?: number;
   riskAssistPenalty: number;
   selfAssistPenalty: number;
   contractorAssistPenalty: number;

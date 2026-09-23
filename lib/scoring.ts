@@ -108,6 +108,29 @@ function emptySection(maxScore = 0): SectionResult {
   };
 }
 
+/**
+ * Aranacak doğru cevabı olmayan bir bölümü puanlama dışına alır.
+ *
+ * scoreSection boş bir doğru kümesini "aranacak bir şey yoktu" kabul edip 100
+ * döndürür. Bölüm tavanı toplama eklendiğinde bu, hiç işaretleme yapmadan o
+ * bölümün tam puanının kazanılması anlamına geliyordu. Böyle bir bölüm artık
+ * işletme sekmesi gibi sıfırlanır; teknik bar da yalnızca puanlanan bölümlerin
+ * tavanı (technicalMax) üzerinden 0–100'e normalize edilir.
+ *
+ * Hits/misses/extras korunur: bölüm puan üretmese de sonuç kartında oyuncunun
+ * ne işaretlediği görünmeye devam eder.
+ */
+function asUnscoredSection(section: SectionResult): SectionResult {
+  return {
+    ...section,
+    rawScore: 0,
+    maxScore: 0,
+    baseScore: 0,
+    assistPenalty: 0,
+    score: 0,
+  };
+}
+
 function applyAssistToSection(
   section: SectionResult,
   maxScore: number,
@@ -232,29 +255,25 @@ export function evaluateScenario(
     assist.hazards.allAssistUsed
   );
 
-  const hazards = applyAssistToSection(
-    hazardSection,
-    SCORE_MAX.hazards,
-    riskAssistPenalty
-  );
-  const self = applyAssistToSection(
-    selfSection,
-    SCORE_MAX.self,
-    selfAssist.penalty
-  );
-  const contractor = applyAssistToSection(
-    contractorSection,
-    SCORE_MAX.contractor,
-    contractorAssist.penalty
-  );
-  const operator: SectionResult = {
-    ...operatorSection,
-    rawScore: 0,
-    maxScore: 0,
-    baseScore: 0,
-    assistPenalty: 0,
-    score: 0,
-  };
+  // Doğru cevap kümesi boş olan bölüm puanlanmaz; tavanı da toplamdan düşer.
+  const hazardsScored = realHazards.length > 0;
+  const selfScored = scenario.required_self.length > 0;
+  const contractorScored = scenario.contractor_gaps.length > 0;
+
+  const hazards = hazardsScored
+    ? applyAssistToSection(hazardSection, SCORE_MAX.hazards, riskAssistPenalty)
+    : asUnscoredSection(hazardSection);
+  const self = selfScored
+    ? applyAssistToSection(selfSection, SCORE_MAX.self, selfAssist.penalty)
+    : asUnscoredSection(selfSection);
+  const contractor = contractorScored
+    ? applyAssistToSection(
+        contractorSection,
+        SCORE_MAX.contractor,
+        contractorAssist.penalty
+      )
+    : asUnscoredSection(contractorSection);
+  const operator: SectionResult = asUnscoredSection(operatorSection);
   const actions = applyAssistToSection(
     actionSection,
     SCORE_MAX.intervention,
@@ -267,11 +286,21 @@ export function evaluateScenario(
   const interventionRaw = actions.rawScore ?? 0;
   const totalRaw = riskRaw + selfRaw + contractorRaw + interventionRaw;
 
-  const technical = Math.round(
-    (clamp(riskRaw + selfRaw + contractorRaw, 0, SCORE_MAX.technical) /
-      SCORE_MAX.technical) *
-      100
-  );
+  // Yalnızca puanlanan bölümlerin tavanı. Üç bölüm de doluysa 75 (eski davranış).
+  const riskMax = hazardsScored ? SCORE_MAX.hazards : 0;
+  const selfMax = selfScored ? SCORE_MAX.self : 0;
+  const contractorMax = contractorScored ? SCORE_MAX.contractor : 0;
+  const technicalMax = riskMax + selfMax + contractorMax;
+  const totalMax = technicalMax + SCORE_MAX.intervention;
+
+  const technical =
+    technicalMax > 0
+      ? Math.round(
+          (clamp(riskRaw + selfRaw + contractorRaw, 0, technicalMax) /
+            technicalMax) *
+            100
+        )
+      : 0;
 
   let behavior = Math.round(
     (clamp(interventionRaw, 0, SCORE_MAX.intervention) /
@@ -341,6 +370,11 @@ export function evaluateScenario(
     contractorRaw,
     interventionRaw,
     totalRaw,
+    riskMax,
+    selfMax,
+    contractorMax,
+    technicalMax,
+    totalMax,
     riskAssistPenalty,
     selfAssistPenalty: selfAssist.penalty,
     contractorAssistPenalty: contractorAssist.penalty,
@@ -367,8 +401,11 @@ export function evaluateScenario(
     Number(actionAssist.indirectFullAssist);
 
   const competencyScores: Record<string, number> = {};
+  // totalMax 100 iken (bölümlerin hepsi puanlanıyorsa) bu ifade totalRaw'a eşittir.
+  const competencyScore =
+    totalMax > 0 ? Math.round((totalRaw / totalMax) * 100) : 0;
   for (const tag of scenario.competency_tags) {
-    competencyScores[tag] = totalRaw;
+    competencyScores[tag] = competencyScore;
   }
 
   return {

@@ -264,26 +264,29 @@ function AssistSummary({ result }: { result: ScenarioResult }) {
 
 function ScoreBreakdownCard({ result }: { result: ScenarioResult }) {
   const b = result.breakdown;
+  // Tavanı 0 olan bölüm puanlanmamıştır (o senaryoda aranacak doğru yoktu);
+  // teknik dökümde satır açmaz. Eski kayıtlarda tavan alanı yoktur, o yüzden
+  // eski sabitler yedek değer olarak kalır.
   const techRows = [
     {
       label: "Risk doğruluğu",
       value: b?.riskRaw ?? result.sections.hazards.rawScore,
-      max: 35,
+      max: b?.riskMax ?? 35,
       assist: b?.riskAssistPenalty ?? 0,
     },
     {
       label: "Kendi donanımı",
       value: b?.selfRaw ?? result.sections.self.rawScore,
-      max: 20,
+      max: b?.selfMax ?? 20,
       assist: b?.selfAssistPenalty ?? 0,
     },
     {
       label: "Yüklenici donanımı",
       value: b?.contractorRaw ?? result.sections.contractor.rawScore,
-      max: 20,
+      max: b?.contractorMax ?? 20,
       assist: b?.contractorAssistPenalty ?? 0,
     },
-  ];
+  ].filter((row) => row.max > 0);
   const behaviorNotes = b?.behaviorNotes ?? [];
 
   return (
@@ -330,7 +333,7 @@ function ScoreBreakdownCard({ result }: { result: ScenarioResult }) {
       </div>
       {typeof b?.totalRaw === "number" && (
         <p className="mt-3 text-xs font-medium text-erd-charcoal">
-          Toplam gelişim puanı {b.totalRaw}/100
+          Toplam gelişim puanı {b.totalRaw}/{b.totalMax ?? 100}
         </p>
       )}
     </div>

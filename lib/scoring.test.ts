@@ -377,3 +377,95 @@ describe("evaluateScenario puan dağılımı", () => {
     expect(result.sections.hazards.rawScore).toBe(20);
   });
 });
+
+describe("doğru cevabı olmayan bölüm puanlanmaz", () => {
+  const noGaps = () => makeScenario({ contractor_gaps: [] });
+  const fullAnswers = (): ScenarioAnswers => ({
+    ...EMPTY_ANSWERS,
+    hazards: ["r1"],
+    self: [...SELF_CODES],
+    action: ["kayit_al"],
+  });
+
+  it("boş gönderim yüklenici bölümünden bedava puan almaz", () => {
+    const result = evaluateScenario(
+      noGaps(),
+      EMPTY_ANSWERS,
+      emptyScenarioAssist(),
+      EQUIPMENT
+    );
+    expect(result.technical).toBe(0);
+    expect(result.breakdown?.contractorRaw).toBe(0);
+    expect(result.sections.contractor.score).toBe(0);
+    expect(result.sections.contractor.maxScore).toBe(0);
+  });
+
+  it("teknik tavan 55'e düşer, müdahale tavanı sabit kalır", () => {
+    const result = evaluateScenario(
+      noGaps(),
+      EMPTY_ANSWERS,
+      emptyScenarioAssist(),
+      EQUIPMENT
+    );
+    expect(result.breakdown?.contractorMax).toBe(0);
+    expect(result.breakdown?.technicalMax).toBe(55);
+    expect(result.breakdown?.totalMax).toBe(80);
+  });
+
+  it("kusursuz gönderim yine 100 teknik üretir", () => {
+    const result = evaluateScenario(
+      noGaps(),
+      fullAnswers(),
+      emptyScenarioAssist(),
+      EQUIPMENT
+    );
+    expect(result.technical).toBe(100);
+    expect(result.breakdown?.totalRaw).toBe(80);
+    expect(Object.values(result.competencyScores)[0]).toBe(100);
+  });
+
+  it("kontrollük barı bölüm dışlansa da değişmez", () => {
+    const answers = fullAnswers();
+    const withGaps = evaluateScenario(
+      makeScenario(),
+      answers,
+      emptyScenarioAssist(),
+      EQUIPMENT
+    );
+    const without = evaluateScenario(
+      noGaps(),
+      answers,
+      emptyScenarioAssist(),
+      EQUIPMENT
+    );
+    expect(without.behavior).toBe(withGaps.behavior);
+    expect(without.breakdown?.interventionRaw).toBe(
+      withGaps.breakdown?.interventionRaw
+    );
+  });
+
+  it("yüklenici eksiği olan senaryoda eski ağırlıklar korunur", () => {
+    const result = evaluateScenario(
+      makeScenario(),
+      { ...fullAnswers(), contractor: ["c1"] },
+      emptyScenarioAssist(),
+      EQUIPMENT
+    );
+    expect(result.breakdown?.contractorMax).toBe(20);
+    expect(result.breakdown?.technicalMax).toBe(75);
+    expect(result.breakdown?.totalMax).toBe(100);
+    expect(result.technical).toBe(100);
+    expect(result.breakdown?.totalRaw).toBe(100);
+  });
+
+  it("boş bölüme yanlış işaretleme yapmak teknik puanı şişirmez", () => {
+    const result = evaluateScenario(
+      noGaps(),
+      { ...EMPTY_ANSWERS, contractor: ["c1"] },
+      emptyScenarioAssist(),
+      EQUIPMENT
+    );
+    expect(result.technical).toBe(0);
+    expect(result.breakdown?.contractorRaw).toBe(0);
+  });
+});
