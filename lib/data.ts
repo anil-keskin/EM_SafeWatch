@@ -6,6 +6,7 @@ import { EQUIPMENT_WHY_SELECT } from "@/content/card-hints";
 import { riskLayerFor } from "@/lib/equipment-layers";
 import { applyOperatorAuthority } from "@/lib/action-authority";
 import { applyLayerConsistency } from "@/lib/ppe-consistency";
+import { isPublished, isTimeMachine } from "@/lib/incident";
 import { ZONES } from "@/content/zones";
 import { EQUIPMENT_CATEGORIES, EQUIPMENT_ITEMS } from "@/content/equipment";
 import { SCENARIOS } from "@/content/scenarios";
@@ -16,6 +17,7 @@ import type {
   EquipmentItem,
   Hazard,
   Scenario,
+  ScenarioType,
   Zone,
 } from "@/lib/types";
 
@@ -86,9 +88,26 @@ function normalizeScenario(
       hints: asList(row.hints),
       competency_tags: asList(row.competency_tags),
       explanation: row.explanation ?? "",
+      scenario_type: asScenarioType(row.scenario_type),
+      incident_date: asText(row.incident_date),
+      incident_unit: asText(row.incident_unit),
+      incident_outcome: asText(row.incident_outcome),
+      incident_lesson: asText(row.incident_lesson),
+      is_published: row.is_published !== false,
       id: row.id,
     })
   );
+}
+
+/** Kolon migration'dan önce hiç gelmeyebilir; o zaman eğitim havuzu varsayılır. */
+function asScenarioType(value: unknown): ScenarioType {
+  return value === "time_machine" ? "time_machine" : "training";
+}
+
+function asText(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  const trimmed = value.trim();
+  return trimmed ? trimmed : undefined;
 }
 
 function mergeById<T extends { id: string }>(remote: T[], local: T[]): T[] {
@@ -125,7 +144,8 @@ function mergeScenarios(remote: Scenario[], local: Scenario[]): Scenario[] {
       bySlug.set(incoming.slug, previous ? { ...previous, ...incoming } : incoming);
     }
   }
-  return Array.from(bySlug.values());
+  // is_published = false olan senaryo hiçbir listeye ve sayaca girmez.
+  return Array.from(bySlug.values()).filter(isPublished);
 }
 
 function normalizeEquipment(row: Partial<EquipmentItem> & { id?: string }): EquipmentItem | null {
@@ -237,11 +257,27 @@ export function useSafeWatchData(): SafeWatchData {
   return { ...content, source, sourceDetail };
 }
 
+/**
+ * Eğitim havuzu: bölge bazlı sabit müfredat. Sayısı 30'dur ve Zaman Makinesi
+ * senaryoları bu sayıyı artırmaz.
+ */
+export function trainingScenarios(scenarios: Scenario[]): Scenario[] {
+  return scenarios.filter((s) => !isTimeMachine(s));
+}
+
+/** Zaman Makinesi havuzu, kronolojik (en yeni üstte). */
+export function timeMachineScenarios(scenarios: Scenario[]): Scenario[] {
+  return scenarios
+    .filter(isTimeMachine)
+    .sort((a, b) => (b.incident_date ?? "").localeCompare(a.incident_date ?? ""));
+}
+
+/** Bölge listeleri yalnızca eğitim havuzunu gösterir. */
 export function scenariosOfZone(
   scenarios: Scenario[],
   zoneId: string
 ): Scenario[] {
-  return scenarios
+  return trainingScenarios(scenarios)
     .filter((s) => s.zone_id === zoneId)
     .sort((a, b) => a.order_index - b.order_index);
 }

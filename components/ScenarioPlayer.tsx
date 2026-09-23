@@ -12,7 +12,9 @@ import DecisionPanel, {
 import HazardScene from "@/components/HazardScene";
 import HintBox from "@/components/HintBox";
 import SolutionAssist from "@/components/SolutionAssist";
+import TimeMachineBand from "@/components/TimeMachineBand";
 import { useSafeWatchData, findScenario } from "@/lib/data";
+import { isTimeMachine } from "@/lib/incident";
 import {
   createHazardLayoutSeed,
   scatterHazards,
@@ -202,6 +204,9 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
 
       {step === "brief" && (
         <>
+          {isTimeMachine(scenario) && (
+            <TimeMachineBand incidentDate={scenario.incident_date} />
+          )}
           <BriefingCard
             title={scenario.title}
             zoneId={scenario.zone_id}

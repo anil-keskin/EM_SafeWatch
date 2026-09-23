@@ -6,6 +6,15 @@ export default defineConfig({
     environment: "node",
     include: ["**/*.test.ts"],
   },
+  // tsconfig jsx: "preserve" Next.js derleyicisi içindir. Vitest .tsx
+  // bileşenlerini renderToStaticMarkup ile test edebilmek için esbuild'e
+  // JSX'i kendisinin derlemesini söyleriz; yol takma adları resolve.alias
+  // üzerinden çalışmaya devam eder.
+  oxc: {
+    jsx: {
+      runtime: "automatic",
+    },
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname),

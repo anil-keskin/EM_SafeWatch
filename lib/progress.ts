@@ -434,3 +434,16 @@ export function completedCount(progress: ProgressMap): number {
   return Object.values(progress).filter((p) => p.status === "tamamlandi")
     .length;
 }
+
+/**
+ * Belirli bir senaryo havuzunda tamamlananların sayısı.
+ *
+ * Eğitim ve Zaman Makinesi havuzları ayrı sayılır: payda da pay da yalnızca
+ * verilen havuzdan gelir, iki havuz birbirine karışmaz.
+ */
+export function completedIn(
+  progress: ProgressMap,
+  pool: Array<{ slug: string }>
+): number {
+  return pool.filter((s) => progress[s.slug]?.status === "tamamlandi").length;
+}

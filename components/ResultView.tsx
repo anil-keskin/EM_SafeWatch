@@ -3,15 +3,26 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import HazardScene from "@/components/HazardScene";
+import IncidentOutcome from "@/components/IncidentOutcome";
 import ScoreMeter from "@/components/ScoreMeter";
 import AppIcon, { IconWatermark } from "@/components/AppIcon";
 import { actionLabel } from "@/content/actions";
 import { competencyLabel } from "@/content/scenarios";
-import { useSafeWatchData, findScenario, scenariosOfZone } from "@/lib/data";
+import {
+  useSafeWatchData,
+  findScenario,
+  scenariosOfZone,
+  timeMachineScenarios,
+} from "@/lib/data";
+import { isTimeMachine } from "@/lib/incident";
 import { readHazardLayoutSeed, scatterHazards } from "@/lib/hazard-layout";
 import { zoneGlyph, zoneTone } from "@/lib/icon-theme";
 import { loadLastResult } from "@/lib/progress";
-import type { EquipmentItem, ScenarioResult, SectionResult } from "@/lib/types";
+import type {
+  EquipmentItem,
+  ScenarioResult,
+  SectionResult,
+} from "@/lib/types";
 
 type LabelFn = (code: string) => string;
 
@@ -42,8 +53,13 @@ export default function ResultView({ slug }: { slug: string }) {
         : [],
     [scenario, layoutSeed]
   );
+  // Sonraki senaryo kendi havuzundan gelir: Zaman Makinesi senaryosundan
+  // sonra bölge müfredatına atlanmaz.
+  const timeMachine = scenario && isTimeMachine(scenario);
   const zoneScenarios = scenario
-    ? scenariosOfZone(scenarios, scenario.zone_id)
+    ? timeMachine
+      ? timeMachineScenarios(scenarios)
+      : scenariosOfZone(scenarios, scenario.zone_id)
     : [];
   const currentIndex = scenario
     ? zoneScenarios.findIndex((item) => item.slug === scenario.slug)
@@ -215,10 +231,16 @@ export default function ResultView({ slug }: { slug: string }) {
         )}
       </div>
 
+      {timeMachine && <IncidentOutcome scenario={scenario} />}
+
       <div className="flex flex-wrap gap-2">
         {nextScenario ? (
           <Link href={`/senaryo/${nextScenario.slug}`} className="sw-btn-primary">
             Sonraki Senaryoya Geç
+          </Link>
+        ) : timeMachine ? (
+          <Link href="/zaman-makinesi" className="sw-btn-primary">
+            Zaman Makinesine Dön
           </Link>
         ) : (
           <Link href="/saha" className="sw-btn-primary">

@@ -6,8 +6,12 @@ import PageShell from "@/components/PageShell";
 import ProgressBar from "@/components/ProgressBar";
 import ZoneIcon from "@/components/ZoneIcon";
 import { competencyLabel } from "@/content/scenarios";
-import { useSafeWatchData } from "@/lib/data";
-import { completedCount, useProgress } from "@/lib/progress";
+import {
+  timeMachineScenarios,
+  trainingScenarios,
+  useSafeWatchData,
+} from "@/lib/data";
+import { completedIn, useProgress } from "@/lib/progress";
 import { scoreBand } from "@/lib/scoring";
 
 /** Bu eşiğin altındaki yetkinlikler "gelişime açık alan" olarak sunulur. */
@@ -25,8 +29,14 @@ export default function GelisimPage() {
   const { zones, scenarios } = useSafeWatchData();
   const { progress, competencies, ready, reset } = useProgress();
 
-  const done = completedCount(progress);
-  const total = scenarios.length;
+  // İki havuz ayrı sayılır: payda da pay da kendi havuzundan gelir.
+  const training = useMemo(() => trainingScenarios(scenarios), [scenarios]);
+  const timeMachine = useMemo(
+    () => timeMachineScenarios(scenarios),
+    [scenarios]
+  );
+  const trainingDone = completedIn(progress, training);
+  const timeMachineDone = completedIn(progress, timeMachine);
 
   const reports = useMemo<ZoneReport[]>(() => {
     const byZone = new Map<string, Array<{ competency: string; score: number }>>();
@@ -97,12 +107,19 @@ export default function GelisimPage() {
         </div>
       ) : (
         <>
-          <section className="sw-card p-5">
+          <section className="sw-card space-y-4 p-5">
             <ProgressBar
-              value={done}
-              total={total}
-              label="Tamamlanan senaryo"
+              value={trainingDone}
+              total={training.length}
+              label="Eğitim Senaryoları"
             />
+            {timeMachine.length > 0 && (
+              <ProgressBar
+                value={timeMachineDone}
+                total={timeMachine.length}
+                label="Zaman Makinesi"
+              />
+            )}
             <p className="mt-4 text-sm leading-relaxed text-erd-charcoal">
               {buildCoachingText(overall, weakestZone)}
             </p>

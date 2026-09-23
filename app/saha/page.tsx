@@ -7,8 +7,12 @@ import AppIcon, { FilledIcon } from "@/components/AppIcon";
 import CircularProgress from "@/components/CircularProgress";
 import PageShell from "@/components/PageShell";
 import ZoneIcon from "@/components/ZoneIcon";
-import { scenariosOfZone, useSafeWatchData } from "@/lib/data";
-import { completedCount, useProgress } from "@/lib/progress";
+import {
+  scenariosOfZone,
+  trainingScenarios,
+  useSafeWatchData,
+} from "@/lib/data";
+import { completedIn, useProgress } from "@/lib/progress";
 import type { ProgressMap, Scenario, Zone } from "@/lib/types";
 
 type Filter = "all" | "done" | "open";
@@ -20,14 +24,21 @@ const FILTER_LABEL: Record<Filter, string> = {
 };
 
 export default function SahaPage() {
-  const { zones, scenarios } = useSafeWatchData();
+  const { zones, scenarios: allScenarios } = useSafeWatchData();
   const { progress } = useProgress();
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
   const [filterOpen, setFilterOpen] = useState(false);
 
+  // Saha Seçimi yalnızca eğitim müfredatını gösterir.
+  // Zaman Makinesi senaryoları /zaman-makinesi ekranında listelenir.
+  const scenarios = useMemo(
+    () => trainingScenarios(allScenarios),
+    [allScenarios]
+  );
+
   const total = scenarios.length || 30;
-  const done = completedCount(progress);
+  const done = completedIn(progress, scenarios);
   const percent = total > 0 ? Math.round((done / total) * 100) : 0;
 
   const visibleZones = useMemo(() => {

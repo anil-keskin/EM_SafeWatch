@@ -7,6 +7,7 @@ import {
   ChevronRight,
   ClipboardList,
   HardHat,
+  History,
   MapPin,
   Play,
 } from "lucide-react";
@@ -18,10 +19,15 @@ import FactorySilhouette from "@/components/FactorySilhouette";
 import OyakMark from "@/components/OyakMark";
 import PrinciplesBar from "@/components/PrinciplesBar";
 import SafeWatchWordmark from "@/components/SafeWatchWordmark";
-import { findScenario, useSafeWatchData } from "@/lib/data";
+import {
+  findScenario,
+  timeMachineScenarios,
+  trainingScenarios,
+  useSafeWatchData,
+} from "@/lib/data";
 import { tabGlyph } from "@/lib/icon-theme";
 import { useAuth } from "@/lib/auth";
-import { completedCount, useProgress } from "@/lib/progress";
+import { completedIn, useProgress } from "@/lib/progress";
 import type { DecisionTab } from "@/lib/types";
 import type { IconTone } from "@/lib/icon-theme";
 import type { LucideIcon } from "lucide-react";
@@ -63,8 +69,12 @@ export default function HomePage() {
   const { progress } = useProgress();
   const { displayName } = useAuth();
 
-  const total = scenarios.length || 30;
-  const done = completedCount(progress);
+  // "30 Senaryo" metriği yalnızca eğitim havuzunu sayar; Zaman Makinesi
+  // senaryoları bu sayıyı ve ilerleme çubuğunu etkilemez.
+  const training = trainingScenarios(scenarios);
+  const timeMachine = timeMachineScenarios(scenarios);
+  const total = training.length || 30;
+  const done = completedIn(progress, training);
   const completed = Object.values(progress).filter(
     (entry) => entry.status === "tamamlandi"
   );
@@ -95,7 +105,7 @@ export default function HomePage() {
   )[0]?.[0];
 
   const nextScenario =
-    scenarios.find((s) => !progress[s.slug]) ?? scenarios[0];
+    training.find((s) => !progress[s.slug]) ?? training[0];
 
   const continueHref = lastSlug
     ? `/senaryo/${lastSlug}`
@@ -139,6 +149,13 @@ export default function HomePage() {
                 primary
               />
               <HomeButton href="/saha" label="Saha Seçimi" icon={MapPin} tone="steel" />
+              <HomeButton
+                href="/zaman-makinesi"
+                label="Zaman Makinesi"
+                hint="Yaşanmış olaylardan dersler"
+                icon={History}
+                tone="crane"
+              />
               <HomeButton
                 href="/ilerlemem"
                 label="Gelişim Raporum"
@@ -239,6 +256,12 @@ export default function HomePage() {
                 </li>
               ))}
             </ul>
+            {timeMachine.length > 0 && (
+              <p className="mt-3 text-center text-[11px] font-medium text-erd-gray">
+                Zaman Makinesi: {timeMachine.length} olay · ana müfredatın
+                dışındadır
+              </p>
+            )}
           </section>
 
           <section>
@@ -298,12 +321,15 @@ function MetricCard({
 function HomeButton({
   href,
   label,
+  hint,
   icon: Icon,
   tone,
   primary = false,
 }: {
   href: string;
   label: string;
+  /** İkinci satır açıklaması. Buton yüksekliği ve radius'u değişmez. */
+  hint?: string;
   icon: LucideIcon;
   tone: IconTone;
   primary?: boolean;
@@ -330,7 +356,14 @@ function HomeButton({
       ) : (
         <AppIcon icon={Icon} tone={tone} size="sm" />
       )}
-      <span className="flex-1 text-left">{label}</span>
+      <span className="min-w-0 flex-1 text-left">
+        {label}
+        {hint && (
+          <span className="mt-0.5 block text-[11px] font-medium leading-snug text-erd-gray">
+            {hint}
+          </span>
+        )}
+      </span>
       <ChevronRight
         size={18}
         strokeWidth={2}

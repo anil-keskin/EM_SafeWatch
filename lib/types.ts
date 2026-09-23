@@ -95,9 +95,27 @@ export interface Scenario {
   hints: string[];
   explanation: string;
   competency_tags: string[];
+  /**
+   * Senaryo havuzu. 'training' bölge bazlı sabit müfredattır (30 senaryo),
+   * 'time_machine' gerçek olaylardan türetilen açık uçlu havuzdur.
+   * Eski kayıtlarda alan yoktur; okunurken 'training' varsayılır.
+   */
+  scenario_type?: ScenarioType;
+  /** Yalnız time_machine: gerçek olayın tarihi (ISO, YYYY-MM-DD). */
+  incident_date?: string;
+  /** Yalnız time_machine: birim etiketi. Kategori DEĞİLDİR, yalnızca gösterilir. */
+  incident_unit?: string;
+  /** Yalnız time_machine: sonuç ekranında "gerçekte ne oldu" metni. */
+  incident_outcome?: string;
+  /** Yalnız time_machine: sonuç ekranında "çıkarılan ders" metni. */
+  incident_lesson?: string;
+  /** false ise hiçbir listede, sayaçta veya doğrudan URL'de görünmez. */
+  is_published?: boolean;
   /** Supabase'ten geldiyse tablo satırının UUID'si. */
   id?: string;
 }
+
+export type ScenarioType = "training" | "time_machine";
 
 export type ActionKind = "gozlem" | "durdurma" | "bildirim" | "kayit";
 

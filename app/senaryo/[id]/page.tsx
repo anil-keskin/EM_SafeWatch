@@ -1,9 +1,13 @@
 import ScenarioPlayer from "@/components/ScenarioPlayer";
 import PageShell from "@/components/PageShell";
 import { SCENARIOS } from "@/content/scenarios";
+import { isPublished } from "@/lib/incident";
 
 export function generateStaticParams() {
-  return SCENARIOS.map((scenario) => ({ id: scenario.slug }));
+  // Yayında olmayan senaryo için rota üretilmez.
+  return SCENARIOS.filter(isPublished).map((scenario) => ({
+    id: scenario.slug,
+  }));
 }
 
 export default async function ScenarioPage({
