@@ -9,7 +9,7 @@
  * 3) İşe özel donanım aktörler arasında kopyalanmaz.
  */
 
-import { substituteGroup } from "@/lib/equipment-families";
+import { canReplace, substituteGroup } from "@/lib/equipment-families";
 import {
   PROTECTION_SLOTS,
   isEnvironmentalWearable,
@@ -31,7 +31,9 @@ function hasCodeOrFamily(items: readonly string[], needed: string): boolean {
   const have = new Set(items);
   if (have.has(needed)) return true;
   const group = substituteGroup(needed);
-  return items.some((code) => substituteGroup(code) === group);
+  return items.some(
+    (code) => substituteGroup(code) === group && canReplace(needed, code)
+  );
 }
 
 function slotOf(code: string): readonly string[] | null {
@@ -42,7 +44,7 @@ function hasSlotCoverage(items: readonly string[], needed: string): boolean {
   if (hasCodeOrFamily(items, needed)) return true;
   const slot = slotOf(needed);
   if (!slot) return false;
-  return items.some((code) => slot.includes(code));
+  return items.some((code) => slot.includes(code) && canReplace(needed, code));
 }
 
 /** 4'lü cihaz CO'yu kapsar; HI3 tabanı S3'ü kapsar; SCBA kaçışı kapsar. */

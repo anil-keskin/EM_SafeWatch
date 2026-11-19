@@ -480,7 +480,27 @@ describe("yüklenici tespitinde aile eşdeğeri", () => {
     expect(wrong.extras).toEqual(["kulak_tikaci"]);
     const right = matchSelectedToCorrect(["kulaklik_en352"], ["kulaklik_en352"], worn);
     expect(right.hits).toEqual(["kulaklik_en352"]);
-    // Kendi KKD'sinde aile eşdeğeri hâlâ geçerli.
-    expect(matchSelectedToCorrect(["kulak_tikaci"], ["kulaklik_en352"]).hits).toEqual(["kulak_tikaci"]);
+    // Kendi KKD'sinde aile eşdeğeri hâlâ geçerli (baret aileleri).
+    expect(matchSelectedToCorrect(["baret_jugular"], ["baret_en397"]).hits).toEqual(["baret_jugular"]);
+  });
+});
+
+describe("işitme koruyucu: yüksek gürültüde tek yönlü eşdeğerlik", () => {
+  it("manşonlu kulaklık istenen yerde kulak tıkacı isabet sayılmaz", async () => {
+    const { matchSelectedToCorrect } = await import("@/lib/equipment-families");
+    const r = matchSelectedToCorrect(["kulak_tikaci"], ["kulaklik_en352"]);
+    expect(r.hits).toEqual([]);
+    expect(r.misses).toEqual(["kulaklik_en352"]);
+    expect(r.extras).toEqual(["kulak_tikaci"]);
+  });
+  it("kulak tıkacı istenen yerde manşonlu kulaklık geçerlidir", async () => {
+    const { matchSelectedToCorrect } = await import("@/lib/equipment-families");
+    expect(matchSelectedToCorrect(["kulaklik_en352"], ["kulak_tikaci"]).hits).toEqual(["kulaklik_en352"]);
+  });
+  it("ikisi birlikte seçilirse çift koruma hata sayılmaz", async () => {
+    const { matchSelectedToCorrect } = await import("@/lib/equipment-families");
+    const r = matchSelectedToCorrect(["kulak_tikaci", "kulaklik_en352"], ["kulaklik_en352"]);
+    expect(r.misses).toEqual([]);
+    expect(r.extras).toEqual([]);
   });
 });

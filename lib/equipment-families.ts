@@ -14,6 +14,19 @@ export const EQUIPMENT_SUBSTITUTE_GROUPS: readonly (readonly string[])[] = [
   ["kulak_tikaci", "kulaklik_en352"],
 ];
 
+/**
+ * Tek yönlü eşdeğerlik: anahtar kod istendiğinde listedeki kodlar onun
+ * yerine geçmez. Senaryo manşonlu kulaklık istiyorsa (çok yüksek gürültü)
+ * kulak tıkacı yetmez; kulak tıkacı istenen yerde kulaklık geçerlidir.
+ */
+const NOT_REPLACEABLE_BY: Record<string, readonly string[]> = {
+  kulaklik_en352: ["kulak_tikaci"],
+};
+
+export function canReplace(required: string, candidate: string): boolean {
+  return !(NOT_REPLACEABLE_BY[required] ?? []).includes(candidate);
+}
+
 const GROUP_BY_CODE: Record<string, string> = {};
 for (const group of EQUIPMENT_SUBSTITUTE_GROUPS) {
   const id = group[0];
@@ -52,6 +65,7 @@ export function matchSelectedToCorrect(
     let found: string | undefined;
     for (const code of remaining) {
       if (blocked.has(code)) continue;
+      if (!canReplace(req, code)) continue;
       if (substituteGroup(code) === group) {
         found = code;
         break;

@@ -41,9 +41,9 @@ export const EQUIPMENT_WHY_SELECT: Record<string, string> = {
   temiz_hava_solunum:
     "Kapalı hacme veya IDLH ortama fiilen giren eğitimli kişide seçin. Dışarıdaki gözlemci, gözetmen veya izolasyon ekibi takmaz.",
   kulak_tikaci:
-    "Gürültülü alandan kısa geçiş varsa seçin. Uzun süre yüksek gürültüde kulaklık daha uygundur.",
+    "Yüksek gürültülü alanda seçin. Çok yüksek gürültüde (elek kulesi, fan, kırıcı) tek başına yetmez; manşonlu kulaklık gerekir.",
   kulaklik_en352:
-    "Sürekli yüksek gürültü (fan, hadde, konveyör) varsa seçin. Baret ve maskeyle birlikte durduğunu kontrol edin.",
+    "Çok yüksek veya sürekli gürültüde (elek kulesi, fan, kırıcı) seçin; bu durumda kulak tıkacı yerine geçmez. Baret ve maskeyle birlikte durduğunu kontrol edin.",
   eldiven_mekanik:
     "Kesici kenar, tel, sac veya pürüzlü malzeme varsa seçin. Sıcak yüzey ve sıvı metalde korumaz.",
   eldiven_isi:
