@@ -18,3 +18,4 @@ yarn-error.log*
 .netlify
 *.tsbuildinfo
 next-env.d.ts
+.api-static-hidden
