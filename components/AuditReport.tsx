@@ -156,6 +156,16 @@ export default function AuditReport({
           )}
         </ReportBlock>
 
+        {[...s.operator.hits, ...s.operator.extras].length > 0 && (
+          <ReportBlock no="3.1" title="İşletme personelinde gözlenen uygunsuzluklar (işletme sorumlusuna bildirilecek)">
+            <ul className="list-disc space-y-0.5 pl-5 text-xs">
+              {[...s.operator.hits, ...s.operator.extras].map((code) => (
+                <li key={code}>{name(code)} eksik / uygun değil</li>
+              ))}
+            </ul>
+          </ReportBlock>
+        )}
+
         <ReportBlock no="4" title="Kontrollük tarafından yapılan işlemler">
           {actions.length === 0 ? (
             <Empty>İşlem kaydedilmedi.</Empty>

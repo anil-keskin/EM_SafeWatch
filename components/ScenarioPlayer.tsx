@@ -12,7 +12,7 @@ import DecisionPanel, {
   nextDecisionTab,
 } from "@/components/DecisionPanel";
 import HazardScene from "@/components/HazardScene";
-import HintBox from "@/components/HintBox";
+import HintButton from "@/components/HintButton";
 import SolutionAssist from "@/components/SolutionAssist";
 import TimeMachineBand from "@/components/TimeMachineBand";
 import { useSafeWatchData, findScenario } from "@/lib/data";
@@ -104,7 +104,11 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
   }
 
   const handleToggle = (tab: DecisionTab, code: string) => {
-    if (tab === "operator") return;
+    if (tab === "operator") {
+      // İşletme tespiti yardımsız ve puansızdır; yalnızca kaydedilir.
+      setAnswers((prev) => ({ ...prev, operator: toggle(prev.operator, code) }));
+      return;
+    }
     const wasSelected = answers[tab].includes(code);
     setAnswers((prev) => ({ ...prev, [tab]: toggle(prev[tab], code) }));
     setAssist((prev) =>
@@ -122,7 +126,7 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
     if (!isScenarioScorable(scenario)) return;
     const result = evaluateScenario(
       scenario,
-      { ...answers, operator: [] },
+      answers,
       assist,
       equipment,
       picks.length > 0 ? summarizeDialogue(dialogueRounds, picks) : undefined
@@ -209,7 +213,27 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
 
   return (
     <div className="space-y-4">
-      <StepBar step={step} onStep={setStep} />
+      <div className="flex items-center gap-2">
+        <div className="min-w-0 flex-1">
+          <StepBar step={step} onStep={setStep} />
+        </div>
+        {step !== "brief" && (
+          <HintButton
+            hints={scenario.hints}
+            used={assist.hazards.hintsUsed}
+            onReveal={() =>
+              setAssist((prev) => ({
+                ...prev,
+                hazards: {
+                  ...prev.hazards,
+                  hintsUsed: Math.min(prev.hazards.hintsUsed + 1, scenario.hints.length),
+                },
+              }))
+            }
+            nextPenalty={nextHintPenalty(assist.hazards.hintsUsed)}
+          />
+        )}
+      </div>
 
       {step === "brief" && (
         <>
@@ -323,7 +347,7 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
                     fillAllUsed={usedKeys.has("hazards:all")}
                     categoryPenalty={0}
                     fullPenalty={ALL_ASSIST_PENALTY}
-                    note="Doğru seçim puan düşürmez; listede olmayan riski seçmek düşürür. HEPSİNİ BELİRLE gerçek riskleri otomatik seçer (−8). İpucu kademeleri ayrıdır (−2 / −3 / −5); risk yardımının tavanı 15 puandır."
+                    note="Yanlış (sahada olmayan) riski seçmek puan düşürür. HEPSİNİ BELİRLE gerçek riskleri otomatik seçer (−8). Sağ üstteki İpucu düğmesi ayrıdır (−2 / −3 / −5); risk yardımının tavanı 15 puandır."
                   />
                 </div>
               )}
@@ -348,23 +372,7 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
               )}
             </div>
 
-            <HintBox
-              hints={scenario.hints}
-              used={assist.hazards.hintsUsed}
-              onReveal={() =>
-                setAssist((prev) => ({
-                  ...prev,
-                  hazards: {
-                    ...prev.hazards,
-                    hintsUsed: Math.min(
-                      prev.hazards.hintsUsed + 1,
-                      scenario.hints.length
-                    ),
-                  },
-                }))
-              }
-              nextPenalty={nextHintPenalty(assist.hazards.hintsUsed)}
-            />
+
           </div>
           )}
 

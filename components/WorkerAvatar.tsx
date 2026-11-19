@@ -16,7 +16,7 @@ import type { EquipmentItem } from "@/lib/types";
 
 type Layer = "back" | "suit" | "over" | "head" | "hat" | "top";
 type Piece = { layer: Layer; draw: (t: Tone) => ReactNode };
-type Tone = "self" | "contractor";
+type Tone = "self" | "contractor" | "operator";
 
 const SUITS: Record<string, { body: string; leg: string; trim?: string }> = {
   standart_is_kiyafeti: { body: "#475569", leg: "#334155" },
@@ -25,13 +25,13 @@ const SUITS: Record<string, { body: string; leg: string; trim?: string }> = {
   antistatik_ex_kiyafet: { body: "#0f766e", leg: "#115e59", trim: "#facc15" },
 };
 
-const helmetColor = (t: Tone) => (t === "contractor" ? "#facc15" : "#ffffff");
+const helmetColor = (t: Tone) => (t === "contractor" ? "#facc15" : t === "operator" ? "#3b82f6" : "#ffffff");
 
 const Helmet = ({ t }: { t: Tone }) => (
   <>
     <path d="M74 44 Q74 18 100 18 Q126 18 126 44 Z" fill={helmetColor(t)} stroke="#9ca3af" strokeWidth="1.5" />
     <rect x="68" y="40" width="64" height="7" rx="3.5" fill={helmetColor(t)} stroke="#9ca3af" strokeWidth="1.5" />
-    <rect x="96" y="19" width="8" height="21" fill={t === "contractor" ? "#eab308" : "#e1251b"} opacity="0.85" />
+    <rect x="96" y="19" width="8" height="21" fill={t === "contractor" ? "#eab308" : t === "operator" ? "#1d4ed8" : "#e1251b"} opacity="0.85" />
   </>
 );
 
@@ -174,7 +174,7 @@ const PIECES: Record<string, Piece> = {
   },
   /* ---- el ---- */
   eldiven_mekanik: { layer: "over", draw: () => <GloveShape fill="#9ca3af" cuff="#4b5563" /> },
-  eldiven_isi: { layer: "over", draw: () => <GloveShape fill="#e5e7eb" cuff="#cbd5e1" long /> },
+  eldiven_isi: { layer: "over", draw: () => <GloveShape fill="#d4d4d8" cuff="#a1a1aa" long /> },
   eldiven_kaynak: { layer: "over", draw: () => <GloveShape fill="#b45309" cuff="#92400e" long /> },
   eldiven_kimyasal: { layer: "over", draw: () => <GloveShape fill="#16a34a" cuff="#15803d" long /> },
   /* ---- ayak ---- */
@@ -451,7 +451,7 @@ export default function WorkerAvatar({
   const suitCode = wornDrawn.find((c) => c in SUITS);
   const suit = suitCode ? SUITS[suitCode] : null;
   const skin = "#e8cdb5";
-  const jacket = suit?.body ?? (tone === "contractor" ? "#6b7280" : "#94a3b8");
+  const jacket = suit?.body ?? (tone === "contractor" ? "#6b7280" : tone === "operator" ? "#64748b" : "#94a3b8");
   const legs = suit?.leg ?? "#475569";
   const hasHeadCover = wornDrawn.some((c) => catOf(c) === "bas");
   const hasGloves = wornDrawn.some((c) => catOf(c) === "el");
@@ -484,7 +484,9 @@ export default function WorkerAvatar({
         className={`relative w-full max-w-[11rem] overflow-hidden rounded-2xl p-2 ring-1 ${
           tone === "contractor"
             ? "bg-gradient-to-b from-amber-50 via-white to-erd-light ring-amber-200"
-            : "bg-gradient-to-b from-sky-50 via-white to-erd-light ring-erd-line"
+            : tone === "operator"
+              ? "bg-gradient-to-b from-blue-50 via-white to-erd-light ring-blue-200"
+              : "bg-gradient-to-b from-sky-50 via-white to-erd-light ring-erd-line"
         }`}
       >
         <svg viewBox="0 0 200 340" className="h-auto w-full" role="img" aria-label={caption}>
@@ -576,14 +578,14 @@ export default function WorkerAvatar({
           })}
         </svg>
       </div>
-      <figcaption className="mt-2 hidden text-center text-[11px] font-semibold text-erd-charcoal @2xl:block">
+      <figcaption className="mt-2 text-center text-[11px] font-semibold text-erd-charcoal">
         {caption}
         {onZone && (
           <span className="mt-0.5 block font-normal text-erd-gray">Vücuda dokunun: o bölgenin KKD&apos;leri açılır</span>
         )}
       </figcaption>
       {(extras.length > 0 || flagged.length > 0) && (
-        <div className="mt-1.5 flex max-w-[12rem] flex-wrap justify-center gap-1 @max-2xl:hidden">
+        <div className="mt-1.5 flex max-w-[12rem] flex-wrap justify-center gap-1">
           {flagged.length > 0 && (
             <span className="rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-semibold text-erd-red">
               {flagged.length} eksik işaretlendi

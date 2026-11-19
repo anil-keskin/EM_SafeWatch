@@ -2,11 +2,8 @@
 
 import ActionPicker from "@/components/ActionPicker";
 import ActorBadge from "@/components/ActorBadge";
-import EquipmentGlyph from "@/components/EquipmentGlyph";
-import EquipmentPicker from "@/components/EquipmentPicker";
-import WorkerAvatar from "@/components/WorkerAvatar";
+import EquipScreen from "@/components/EquipScreen";
 import { FilledIcon } from "@/components/AppIcon";
-import { useState } from "react";
 import { DECISION_TABS } from "@/content/decision-tabs";
 import { tabGlyph } from "@/lib/icon-theme";
 import type {
@@ -49,15 +46,15 @@ const TAB_HELP: Record<DecisionTab, string> = {
   contractor:
     "Denetlediğiniz müteahhit çalışanında EKSİK olan koruyucuları işaretleyin. Bu sekme giydirme değil tespittir. Anlık ciddi ihlalde durdurma yetkiniz müdahale sekmesindedir. Eksiği yoksa hiçbir şey seçmeyin.",
   operator:
-    "İşletme personeline KKD giydirmezsiniz. Bu sekme bağımsız puan üretmez; gördüğünüz eksiği kayda geçirir ve müdahale kararına bağlam sağlar.",
+    "İşletme personeline KKD giydirmez, talimat da vermezsiniz. Ama gördüğünüz eksiği tespit edip işletme sorumlusuna ve İSG birimine bildirmek görevinizdir. Bu sekme teknik puana girmez; tespitleriniz sonuç ekranında ve tutanakta yer alır.",
   action:
     "Tespitleriniz karşısında hangi adımları atacağınızı seçin. Birden fazla aksiyon seçebilirsiniz; yetki sınırınızı gözetin.",
 };
 
 const TAB_SHORT: Record<DecisionTab, string> = {
-  self: "Bu sahaya girerken SİZİN takmanız gerekenleri seçin. Seçtikçe karakteriniz giyinir.",
-  contractor: "Müteahhit çalışanının üzerinde EKSİK olanları işaretleyin. Eksiği yoksa boş bırakın.",
-  operator: "İşletme personelindeki eksikleri inceleyin: kayda geçirir, yetkiliye bildirirsiniz.",
+  self: "Bu sahaya girerken SİZİN takmanız gerekenleri seçin. Karakterin vücuduna ya da bölgelere dokunun.",
+  contractor: "Müteahhit çalışanında EKSİK ya da uygun olmayanı işaretleyin. Mavi rozet: şu an üzerinde.",
+  operator: "İşletme personelinde EKSİK olanları işaretleyin. Talimat vermezsiniz; tespit edip doğru kanala bildirirsiniz.",
   action: "Tespitlerinize göre atacağınız adımları seçin. Yetki sınırınızı unutmayın.",
 };
 
@@ -85,14 +82,6 @@ export default function DecisionPanel({
 }: DecisionPanelProps) {
   const contractor = actors.find((a) => a.type === "yuklenici");
   const operator = actors.find((a) => a.type === "isletme");
-  const [focus, setFocus] = useState<{ categoryId: string; nonce: number } | null>(null);
-  const [activeCat, setActiveCat] = useState<string>("");
-  const openZone = (categoryId: string) => {
-    setFocus((prev) => ({ categoryId, nonce: (prev?.nonce ?? 0) + 1 }));
-    requestAnimationFrame(() =>
-      document.getElementById("equipment-picker")?.scrollIntoView({ behavior: "smooth", block: "nearest" })
-    );
-  };
 
   return (
     <div id="decision-panel" className="sw-card scroll-mt-[5rem]">
@@ -150,13 +139,6 @@ export default function DecisionPanel({
           </details>
         </div>
 
-        {activeTab === "contractor" && contractor && (
-          <ObservedActor actor={contractor} equipment={equipment} />
-        )}
-        {activeTab === "contractor" && !contractor && (
-          <EmptyActorNote text="Bu senaryoda sahada müteahhit çalışanı bulunmuyor." />
-        )}
-
         {activeTab === "action" ? (
           <ActionPicker
             selected={answers.action}
@@ -166,108 +148,67 @@ export default function DecisionPanel({
             onFillScope={(kind) => onFillScope("action", kind)}
             onFillAll={() => onFillTab("action")}
           />
-        ) : activeTab === "operator" ? (
-          <OperatorInspectPanel
-            actor={operator}
-            equipment={equipment}
-            gaps={correctByTab.operator}
-          />
-        ) : (
-          <div className="@container"><div className="grid gap-4 @2xl:grid-cols-[11rem_minmax(0,1fr)]">
-            <div className="fixed bottom-[8.5rem] right-3 z-30 w-[5.5rem] rounded-2xl bg-white/90 p-1 shadow-xl ring-1 ring-erd-line backdrop-blur @2xl:sticky @2xl:bottom-auto @2xl:right-auto @2xl:top-32 @2xl:z-auto @2xl:w-full @2xl:self-start @2xl:bg-transparent @2xl:p-0 @2xl:shadow-none @2xl:ring-0 md:bottom-[7rem]">
-              {activeTab === "self" ? (
-                <WorkerAvatar
-                  equipment={equipment}
-                  worn={answers.self}
-                  caption="Siz · Kontrollük"
-                  onZone={openZone}
-                  activeZone={activeCat}
-                />
-              ) : (
-                <WorkerAvatar
-                  equipment={equipment}
-                  worn={contractor?.current_items ?? []}
-                  flagged={answers.contractor}
-                  caption={contractor ? `${contractor.employer} çalışanı` : "Müteahhit çalışanı"}
-                  tone="contractor"
-                  onZone={openZone}
-                  activeZone={activeCat}
-                />
-              )}
-            </div>
-          <div id="equipment-picker" className="min-w-0 scroll-mt-32">
-          <EquipmentPicker
-            tab={activeTab}
+        ) : activeTab === "self" ? (
+          <EquipScreen
+            key="self"
+            mode="self"
             categories={categories}
             items={equipment}
-            selected={answers[activeTab]}
-            onToggle={(code) => onToggle(activeTab, code)}
-            correctCodes={correctByTab[activeTab]}
+            selected={answers.self}
+            onToggle={(code) => onToggle("self", code)}
+            caption="Siz · Kontrollük"
+            correctCodes={correctByTab.self}
             requiredSelf={correctByTab.self}
             usedKeys={usedKeys}
-            onFillScope={(categoryId) => onFillScope(activeTab, categoryId)}
-            onFillAll={() => onFillTab(activeTab)}
-            focusRequest={focus}
-            onCategoryChange={setActiveCat}
+            onFillScope={(cat) => onFillScope("self", cat)}
+            onFillAll={() => onFillTab("self")}
           />
-          </div>
-          </div></div>
-        )}
+        ) : (() => {
+          const isContractor = activeTab === "contractor";
+          const actor = isContractor ? contractor : operator;
+          if (!actor) {
+            return (
+              <EmptyActorNote
+                text={
+                  isContractor
+                    ? "Bu senaryoda sahada müteahhit çalışanı bulunmuyor."
+                    : "Bu senaryoda sahada işletme personeli bulunmuyor."
+                }
+              />
+            );
+          }
+          return (
+            <div className="space-y-3">
+              <ActorLine actor={actor} />
+              <EquipScreen
+                key={activeTab}
+                mode={isContractor ? "contractor" : "operator"}
+                categories={categories}
+                items={equipment}
+                selected={isContractor ? answers.contractor : answers.operator}
+                onToggle={(code) => onToggle(activeTab, code)}
+                worn={actor.current_items ?? []}
+                caption={`${actor.employer}`}
+                correctCodes={correctByTab[activeTab]}
+                usedKeys={usedKeys}
+                onFillScope={isContractor ? (cat) => onFillScope("contractor", cat) : undefined}
+                onFillAll={isContractor ? () => onFillTab("contractor") : undefined}
+              />
+            </div>
+          );
+        })()}
       </div>
     </div>
   );
 }
 
-/** Denetlenen kişinin şu an üzerinde ne olduğunu gösteren gözlem kartı. */
-function ObservedActor({
-  actor,
-  equipment,
-}: {
-  actor: Actor;
-  equipment: EquipmentItem[];
-}) {
-  const byCode = new Map(equipment.map((e) => [e.code, e]));
-  const current = actor.current_items ?? [];
-
+/** Denetlenen kişi: kim, ne yapıyor. Üzerindekiler kartlarda "Üzerinde" rozetiyle görünür. */
+function ActorLine({ actor }: { actor: Actor }) {
   return (
-    <div className="rounded-xl border border-erd-line bg-erd-light p-3.5">
-      <div className="flex flex-wrap items-center gap-2">
-        <ActorBadge type={actor.type} />
-        <span className="text-sm font-semibold text-erd-charcoal">
-          {actor.employer}
-        </span>
-      </div>
-      <p className="mt-1.5 text-sm leading-snug text-erd-charcoal">
-        {actor.activity}
-      </p>
-      <p className="mt-2.5 text-[11px] font-semibold uppercase tracking-wide text-erd-gray">
-        Şu an üzerinde gözlemlenenler
-      </p>
-      <ul className="mt-1.5 flex flex-wrap gap-1.5">
-        {current.length === 0 && (
-          <li className="text-xs text-erd-gray">
-            Gözlemlenebilir bir koruyucu yok.
-          </li>
-        )}
-        {current.map((code) => {
-          const item = byCode.get(code);
-          return (
-            <li
-              key={code}
-              className="flex items-center gap-1.5 rounded-lg border border-erd-line bg-white px-2 py-1 text-[11px] font-medium text-erd-charcoal"
-            >
-              {item && (
-                <EquipmentGlyph
-                  code={item.code}
-                  categoryId={item.category_id}
-                  size="xs"
-                />
-              )}
-              {item?.name ?? code}
-            </li>
-          );
-        })}
-      </ul>
+    <div className="flex flex-wrap items-center gap-2 rounded-xl border border-erd-line bg-white px-3 py-2">
+      <ActorBadge type={actor.type} />
+      <span className="text-sm font-semibold text-erd-charcoal">{actor.employer}</span>
+      <span className="text-sm text-erd-gray">· {actor.activity}</span>
     </div>
   );
 }
@@ -277,67 +218,5 @@ function EmptyActorNote({ text }: { text: string }) {
     <p className="rounded-xl bg-erd-light px-3.5 py-3 text-sm text-erd-gray">
       {text} Bu sekmede seçim yapmadan devam edebilirsiniz.
     </p>
-  );
-}
-
-/** İşletme sekmesi salt okunur incelemedir; seçim veya yardım butonu yoktur. */
-function OperatorInspectPanel({
-  actor,
-  equipment,
-  gaps,
-}: {
-  actor: Actor | undefined;
-  equipment: EquipmentItem[];
-  gaps: string[];
-}) {
-  if (!actor) {
-    return (
-      <EmptyActorNote text="Bu senaryoda sahada işletme personeli bulunmuyor." />
-    );
-  }
-
-  const byCode = new Map(equipment.map((item) => [item.code, item]));
-  const missing = gaps;
-
-  return (
-    <div className="space-y-3">
-      <ObservedActor actor={actor} equipment={equipment} />
-      <div className="rounded-xl border border-erd-line bg-white p-3.5">
-        <p className="text-[11px] font-semibold uppercase tracking-wide text-erd-gray">
-          Gözlemlenen eksikler
-        </p>
-        {missing.length === 0 ? (
-          <p className="mt-2 text-sm leading-relaxed text-erd-gray">
-            Bu sahnede işletme personelinde işaretlenecek bir eksik
-            bulunmuyor. Müdahale kararını buna göre verin.
-          </p>
-        ) : (
-          <ul className="mt-2 flex flex-wrap gap-1.5">
-            {missing.map((code) => {
-              const item = byCode.get(code);
-              return (
-                <li
-                  key={code}
-                  className="flex items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-2 py-1 text-[11px] font-medium text-amber-900"
-                >
-                  {item && (
-                    <EquipmentGlyph
-                      code={item.code}
-                      categoryId={item.category_id}
-                      size="xs"
-                    />
-                  )}
-                  {item?.name ?? code}
-                </li>
-              );
-            })}
-          </ul>
-        )}
-        <p className="mt-3 text-xs leading-relaxed text-erd-gray">
-          Bu liste yalnızca incelemedir. Kart seçmek veya giydirmek yoktur;
-          doğru adımı müdahale sekmesinde verirsiniz.
-        </p>
-      </div>
-    </div>
   );
 }

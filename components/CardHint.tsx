@@ -16,7 +16,7 @@ interface CardHintProps {
 
 /**
  * Seçilebilir karttaki (i) popover'ı.
- * Puan düşüren senaryo ipucusundan (HintBox) ayrıdır; doğru cevabı söylemez.
+ * Puan düşüren senaryo ipucusundan ayrıdır; doğru cevabı söylemez.
  */
 export default function CardHint({
   label,
