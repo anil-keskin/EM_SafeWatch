@@ -34,9 +34,9 @@ export default function SolutionAssist({
   const showFill = Boolean(onFill && fillLabel);
 
   return (
-    <div className="rounded-xl border border-erd-line bg-erd-light p-3">
-      <p className="text-[11px] leading-snug text-erd-gray">{note}</p>
-      <div className="mt-2 flex flex-wrap gap-2">
+    <div className="flex flex-wrap items-center gap-2 rounded-xl border border-dashed border-erd-line bg-erd-light/60 px-3 py-2">
+      <span className="text-[11px] font-semibold uppercase tracking-wide text-erd-gray">Takıldınız mı?</span>
+      <div className="flex flex-wrap gap-2">
         {showFill && (
           <button
             type="button"
@@ -62,6 +62,12 @@ export default function SolutionAssist({
           )}
         </button>
       </div>
+      <details className="group ml-auto text-[11px] text-erd-gray">
+        <summary className="flex h-6 w-6 cursor-pointer list-none items-center justify-center rounded-full border border-erd-line bg-white font-bold text-erd-gray hover:text-erd-charcoal" aria-label="Yardım puanı nasıl hesaplanır?">
+          ?
+        </summary>
+        <p className="mt-2 max-w-md leading-snug">{note}</p>
+      </details>
     </div>
   );
 }

@@ -4,6 +4,7 @@ import ActionPicker from "@/components/ActionPicker";
 import ActorBadge from "@/components/ActorBadge";
 import EquipmentGlyph from "@/components/EquipmentGlyph";
 import EquipmentPicker from "@/components/EquipmentPicker";
+import WorkerAvatar from "@/components/WorkerAvatar";
 import { FilledIcon } from "@/components/AppIcon";
 import { DECISION_TABS } from "@/content/decision-tabs";
 import { tabGlyph } from "@/lib/icon-theme";
@@ -50,6 +51,13 @@ const TAB_HELP: Record<DecisionTab, string> = {
     "İşletme personeline KKD giydirmezsiniz. Bu sekme bağımsız puan üretmez; gördüğünüz eksiği kayda geçirir ve müdahale kararına bağlam sağlar.",
   action:
     "Tespitleriniz karşısında hangi adımları atacağınızı seçin. Birden fazla aksiyon seçebilirsiniz; yetki sınırınızı gözetin.",
+};
+
+const TAB_SHORT: Record<DecisionTab, string> = {
+  self: "Bu sahaya girerken SİZİN takmanız gerekenleri seçin. Seçtikçe karakteriniz giyinir.",
+  contractor: "Müteahhit çalışanının üzerinde EKSİK olanları işaretleyin. Eksiği yoksa boş bırakın.",
+  operator: "İşletme personelindeki eksikleri inceleyin: kayda geçirir, yetkiliye bildirirsiniz.",
+  action: "Tespitlerinize göre atacağınız adımları seçin. Yetki sınırınızı unutmayın.",
 };
 
 const ASSIST_LINE: Record<DecisionTab, string | null> = {
@@ -118,14 +126,20 @@ export default function DecisionPanel({
       </div>
 
       <div className="space-y-4 p-4">
-        <p className="text-xs leading-snug text-erd-gray">
-          {TAB_HELP[activeTab]}
-        </p>
-        {ASSIST_LINE[activeTab] && (
-          <p className="text-[11px] leading-snug text-erd-gray">
-            {ASSIST_LINE[activeTab]}
+        <div className="rounded-xl bg-erd-light/70 px-3.5 py-2.5">
+          <p className="text-sm font-medium leading-snug text-erd-charcoal">
+            {TAB_SHORT[activeTab]}
           </p>
-        )}
+          <details className="mt-1 text-xs text-erd-gray">
+            <summary className="cursor-pointer font-semibold text-erd-gray hover:text-erd-charcoal">
+              Ayrıntılı kural
+            </summary>
+            <p className="mt-1.5 leading-snug">{TAB_HELP[activeTab]}</p>
+            {ASSIST_LINE[activeTab] && (
+              <p className="mt-1.5 leading-snug">{ASSIST_LINE[activeTab]}</p>
+            )}
+          </details>
+        </div>
 
         {activeTab === "contractor" && contractor && (
           <ObservedActor actor={contractor} equipment={equipment} />
@@ -150,6 +164,24 @@ export default function DecisionPanel({
             gaps={correctByTab.operator}
           />
         ) : (
+          <div className="@container"><div className="grid gap-4 @2xl:grid-cols-[11rem_minmax(0,1fr)]">
+            <div className="mx-auto w-28 @2xl:sticky @2xl:top-32 @2xl:w-full @2xl:self-start">
+              {activeTab === "self" ? (
+                <WorkerAvatar
+                  equipment={equipment}
+                  worn={answers.self}
+                  caption="Siz · Kontrollük"
+                />
+              ) : (
+                <WorkerAvatar
+                  equipment={equipment}
+                  worn={contractor?.current_items ?? []}
+                  flagged={answers.contractor}
+                  caption={contractor ? `${contractor.employer} çalışanı` : "Müteahhit çalışanı"}
+                  tone="contractor"
+                />
+              )}
+            </div>
           <EquipmentPicker
             tab={activeTab}
             categories={categories}
@@ -162,6 +194,7 @@ export default function DecisionPanel({
             onFillScope={(categoryId) => onFillScope(activeTab, categoryId)}
             onFillAll={() => onFillTab(activeTab)}
           />
+          </div></div>
         )}
       </div>
     </div>

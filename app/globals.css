@@ -203,7 +203,48 @@ body {
 .sw-device-alarm { animation: sw-alarm-flash 0.5s ease-in-out infinite; }
 .sw-probe-alarm { animation: sw-alarm-flash 0.5s ease-in-out infinite; }
 
+/* ---- Ana sayfa tesis sahnesi ---- */
+.ph-crane { animation: ph-crane 16s ease-in-out infinite; }
+@keyframes ph-crane { 0%, 8% { transform: translateX(0); } 45%, 55% { transform: translateX(330px); } 92%, 100% { transform: translateX(0); } }
+.ph-smoke { transform-box: fill-box; transform-origin: center; animation: ph-smoke 7s linear infinite; }
+@keyframes ph-smoke { 0% { transform: translate(0, 0) scale(0.5); opacity: 0; } 15% { opacity: 1; } 100% { transform: translate(60px, -120px) scale(2.6); opacity: 0; } }
+.ph-flicker { animation: ph-flicker 2.6s ease-in-out infinite; }
+@keyframes ph-flicker { 0%, 100% { opacity: 1; } 40% { opacity: 0.75; } 60% { opacity: 0.95; } 80% { opacity: 0.8; } }
+.ph-twinkle { animation: ph-twinkle 3.5s ease-in-out infinite; }
+@keyframes ph-twinkle { 0%, 100% { opacity: 0.25; } 50% { opacity: 0.9; } }
+.ph-blink { animation: ph-blink 1.6s steps(1) infinite; }
+@keyframes ph-blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0.1; } }
+.ph-spark { animation: ph-spark 1.4s ease-out infinite; }
+@keyframes ph-spark { 0% { transform: translate(0, 0); opacity: 1; } 100% { transform: translate(var(--sx, 10px), -46px); opacity: 0; } }
+.ph-belt { animation: ph-belt 1s linear infinite; }
+@keyframes ph-belt { to { stroke-dashoffset: -16; } }
+.ph-ore { animation: ph-ore 4.8s linear infinite; }
+@keyframes ph-ore { 0% { transform: translate(470px, 258px); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translate(610px, 206px); opacity: 0; } }
+.ph-walker { animation: ph-walk 38s linear infinite; }
+@keyframes ph-walk { 0% { transform: translate(-30px, 352px); } 100% { transform: translate(1230px, 352px); } }
+.ph-leg-a { transform-box: fill-box; transform-origin: top; animation: ph-leg 0.7s ease-in-out infinite alternate; }
+.ph-leg-b { transform-box: fill-box; transform-origin: top; animation: ph-leg 0.7s ease-in-out infinite alternate-reverse; }
+@keyframes ph-leg { from { transform: rotate(-16deg); } to { transform: rotate(16deg); } }
+
+/* KKD avatarı: takılan parça yerine oturur */
+.sw-equip { transform-box: fill-box; transform-origin: center; animation: sw-equip 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); }
+@keyframes sw-equip { from { transform: scale(1.6) translateY(-14px); opacity: 0; } to { transform: none; opacity: 1; } }
+.sw-flag { transform-box: fill-box; transform-origin: center; animation: sw-flag 1.2s ease-in-out infinite; }
+@keyframes sw-flag { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+
+/* Sonuç: puan sayacı ve rozet */
+.sw-pop { animation: sw-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+@keyframes sw-pop { from { transform: scale(0.4); opacity: 0; } to { transform: none; opacity: 1; } }
+.sw-rise { animation: sw-rise 0.5s ease-out both; }
+@keyframes sw-rise { from { transform: translateY(14px); opacity: 0; } to { transform: none; opacity: 1; } }
+
 @media (prefers-reduced-motion: reduce) {
+  .ph-crane, .ph-smoke, .ph-flicker, .ph-twinkle, .ph-blink, .ph-spark, .ph-belt,
+  .ph-ore, .ph-walker, .ph-leg-a, .ph-leg-b, .sw-equip, .sw-flag, .sw-pop, .sw-rise {
+    animation: none;
+  }
+  .ph-walker { transform: translate(560px, 352px); }
+  .ph-ore, .ph-spark { display: none; }
   .sw-hotspot-idle,
   .sw-smoke,
   .sw-spark,

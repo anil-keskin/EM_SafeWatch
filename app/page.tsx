@@ -5,20 +5,14 @@ import {
   BarChart3,
   BookOpen,
   ChevronRight,
-  ClipboardList,
-  HardHat,
   History,
-  MapPin,
   Play,
 } from "lucide-react";
 import AppIcon from "@/components/AppIcon";
-import BrandMark from "@/components/BrandMark";
-import CircularProgress from "@/components/CircularProgress";
 import FeedbackForm from "@/components/FeedbackForm";
-import FactorySilhouette from "@/components/FactorySilhouette";
-import OyakMark from "@/components/OyakMark";
+import PlantHero from "@/components/PlantHero";
+import ZoneIcon from "@/components/ZoneIcon";
 import PrinciplesBar from "@/components/PrinciplesBar";
-import SafeWatchWordmark from "@/components/SafeWatchWordmark";
 import {
   findScenario,
   timeMachineScenarios,
@@ -29,8 +23,6 @@ import { tabGlyph } from "@/lib/icon-theme";
 import { useAuth } from "@/lib/auth";
 import { completedIn, useProgress } from "@/lib/progress";
 import type { DecisionTab } from "@/lib/types";
-import type { IconTone } from "@/lib/icon-theme";
-import type { LucideIcon } from "lucide-react";
 
 const METHODOLOGY: Array<{
   id: DecisionTab;
@@ -113,179 +105,166 @@ export default function HomePage() {
       ? `/senaryo/${nextScenario.slug}`
       : "/saha";
 
-  const catalog = [
-    { value: String(zones.length || 11), label: "Bölge", icon: MapPin, tone: "steel" as const },
-    { value: String(total), label: "Senaryo", icon: ClipboardList, tone: "kkd" as const },
-    { value: "4", label: "Kritik Karar", icon: HardHat, tone: "kkd" as const },
-  ];
+
+  const zoneCards = zones
+    .slice()
+    .sort((a, b) => a.order_index - b.order_index)
+    .map((zone) => {
+      const list = training
+        .filter((s) => s.zone_id === zone.id)
+        .sort((a, b) => a.order_index - b.order_index);
+      const zoneDone = list.filter((s) => progress[s.slug]).length;
+      const next = list.find((s) => !progress[s.slug]) ?? list[0];
+      return { zone, total: list.length, done: zoneDone, next };
+    })
+    .filter((z) => z.total > 0);
 
   return (
-    <div className="relative flex min-h-[calc(100dvh-4.5rem)] flex-col overflow-hidden bg-erd-canvas">
-      <div className="pointer-events-none absolute inset-0 sw-lms-wash" aria-hidden />
-      <FactorySilhouette />
-
-      <div className="relative z-10 mx-auto grid w-full max-w-6xl flex-1 items-start gap-8 px-4 py-7 sm:px-6 sm:py-10 lg:grid-cols-[minmax(17.5rem,20.5rem)_minmax(0,1fr)] lg:gap-10 lg:py-12">
-        <aside className="lg:sticky lg:top-[5.25rem]">
-          <div className="sw-home-panel p-6 sm:p-7">
-            <p className="text-center text-[11px] font-semibold uppercase tracking-[0.18em] text-erd-gray">
-              Kontrollük antrenmanı
-            </p>
-            <p className="mt-2 text-center text-sm text-erd-gray">
-              Hoş geldiniz,{" "}
-              <span className="font-semibold text-erd-charcoal">{displayName}</span>
-            </p>
-
-            <div className="mt-5 flex flex-col items-center gap-3">
-              <OyakMark size="hero" />
-              <BrandMark size="hero" />
-            </div>
-
-            <nav className="mt-8 space-y-2" aria-label="Öğrenme menüsü">
-              <HomeButton
-                href={continueHref}
-                label="Oyuna Başla"
-                icon={Play}
-                tone="kkd"
-                primary
-              />
-              <HomeButton href="/saha" label="Saha Seçimi" icon={MapPin} tone="steel" />
-              <HomeButton
-                href="/zaman-makinesi"
-                label="Zaman Makinesi"
-                hint="Yaşanmış olaylardan dersler"
-                icon={History}
-                tone="crane"
-              />
-              <HomeButton
-                href="/ilerlemem"
-                label="Gelişim Raporum"
-                icon={BarChart3}
-                tone="nav"
-              />
-              <HomeButton
-                href="/yardim"
-                label="Nasıl Oynanır"
-                icon={BookOpen}
-                tone="port"
-              />
-            </nav>
-
-            <div className="mt-7 flex items-center gap-4 border-t border-erd-line pt-5">
-              <CircularProgress value={done} total={total} />
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-bold text-erd-charcoal">
-                  {done}/{total} senaryo
-                </p>
-                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-erd-line">
-                  <div
-                    className="h-full rounded-full bg-erd-red"
-                    style={{
-                      width: `${total ? Math.round((done / total) * 100) : 0}%`,
-                    }}
-                  />
-                </div>
-                <p className="mt-2 text-xs leading-snug text-erd-gray">
-                  Gelişiminiz kayıtlıdır; kaldığınız yerden devam edebilirsiniz.
-                </p>
+    <div className="bg-erd-canvas">
+      {/* ---------- Sahne ---------- */}
+      <section className="relative isolate overflow-hidden bg-[#070b14] text-white">
+        <PlantHero />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#070b14]/90 via-[#070b14]/55 to-transparent" />
+        <div className="relative mx-auto flex min-h-[26rem] max-w-6xl flex-col justify-center px-4 py-10 sm:min-h-[30rem] sm:px-6">
+          <p className="sw-rise inline-flex w-fit items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/80 backdrop-blur">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
+            Kontrollük antrenmanı · {displayName}
+          </p>
+          <h1 className="sw-rise mt-4 max-w-xl text-4xl font-black leading-[1.05] tracking-tight sm:text-6xl" style={{ animationDelay: "80ms" }}>
+            Sahaya çık.
+            <br />
+            <span className="text-amber-300">Riski gör.</span>
+            <br />
+            Kazayı önle.
+          </h1>
+          <p className="sw-rise mt-4 max-w-md text-sm leading-relaxed text-white/75 sm:text-base" style={{ animationDelay: "160ms" }}>
+            Demir-çelik sahasında müteahhit işlerini denetleyen kontrolör sizsiniz.
+            Ölçün, KKD&apos;nizi seçin, eksikleri yakalayın, doğru kişiye doğru talimatı verin.
+          </p>
+          <div className="sw-rise mt-6 flex flex-wrap items-center gap-3" style={{ animationDelay: "240ms" }}>
+            <Link
+              href={continueHref}
+              className="group inline-flex items-center gap-2.5 rounded-2xl bg-erd-red px-6 py-3.5 text-base font-bold text-white shadow-[0_10px_30px_-8px_rgba(225,37,27,0.8)] transition-transform hover:-translate-y-0.5"
+            >
+              <Play size={20} fill="currentColor" />
+              {lastSlug ? "Kaldığın yerden devam" : "Vardiyaya Başla"}
+              <ChevronRight size={18} className="transition-transform group-hover:translate-x-1" />
+            </Link>
+            <Link
+              href="/zaman-makinesi"
+              className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white/10 px-5 py-3.5 text-sm font-semibold text-white backdrop-blur transition-colors hover:bg-white/20"
+            >
+              <History size={18} /> Zaman Makinesi
+              {timeMachine.length > 0 && (
+                <span className="rounded-full bg-amber-300 px-1.5 text-[11px] font-bold text-black">
+                  {timeMachine.length}
+                </span>
+              )}
+            </Link>
+          </div>
+          <dl className="sw-rise mt-8 flex flex-wrap gap-x-8 gap-y-3" style={{ animationDelay: "320ms" }}>
+            {[
+              { k: "Tamamlanan", v: `${done}/${total}` },
+              { k: "Teknik doğruluk", v: avgTechnical === null ? "—" : `%${avgTechnical}` },
+              { k: "Kontrollük davranışı", v: avgBehavior === null ? "—" : `%${avgBehavior}` },
+            ].map((m) => (
+              <div key={m.k}>
+                <dt className="text-[11px] uppercase tracking-wider text-white/55">{m.k}</dt>
+                <dd className="text-2xl font-bold tabular-nums">{m.v}</dd>
               </div>
-            </div>
+            ))}
+          </dl>
+        </div>
+      </section>
 
-            <div className="mt-4">
-              <FeedbackForm />
+      <div className="mx-auto max-w-6xl space-y-10 px-4 py-10 sm:px-6">
+        {/* ---------- Tesis haritası ---------- */}
+        <section>
+          <div className="flex flex-wrap items-end justify-between gap-2">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-erd-red">Tesis haritası</p>
+              <h2 className="mt-1 text-2xl font-bold tracking-tight text-erd-charcoal">Bugün hangi sahaya çıkıyorsunuz?</h2>
+            </div>
+            <Link href="/saha" className="text-sm font-semibold text-erd-red hover:underline">
+              Tüm senaryolar →
+            </Link>
+          </div>
+          <ul className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            {zoneCards.map(({ zone, total: zt, done: zd, next }, i) => {
+              const pct = zt > 0 ? Math.round((zd / zt) * 100) : 0;
+              const complete = zd === zt;
+              return (
+                <li key={zone.id} className="sw-rise" style={{ animationDelay: `${i * 40}ms` }}>
+                  <Link
+                    href={next ? `/senaryo/${next.slug}` : "/saha"}
+                    className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-erd-line bg-white p-4 transition-all hover:-translate-y-1 hover:border-erd-red/40 hover:shadow-[0_18px_40px_-18px_rgba(46,46,46,0.35)]"
+                  >
+                    <ZoneIcon zoneId={zone.id} watermark />
+                    <div className="relative flex items-start justify-between gap-2">
+                      <ZoneIcon zoneId={zone.id} />
+                      {complete ? (
+                        <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">TAMAM</span>
+                      ) : (
+                        <span className="rounded-full bg-erd-light px-2 py-0.5 text-[10px] font-bold tabular-nums text-erd-gray">
+                          {zd}/{zt}
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="relative mt-3 text-sm font-bold leading-snug text-erd-charcoal">{zone.name}</h3>
+                    <p className="relative mt-0.5 line-clamp-1 text-[11px] text-erd-gray">
+                      {next && !complete ? `Sıradaki: ${next.title}` : "Tekrar oyna"}
+                    </p>
+                    <div className="relative mt-auto pt-3">
+                      <div className="h-1.5 overflow-hidden rounded-full bg-erd-line">
+                        <div
+                          className={`h-full rounded-full transition-[width] duration-700 ${complete ? "bg-emerald-500" : "bg-erd-red"}`}
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                    </div>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+
+        {/* ---------- 4 karar ---------- */}
+        <section>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-erd-red">Her senaryoda</p>
+          <h2 className="mt-1 text-2xl font-bold tracking-tight text-erd-charcoal">Dört kritik karar</h2>
+          <ol className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {METHODOLOGY.map((item) => {
+              const g = tabGlyph(item.id);
+              return (
+                <li key={item.id} className="relative rounded-2xl border border-erd-line bg-white p-4">
+                  <span className="absolute right-4 top-3 text-3xl font-black text-erd-line">{item.num}</span>
+                  <AppIcon icon={g.icon} tone={g.tone} size="md" />
+                  <h3 className="mt-3 text-sm font-bold text-erd-charcoal">{item.title}</h3>
+                  <p className="mt-1 text-xs leading-relaxed text-erd-gray">{item.body}</p>
+                </li>
+              );
+            })}
+          </ol>
+        </section>
+
+        <section className="grid gap-4 md:grid-cols-2">
+          <div className="rounded-2xl border border-erd-line bg-white p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-erd-gray">Son tamamlanan</p>
+            <p className="mt-1 text-base font-semibold text-erd-charcoal">
+              {lastTitle ?? "Henüz yok — ilk vardiyanız sizi bekliyor."}
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Link href="/gelisim" className="sw-btn-ghost inline-flex items-center gap-1.5">
+                <BarChart3 size={16} /> Gelişim raporum
+              </Link>
+              <Link href="/nasil-oynanir" className="sw-btn-ghost inline-flex items-center gap-1.5">
+                <BookOpen size={16} /> Nasıl oynanır
+              </Link>
             </div>
           </div>
-        </aside>
-
-        <div className="flex min-w-0 flex-col gap-8 pb-2 lg:pt-1">
-          <section>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em]">
-              <SafeWatchWordmark />
-              <span className="text-erd-red"> metodolojisi</span>
-            </p>
-            <h1 className="mt-2 text-2xl font-bold tracking-tight text-erd-charcoal sm:text-3xl">
-              Dört Karar Metodolojisi
-            </h1>
-            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-erd-gray">
-              Her senaryoda aynı dört kararı çalışırsınız. Sistem tanı koymaz;
-              yalnızca gelişim göstergesi üretir.
-            </p>
-
-            <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
-              {METHODOLOGY.map((item) => {
-                const glyph = tabGlyph(item.id);
-                return (
-                  <li
-                    key={item.id}
-                    className="sw-lift sw-home-card relative min-h-[11.5rem] overflow-hidden rounded-2xl p-5 sm:min-h-[13.25rem] sm:p-6"
-                  >
-                    <span className="absolute inset-y-0 left-0 w-1 bg-erd-red/80" aria-hidden />
-                    <div className="flex items-start justify-between gap-3">
-                      <AppIcon icon={glyph.icon} tone={glyph.tone} size="md" />
-                      <span className="text-2xl font-light tabular-nums tracking-tight text-erd-red/70">
-                        {item.num}
-                      </span>
-                    </div>
-                    <h2 className="mt-5 text-base font-bold leading-snug text-erd-charcoal sm:text-lg">
-                      {item.title}
-                    </h2>
-                    <p className="mt-1.5 text-sm leading-relaxed text-erd-gray">
-                      {item.body}
-                    </p>
-                  </li>
-                );
-              })}
-            </ul>
-          </section>
-
-          <section>
-            <ul className="grid grid-cols-3 gap-3">
-              {catalog.map((fact) => (
-                <li
-                  key={fact.label}
-                  className="sw-lift sw-home-card relative overflow-hidden rounded-2xl px-3 py-7 text-center sm:px-5 sm:py-10"
-                >
-                  <span className="mx-auto mb-4 hidden sm:flex sm:justify-center">
-                    <AppIcon icon={fact.icon} tone={fact.tone} size="md" />
-                  </span>
-                  <p className="text-4xl font-bold tabular-nums tracking-tight text-erd-charcoal sm:text-6xl">
-                    {fact.value}
-                  </p>
-                  <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-erd-gray sm:text-xs">
-                    {fact.label}
-                  </p>
-                </li>
-              ))}
-            </ul>
-            {timeMachine.length > 0 && (
-              <p className="mt-3 text-center text-[11px] font-medium text-erd-gray">
-                Zaman Makinesi: {timeMachine.length} olay · ana müfredatın
-                dışındadır
-              </p>
-            )}
-          </section>
-
-          <section>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-erd-gray">
-              Gelişiminiz
-            </p>
-            <ul className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
-              <MetricCard
-                label="Son tamamlanan"
-                value={lastTitle ?? "Henüz yok"}
-                compact
-              />
-              <MetricCard label="Tamamlanan senaryo" value={`${done}/${total}`} />
-              <MetricCard
-                label="Ortalama teknik doğruluk"
-                value={avgTechnical == null ? "—" : String(avgTechnical)}
-              />
-              <MetricCard
-                label="Ortalama kontrollük davranışı"
-                value={avgBehavior == null ? "—" : String(avgBehavior)}
-              />
-            </ul>
-          </section>
-        </div>
+          <FeedbackForm />
+        </section>
       </div>
 
       <PrinciplesBar />
@@ -293,82 +272,3 @@ export default function HomePage() {
   );
 }
 
-function MetricCard({
-  label,
-  value,
-  compact = false,
-}: {
-  label: string;
-  value: string;
-  compact?: boolean;
-}) {
-  return (
-    <li className="sw-home-card min-h-[5.5rem] rounded-2xl px-4 py-5">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-erd-gray">
-        {label}
-      </p>
-      <p
-        className={`mt-2 font-bold leading-snug text-erd-charcoal ${
-          compact ? "text-sm" : "text-lg sm:text-xl"
-        }`}
-      >
-        {value}
-      </p>
-    </li>
-  );
-}
-
-function HomeButton({
-  href,
-  label,
-  hint,
-  icon: Icon,
-  tone,
-  primary = false,
-}: {
-  href: string;
-  label: string;
-  /** İkinci satır açıklaması. Buton yüksekliği ve radius'u değişmez. */
-  hint?: string;
-  icon: LucideIcon;
-  tone: IconTone;
-  primary?: boolean;
-}) {
-  return (
-    <Link
-      href={href}
-      className={`sw-nav-item flex w-full items-center gap-3 rounded-2xl px-3.5 py-3.5 text-sm font-semibold ${
-        primary
-          ? "bg-erd-red text-white shadow-[0_2px_8px_rgba(225,37,27,0.16)] hover:bg-erd-red-dark"
-          : "border border-erd-line bg-erd-canvas text-erd-charcoal hover:border-brand-safe-gray/25 hover:bg-white"
-      }`}
-    >
-      {primary ? (
-        <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/15">
-          <Icon
-            size={20}
-            strokeWidth={1.7}
-            fill="currentColor"
-            fillOpacity={0.28}
-            className="text-white"
-          />
-        </span>
-      ) : (
-        <AppIcon icon={Icon} tone={tone} size="sm" />
-      )}
-      <span className="min-w-0 flex-1 text-left">
-        {label}
-        {hint && (
-          <span className="mt-0.5 block text-[11px] font-medium leading-snug text-erd-gray">
-            {hint}
-          </span>
-        )}
-      </span>
-      <ChevronRight
-        size={18}
-        strokeWidth={2}
-        className={primary ? "text-white/80" : "text-erd-red"}
-      />
-    </Link>
-  );
-}
