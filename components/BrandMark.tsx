@@ -43,7 +43,7 @@ function BrandImage({
   const src = face === "logo" ? withBase("/logo.png") : withBase("/icon.svg");
   const className = large
     ? "h-12 w-auto bg-white object-contain"
-    : "h-10 w-auto shrink-0 bg-white object-contain sm:h-11";
+    : "h-8 w-auto shrink-0 bg-white object-contain md:h-11";
 
   return (
     // Logo dosyası opsiyoneldir; yoksa icon.svg, o da yoksa EM monogramı.
@@ -88,7 +88,7 @@ export default function BrandMark({ size = "header" }: BrandMarkProps) {
       )}
       <SafeWatchWordmark
         className={`block font-bold tracking-tight ${
-          isHero ? "text-4xl sm:text-5xl" : "text-lg sm:text-[22px]"
+          isHero ? "text-4xl sm:text-5xl" : "text-base md:text-[22px]"
         }`}
       />
       <span

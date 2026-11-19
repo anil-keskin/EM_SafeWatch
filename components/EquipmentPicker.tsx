@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import CardHint from "@/components/CardHint";
 import EquipmentGlyph from "@/components/EquipmentGlyph";
 import FamilyStepper from "@/components/FamilyStepper";
@@ -71,14 +71,6 @@ export default function EquipmentPicker({
   );
   const [query, setQuery] = useState("");
   const [openInfo, setOpenInfo] = useState<string | null>(null);
-  const advanceTimer = useRef<number | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (advanceTimer.current) window.clearTimeout(advanceTimer.current);
-    };
-  }, []);
-
   useEffect(() => {
     setActiveCategory(sortedCategories[0]?.id ?? "all");
     setQuery("");
@@ -110,13 +102,9 @@ export default function EquipmentPicker({
     if (familyIndex > 0) setActiveCategory(familyIds[familyIndex - 1]);
   };
 
-  const handlePick = (code: string) => {
-    const adding = !selectedSet.has(code);
-    onToggle(code);
-    if (!adding || !inFamily || query.trim()) return;
-    if (advanceTimer.current) window.clearTimeout(advanceTimer.current);
-    advanceTimer.current = window.setTimeout(goNextFamily, 280);
-  };
+  // Seçim yapılınca aile değişmez: aynı aileden birden fazla kart seçilebilir,
+  // kullanıcı seçimini görür ve "İleri" ile kendisi geçer.
+  const handlePick = (code: string) => onToggle(code);
   const scopeCodes =
     activeCategory === "all" ? [] : codesInCategory(items, activeCategory);
   const tabSolved = isExactSolved(selected, correctCodes);

@@ -86,10 +86,10 @@ export default function DecisionPanel({
   const operator = actors.find((a) => a.type === "isletme");
 
   return (
-    <div className="sw-card">
+    <div id="decision-panel" className="sw-card scroll-mt-[5rem]">
       <div
         id="decision-tabs"
-        className="sticky top-[4.5rem] z-30 flex scroll-mt-[4.75rem] overflow-x-auto border-b border-erd-line bg-erd-light/95 backdrop-blur-sm"
+        className="sticky top-[3.75rem] z-30 flex overflow-x-auto md:top-[4.5rem] border-b border-erd-line bg-erd-light/95 backdrop-blur-sm"
       >
         {DECISION_TABS.map((tab) => {
           const count = tab.id === "operator" ? 0 : answers[tab.id].length;

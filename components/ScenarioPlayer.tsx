@@ -66,7 +66,11 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
   const { zones, scenarios, categories, equipment } = useSafeWatchData();
   const { recordResult } = useProgress();
 
-  const [step, setStep] = useState<Step>("brief");
+  const [step, setStepState] = useState<Step>("brief");
+  const setStep = (next: Step) => {
+    setStepState(next);
+    requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
+  };
   const [answers, setAnswers] = useState<ScenarioAnswers>(EMPTY_ANSWERS);
   const [activeTab, setActiveTab] = useState<DecisionTab>("self");
   const [assist, setAssist] = useState(emptyScenarioAssist);
@@ -188,7 +192,7 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
     setActiveTab(next);
     requestAnimationFrame(() => {
       document
-        .getElementById("decision-tabs")
+        .getElementById("decision-panel")
         ?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   };
@@ -230,7 +234,8 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
       )}
 
       {step !== "brief" && (
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
+        <div className="mx-auto max-w-4xl space-y-4">
+          {step === "hazard" && (
           <div className="space-y-4">
             <div className="sw-card overflow-hidden p-4">
               <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
@@ -346,9 +351,40 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
               nextPenalty={nextHintPenalty(assist.hazards.hintsUsed)}
             />
           </div>
+          )}
 
           {step === "decide" && (
             <div className="space-y-4">
+              <div className="sw-card flex flex-wrap items-center gap-3 p-4">
+                <div className="min-w-0 flex-1">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-erd-gray">
+                    {zone?.name} · İşaretlediğiniz riskler
+                  </p>
+                  <h1 className="text-lg font-bold text-erd-charcoal">{scenario.title}</h1>
+                  <ul className="mt-2 flex flex-wrap gap-1.5">
+                    {sceneHazards
+                      .filter((h) => answers.hazards.includes(h.code))
+                      .map((h) => (
+                        <li
+                          key={h.code}
+                          className="rounded-full bg-red-50 px-2.5 py-1 text-[11px] font-semibold text-erd-red"
+                        >
+                          {h.label}
+                        </li>
+                      ))}
+                    {answers.hazards.length === 0 && (
+                      <li className="text-xs text-erd-gray">Henüz risk işaretlemediniz.</li>
+                    )}
+                  </ul>
+                </div>
+                <button
+                  type="button"
+                  className="sw-btn-ghost shrink-0"
+                  onClick={() => setStep("hazard")}
+                >
+                  Riskleri düzenle
+                </button>
+              </div>
               <DecisionPanel
                 activeTab={activeTab}
                 onTabChange={setActiveTab}
@@ -363,14 +399,14 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
                 onFillTab={handleFillTab}
               />
 
-              <div className="sw-card sticky bottom-4 z-20 flex flex-wrap items-center gap-3 p-4">
+              <div className="sw-card sticky bottom-[4.5rem] z-20 flex flex-wrap items-center gap-2 p-3 shadow-lg sm:gap-3 sm:p-4 md:bottom-4">
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold text-erd-charcoal">
                     {scorable
                       ? "Değerlendirmeye hazır mısınız?"
                       : "Bu senaryo henüz puanlanamaz"}
                   </p>
-                  <p className="text-xs text-erd-gray">
+                  <p className="hidden text-xs text-erd-gray sm:block">
                     {scorable
                       ? `${totalSelections} karar, ${answers.hazards.length} risk işaretlemesi yaptınız. Değerlendirme sonunda oyun bitmez; tekrar deneyebilirsiniz.`
                       : "Görev içeriği henüz doldurulmamış. Puan şişmesini önlemek için değerlendirme kapalıdır."}
@@ -379,14 +415,14 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
                 <div className="flex w-full shrink-0 flex-wrap gap-2 sm:w-auto">
                   <button
                     type="button"
-                    className="sw-btn-primary flex-1 px-4 py-3 text-sm sm:flex-none"
+                    className="sw-btn-ghost flex-1 px-3 py-2.5 text-sm sm:flex-none"
                     onClick={handleNextTab}
                   >
                     Sıradaki · {decisionTabShort(nextDecisionTab(activeTab))}
                   </button>
                   <button
                     type="button"
-                    className="sw-btn-primary flex-1 disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
+                    className="sw-btn-primary flex-1 py-2.5 disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
                     onClick={handleEvaluate}
                     disabled={!scorable}
                   >

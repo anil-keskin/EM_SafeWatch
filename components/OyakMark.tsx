@@ -18,7 +18,7 @@ export default function OyakMark({ size = "header" }: OyakMarkProps) {
       src={withBase("/oyak-maden-metalurji.jpg")}
       alt="OYAK Maden Metalürji"
       className={`shrink-0 bg-white object-contain object-center ${
-        tall ? "h-16 w-auto sm:h-[4.75rem]" : "h-12 w-auto sm:h-14"
+        tall ? "h-16 w-auto sm:h-[4.75rem]" : "h-10 w-auto md:h-14"
       }`}
     />
   );

@@ -65,10 +65,10 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 flex h-[4.5rem] border-b border-erd-line bg-erd-charcoal">
+    <header className="sticky top-0 z-50 flex h-[3.75rem] border-b border-erd-line bg-erd-charcoal md:h-[4.5rem]">
       <Link
         href="/"
-        className="flex shrink-0 items-center gap-2.5 bg-white px-3 py-2 sm:gap-3.5 sm:px-4"
+        className="flex min-w-0 shrink items-center gap-2.5 bg-white px-3 py-2 sm:gap-3.5 sm:px-4"
         aria-label="SafeWatch ana sayfa"
       >
         <OyakMark size="header" />
@@ -114,8 +114,10 @@ export default function Header() {
           />
         </div>
 
+        <div className="flex-1 md:hidden" />
+
         <nav
-          className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto self-center px-2 md:hidden"
+          className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-4 border-t border-white/10 bg-erd-charcoal pb-[env(safe-area-inset-bottom)] md:hidden"
           aria-label="Ana menü"
         >
           {NAV.map((item) => {
@@ -125,7 +127,7 @@ export default function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex shrink-0 flex-col items-center gap-0.5 rounded-lg px-2.5 py-1.5 text-[10px] font-medium ${
+                className={`flex flex-col items-center gap-0.5 py-2 text-[10px] font-medium ${
                   active ? "bg-white/10 text-white" : "text-white/70"
                 }`}
               >
@@ -142,7 +144,7 @@ export default function Header() {
           })}
         </nav>
 
-        <div className="relative shrink-0 self-center px-3 sm:px-5" ref={menuRef}>
+        <div className="relative shrink-0 self-center px-1.5 sm:px-5" ref={menuRef}>
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}

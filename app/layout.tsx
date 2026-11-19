@@ -30,7 +30,7 @@ export default function RootLayout({
     <html lang="tr">
       <body className="flex min-h-dvh flex-col font-sans">
         <Header />
-        <main className="flex-1">{children}</main>
+        <main className="flex-1 pb-16 md:pb-0">{children}</main>
         <ServiceWorkerRegistrar />
       </body>
     </html>
