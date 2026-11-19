@@ -1,5 +1,6 @@
 import { matchSelectedToCorrect } from "@/lib/equipment-families";
 import type { DialogueResult } from "@/lib/dialogue";
+import type { FieldEventResult } from "@/lib/field-events";
 import { taskSpecificExtrasForSelf } from "@/lib/equipment-layers";
 import {
   ALL_ASSIST_PENALTY,
@@ -29,6 +30,19 @@ import type {
 
 /** Saha diyaloğunun Kontrollük Davranışı puanındaki ağırlığı. */
 export const DIALOGUE_WEIGHT = 0.3;
+
+/**
+ * Kontrollük Davranışı bileşenlerinin ağırlıkları. Yapılmayan bileşen
+ * hesaba girmez; kalanlar kendi aralarında 100'e ölçeklenir.
+ */
+export const BEHAVIOR_WEIGHTS = { mudahale: 0.6, diyalog: 0.25, olay: 0.15 } as const;
+
+const EVENT_SCORE: Record<FieldEventResult["verdict"], number> = {
+  dogru: 100,
+  yetki: 25,
+  zayif: 0,
+  gecikme: 0,
+};
 
 /**
  * SafeWatch puanlama motoru.
@@ -189,7 +203,8 @@ export function evaluateScenario(
   answers: ScenarioAnswers,
   assist: ScenarioAssistState = emptyScenarioAssist(),
   equipment: EquipmentItem[] = [],
-  dialogue?: DialogueResult
+  dialogue?: DialogueResult,
+  fieldEvent?: FieldEventResult
 ): ScenarioResult {
   const completedAt = new Date().toISOString();
 
@@ -328,10 +343,20 @@ export function evaluateScenario(
     dialogue && dialogue.total > 0
       ? Math.round((dialogue.correct / dialogue.total) * 100)
       : undefined;
+  const eventScore = fieldEvent ? EVENT_SCORE[fieldEvent.verdict] : undefined;
+  const parts = [
+    { key: "mudahale" as const, label: "Müdahale kararı", score: interventionPct },
+    ...(dialogueScore !== undefined ? [{ key: "diyalog" as const, label: "Saha diyaloğu", score: dialogueScore }] : []),
+    ...(eventScore !== undefined ? [{ key: "olay" as const, label: "Anlık olay", score: eventScore }] : []),
+  ];
+  const weightSum = parts.reduce((sum, p) => sum + BEHAVIOR_WEIGHTS[p.key], 0);
+  const behaviorParts = parts.map((p) => ({
+    label: p.label,
+    share: Math.round((BEHAVIOR_WEIGHTS[p.key] / weightSum) * 100),
+    score: Math.round(p.score),
+  }));
   let behavior = Math.round(
-    dialogueScore === undefined
-      ? interventionPct
-      : interventionPct * (1 - DIALOGUE_WEIGHT) + dialogueScore * DIALOGUE_WEIGHT
+    parts.reduce((sum, p) => sum + p.score * (BEHAVIOR_WEIGHTS[p.key] / weightSum), 0)
   );
 
   const selfPrepUsed =
@@ -390,8 +415,23 @@ export function evaluateScenario(
     behaviorCapped,
   });
   if (dialogue && dialogueScore !== undefined) {
+    const share = behaviorParts.find((p) => p.label === "Saha diyaloğu")?.share ?? 0;
     behaviorNotes.push(
-      `Saha diyaloğu: ${dialogue.correct}/${dialogue.total} konuşmada doğru yaklaşım. Davranış puanının %${Math.round(DIALOGUE_WEIGHT * 100)}'unu oluşturur.`
+      `Saha diyaloğu: ${dialogue.correct}/${dialogue.total} konuşmada doğru yaklaşım. Davranış puanının %${share}'ini oluşturur.`
+    );
+  }
+  if (fieldEvent) {
+    const share = behaviorParts.find((p) => p.label === "Anlık olay")?.share ?? 0;
+    behaviorNotes.push(
+      `Anlık olay (${fieldEvent.title}): ${
+        fieldEvent.verdict === "dogru"
+          ? `doğru refleks, ${(fieldEvent.ms / 1000).toFixed(1)} sn`
+          : fieldEvent.verdict === "gecikme"
+            ? "süre doldu"
+            : fieldEvent.verdict === "yetki"
+              ? "yetki sınırı aşıldı"
+              : "riskli karar"
+      }. Davranış puanının %${share}'ini oluşturur.`
     );
   }
 
@@ -417,6 +457,7 @@ export function evaluateScenario(
     technicalNotes,
     behaviorNotes,
     dialogueScore,
+    behaviorParts,
   };
 
   const categorySolutions =
@@ -459,6 +500,7 @@ export function evaluateScenario(
     competencyScores,
     completedAt,
     ...(dialogue ? { dialogue } : {}),
+    ...(fieldEvent ? { fieldEvent } : {}),
   };
 }
 

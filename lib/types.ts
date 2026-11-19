@@ -221,6 +221,8 @@ export interface ScoreBreakdown {
   behaviorNotes: string[];
   /** Saha diyaloğu puanı (0-100); diyalog yapılmadıysa yok. */
   dialogueScore?: number;
+  /** Davranış puanının bileşenleri ve payları (%). */
+  behaviorParts?: { label: string; share: number; score: number }[];
 }
 
 export interface ScenarioResult {
@@ -243,6 +245,8 @@ export interface ScenarioResult {
   completedAt: string;
   /** Saha diyaloğu (yetki sınırı ve iletişim); puan barlarına girmez. */
   dialogue?: import("@/lib/dialogue").DialogueResult;
+  /** "Durum değişti!" anlık olayına verilen karar. */
+  fieldEvent?: import("@/lib/field-events").FieldEventResult;
 }
 
 export interface ProgressEntry {

@@ -176,6 +176,16 @@ export default function AuditReport({
           )}
         </ReportBlock>
 
+        {result.fieldEvent && (
+          <ReportBlock no="4.1" title="Gözlem sırasında gelişen olay">
+            <p className="text-xs">
+              <span className="font-semibold">{result.fieldEvent.title}:</span> {result.fieldEvent.situation}
+              <br />
+              <span className="text-erd-gray">Kontrollük müdahalesi:</span> {result.fieldEvent.answer}
+            </p>
+          </ReportBlock>
+        )}
+
         {result.dialogue && result.dialogue.picks.length > 0 && (
           <ReportBlock no="5" title="Sahada yapılan görüşmeler">
             <ul className="space-y-1.5 text-xs">

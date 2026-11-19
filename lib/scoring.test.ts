@@ -521,9 +521,24 @@ describe("saha diyaloğu davranış puanında", () => {
     expect(r.dialogue?.correct).toBe(2);
   });
 
-  it("müdahale yok ama diyalog tam → 30", () => {
+  it("müdahale yok ama diyalog tam → diyalog payı (%29)", () => {
     const r = evaluateScenario(makeScenario(), EMPTY_ANSWERS, emptyScenarioAssist(), EQUIPMENT, dlg(3, 3));
-    expect(r.behavior).toBe(30);
+    expect(r.behavior).toBe(29);
+  });
+
+  it("üç bileşen: müdahale %60, diyalog %25, anlık olay %15", () => {
+    const ev = { id: "gaz:co", title: "Gaz alarmı", situation: "", verdict: "dogru" as const, answer: "", feedback: "", ms: 3200 };
+    const r = evaluateScenario(makeScenario(), { ...EMPTY_ANSWERS, action: ["kayit_al"] }, emptyScenarioAssist(), EQUIPMENT, dlg(0, 4), ev);
+    expect(r.behavior).toBe(75);
+    expect(r.breakdown?.behaviorParts?.map((p) => p.share)).toEqual([60, 25, 15]);
+    expect(r.fieldEvent?.verdict).toBe("dogru");
+  });
+
+  it("anlık olayda süre dolarsa olay payı sıfırdır", () => {
+    const ev = { id: "x", title: "t", situation: "", verdict: "gecikme" as const, answer: "", feedback: "", ms: 15000 };
+    const r = evaluateScenario(makeScenario(), { ...EMPTY_ANSWERS, action: ["kayit_al"] }, emptyScenarioAssist(), EQUIPMENT, undefined, ev);
+    // müdahale 0.6/0.75 = %80 pay, olay %20 pay ve 0 puan
+    expect(r.behavior).toBe(80);
   });
 
   it("diyalog teknik puanı değiştirmez", () => {

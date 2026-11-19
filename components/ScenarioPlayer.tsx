@@ -6,6 +6,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ClipboardList, HardHat, MessagesSquare, TriangleAlert } from "lucide-react";
 import DialogueStage from "@/components/DialogueStage";
 import { buildDialogue, summarizeDialogue, type DialoguePick } from "@/lib/dialogue";
+import FieldEventModal from "@/components/FieldEventModal";
+import { buildFieldEvent, type FieldEventResult } from "@/lib/field-events";
 import BriefingCard from "@/components/BriefingCard";
 import DecisionPanel, {
   decisionTabShort,
@@ -69,6 +71,9 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
   const { recordResult } = useProgress();
 
   const [step, setStepState] = useState<Step>("brief");
+  const [eventOpen, setEventOpen] = useState(false);
+  const [eventResult, setEventResult] = useState<FieldEventResult | null>(null);
+  const [eventAfter, setEventAfter] = useState<"talk" | null>(null);
   const setStep = (next: Step) => {
     setStepState(next);
     requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
@@ -88,6 +93,23 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
   useEffect(() => {
     setLayoutSeed(createHazardLayoutSeed(slug));
   }, [slug]);
+
+  // "Durum değişti!": hazırlıkta 4 seçimden sonra ya da 25 sn hareketsizlikte bir kez.
+  const selectionCount =
+    answers.self.length + answers.contractor.length + answers.operator.length;
+  const hasFieldEvent = useMemo(
+    () => Boolean(scenario && buildFieldEvent(scenario)),
+    [scenario]
+  );
+  useEffect(() => {
+    if (step !== "decide" || !hasFieldEvent || eventResult || eventOpen) return;
+    if (selectionCount >= 4) {
+      setEventOpen(true);
+      return;
+    }
+    const t = window.setTimeout(() => setEventOpen(true), 25000);
+    return () => window.clearTimeout(t);
+  }, [step, hasFieldEvent, eventResult, eventOpen, selectionCount]);
 
   const sceneHazards = useMemo(() => {
     if (!scenario || layoutSeed == null) return [];
@@ -121,6 +143,19 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
   };
 
   const dialogueRounds = buildDialogue(scenario, equipment);
+  const fieldEvent = buildFieldEvent(scenario);
+
+  // Olay bir kez, hazırlık sırasında araya girer; değerlendirmeden önce mutlaka çıkar.
+  const proceedToTalk = () =>
+    dialogueRounds.length > 0 ? setStep("talk") : handleEvaluate();
+  const handleDecideNext = () => {
+    if (fieldEvent && !eventResult) {
+      setEventAfter("talk");
+      setEventOpen(true);
+      return;
+    }
+    proceedToTalk();
+  };
 
   const handleEvaluate = (picks: DialoguePick[] = []) => {
     if (!isScenarioScorable(scenario)) return;
@@ -129,7 +164,8 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
       answers,
       assist,
       equipment,
-      picks.length > 0 ? summarizeDialogue(dialogueRounds, picks) : undefined
+      picks.length > 0 ? summarizeDialogue(dialogueRounds, picks) : undefined,
+      eventResult ?? undefined
     );
     recordResult(scenario, result);
     router.push(`/sonuc/${scenario.slug}`);
@@ -260,6 +296,20 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
             </Link>
           </div>
         </>
+      )}
+
+      {eventOpen && fieldEvent && (
+        <FieldEventModal
+          event={fieldEvent}
+          onDone={(r) => {
+            setEventResult(r);
+            setEventOpen(false);
+            if (eventAfter === "talk") {
+              setEventAfter(null);
+              proceedToTalk();
+            }
+          }}
+        />
       )}
 
       {step === "talk" && (
@@ -446,9 +496,7 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
                   <button
                     type="button"
                     className="sw-btn-primary flex-1 py-2.5 disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
-                    onClick={() =>
-                      dialogueRounds.length > 0 ? setStep("talk") : handleEvaluate()
-                    }
+                    onClick={handleDecideNext}
                     disabled={!scorable}
                   >
                     {dialogueRounds.length > 0 ? "Sahada Konuş →" : "Değerlendir"}

@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import AuditReport from "@/components/AuditReport";
 import DefenseLayers from "@/components/DefenseLayers";
 import DialogueSummary from "@/components/DialogueSummary";
+import FieldEventSummary from "@/components/FieldEventSummary";
 import HazardScene from "@/components/HazardScene";
 import IncidentOutcome from "@/components/IncidentOutcome";
 import ScoreMeter from "@/components/ScoreMeter";
@@ -138,8 +139,8 @@ export default function ResultView({ slug }: { slug: string }) {
           <ScoreMeter
             label="Kontrollük Davranışı"
             hint={
-              result.dialogue
-                ? "Müdahale kararı (%70) ve saha diyaloğu (%30). Teknik barın kopyası değildir."
+              result.breakdown?.behaviorParts && result.breakdown.behaviorParts.length > 1
+                ? `${result.breakdown.behaviorParts.map((p) => `${p.label} %${p.share}`).join(" · ")}. Teknik barın kopyası değildir.`
                 : "Nasıl müdahale etmeliyim? kararı (25 ham puan). Teknik barın kopyası değildir."
             }
             score={result.behavior}
@@ -153,6 +154,8 @@ export default function ResultView({ slug }: { slug: string }) {
         layers={defenseLayers(scenario, result)}
         chain={consequenceChain(scenario, result, equipment, actionLabel)}
       />
+
+      {result.fieldEvent && <FieldEventSummary event={result.fieldEvent} />}
 
       <DialogueSummary dialogue={result.dialogue} />
 
@@ -361,6 +364,20 @@ function ScoreBreakdownCard({ result }: { result: ScenarioResult }) {
                 : ""}
             </span>
           </p>
+          {result.fieldEvent && (
+            <p className="mt-1.5 flex justify-between gap-3 text-xs text-erd-charcoal">
+              <span>Anlık olay</span>
+              <span className="tabular-nums text-erd-gray">
+                {result.fieldEvent.verdict === "dogru"
+                  ? `doğru · ${(result.fieldEvent.ms / 1000).toFixed(1)} sn`
+                  : result.fieldEvent.verdict === "gecikme"
+                    ? "süre doldu"
+                    : result.fieldEvent.verdict === "yetki"
+                      ? "yetki aşımı"
+                      : "riskli karar"}
+              </span>
+            </p>
+          )}
           {result.dialogue && (
             <p className="mt-1.5 flex justify-between gap-3 text-xs text-erd-charcoal">
               <span>Saha diyaloğu</span>
