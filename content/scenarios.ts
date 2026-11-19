@@ -162,7 +162,7 @@ export const SCENARIOS: Scenario[] = [
           "gaz_dedektoru_co",
           "kacis_maskesi_co",
           "baret_en397",
-          "gozluk_en166",
+          "gozluk_ir",
           "toz_maskesi_ffp3",
           "eldiven_isi",
           "fr_kiyafet",
@@ -228,7 +228,7 @@ export const SCENARIOS: Scenario[] = [
       "temiz_hava_solunum",
       "kursun_onluk",
     ],
-    contractor_gaps: ["gozluk_en166", "toz_maskesi_ffp3", "eldiven_isi"],
+    contractor_gaps: ["gozluk_ir", "toz_maskesi_ffp3", "eldiven_isi"],
     operator_gaps: [],
     correct_actions: ["izin_kontrol", "bildir_firma", "kayit_al"],
     wrong_actions: ["gozleme_devam"],
@@ -238,7 +238,7 @@ export const SCENARIOS: Scenario[] = [
       "İş izni notuna tekrar bakın: gaz ölçümünün üzerinden 2 saat 40 dakika geçmiş. Ölçümlerin geçerlilik süresi sınırlıdır — girmeden önce yenilenmesini istemelisiniz.",
     ],
     explanation:
-      "Bu senaryonun özü, görünmeyen riski yönetmektir. Döküm sahasında ısı ve toz kolayca fark edilir; asıl belirleyici olan CO maruziyetidir. Kişisel gaz dedektörü ve acil kaçış maskesi bu bölgede pazarlık konusu değildir. Alev almaz iş elbisesi, IR filtreli gözlük ve ısıya dayanıklı eldiven radyan ısı yükünü karşılar. Buna karşılık kaynakçı maskesi, alüminize giysi veya temiz hava beslemeli cihaz bu görev için gereksizdir; hareketinizi kısıtlar ve yanlış bir güven duygusu yaratır. Gerekenden fazla KKD seçmek de bir uygunsuzluktur. Yüklenici refrakter ekibinde göz koruması ve toz maskesi eksik, eldiven seçimi işin ısısına uygun değil. Bu, işi anında durdurmayı gerektiren kritik bir ihlal olmamakla birlikte firma saha sorumlusuna bildirilmesi ve kayıt altına alınması gereken bir eksikliktir. İşletme personelinde bu vardiyada bir uygunsuzluk gözlenmemiştir; eksik olmadığını söylemek de doğru bir denetim sonucudur. Son olarak gaz ölçümünün üzerinden geçen süre nedeniyle iş izin şartlarının yeniden kontrol ettirilmesi, bu senaryodaki en değerli kontrollük davranışıdır.",
+      "Bu senaryonun özü, görünmeyen riski yönetmektir. Döküm sahasında ısı ve toz kolayca fark edilir; asıl belirleyici olan CO maruziyetidir. Kişisel gaz dedektörü ve acil kaçış maskesi bu bölgede pazarlık konusu değildir. Alev almaz iş elbisesi, IR filtreli gözlük ve ısıya dayanıklı eldiven radyan ısı yükünü karşılar. Buna karşılık kaynakçı maskesi, alüminize giysi veya temiz hava beslemeli cihaz bu görev için gereksizdir; hareketinizi kısıtlar ve yanlış bir güven duygusu yaratır. Gerekenden fazla KKD seçmek de bir uygunsuzluktur. Yüklenici refrakter ekibinde IR filtreli göz koruması ve toz maskesi eksik, eldiven seçimi işin ısısına uygun değil. Bu, işi anında durdurmayı gerektiren kritik bir ihlal olmamakla birlikte firma saha sorumlusuna bildirilmesi ve kayıt altına alınması gereken bir eksikliktir. İşletme personelinde bu vardiyada bir uygunsuzluk gözlenmemiştir; eksik olmadığını söylemek de doğru bir denetim sonucudur. Son olarak gaz ölçümünün üzerinden geçen süre nedeniyle iş izin şartlarının yeniden kontrol ettirilmesi, bu senaryodaki en değerli kontrollük davranışıdır.",
     competency_tags: [
       "gaz_guvenligi",
       "kkd_secimi",
