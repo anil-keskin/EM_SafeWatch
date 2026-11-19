@@ -8,6 +8,7 @@ import CircularProgress from "@/components/CircularProgress";
 import PageShell from "@/components/PageShell";
 import ZoneIcon from "@/components/ZoneIcon";
 import {
+  plannedOfZone,
   scenariosOfZone,
   trainingScenarios,
   useSafeWatchData,
@@ -37,7 +38,7 @@ export default function SahaPage() {
     [allScenarios]
   );
 
-  const total = scenarios.length || 30;
+  const total = scenarios.length;
   const done = completedIn(progress, scenarios);
   const percent = total > 0 ? Math.round((done / total) * 100) : 0;
 
@@ -52,9 +53,9 @@ export default function SahaPage() {
         const completed = list.filter((s) => progress[s.slug]).length;
         if (filter === "done") return completed > 0;
         if (filter === "open") return completed < list.length;
-        return list.length > 0;
+        return list.length > 0 || plannedOfZone(allScenarios, zone.id).length > 0;
       });
-  }, [zones, scenarios, progress, query, filter]);
+  }, [zones, scenarios, allScenarios, progress, query, filter]);
 
   const ungrouped = useMemo(() => {
     const known = new Set(zones.map((z) => z.id));
@@ -131,12 +132,14 @@ export default function SahaPage() {
       <div className="mt-5 space-y-4">
         {visibleZones.map((zone) => {
           const zoneScenarios = scenariosOfZone(scenarios, zone.id);
-          if (zoneScenarios.length === 0) return null;
+          const zonePlanned = filter === "all" ? plannedOfZone(allScenarios, zone.id) : [];
+          if (zoneScenarios.length === 0 && zonePlanned.length === 0) return null;
           return (
             <ZoneCard
               key={zone.id}
               zone={zone}
               scenarios={zoneScenarios}
+              planned={zonePlanned}
               progress={progress}
             />
           );
@@ -216,10 +219,12 @@ function Stat({
 function ZoneCard({
   zone,
   scenarios,
+  planned = [],
   progress,
 }: {
   zone: Zone;
   scenarios: Scenario[];
+  planned?: Scenario[];
   progress: ProgressMap;
 }) {
   return (
@@ -229,7 +234,10 @@ function ZoneCard({
         <ZoneIcon zoneId={zone.id} />
         <div className="min-w-0 flex-1">
           <h2 className="text-sm font-bold text-erd-charcoal">{zone.name}</h2>
-          <p className="mt-0.5 text-xs text-erd-gray">{scenarios.length} senaryo</p>
+          <p className="mt-0.5 text-xs text-erd-gray">
+            {scenarios.length} senaryo
+            {planned.length > 0 && ` · ${planned.length} hazırlanıyor`}
+          </p>
         </div>
       </header>
 
@@ -260,6 +268,19 @@ function ZoneCard({
             </li>
           );
         })}
+        {planned.map((scenario) => (
+          <li
+            key={scenario.slug}
+            className="flex items-center gap-3 border-b border-erd-line px-4 py-3 text-sm last:border-b-0"
+            aria-disabled="true"
+          >
+            <span className="h-2.5 w-2.5 shrink-0 rounded-full border border-dashed border-erd-gray/40" />
+            <span className="min-w-0 flex-1 text-erd-gray/70">{scenario.title}</span>
+            <span className="rounded-full bg-erd-light px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-erd-gray">
+              Hazırlanıyor
+            </span>
+          </li>
+        ))}
       </ul>
     </section>
   );

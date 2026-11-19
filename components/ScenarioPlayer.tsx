@@ -248,10 +248,40 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
               </div>
 
               {scenario.hazards.length > 0 && (
-                <p className="mb-3 text-xs leading-relaxed text-erd-gray">
-                  Sahnedeki risk noktalarına dokunarak işaretleyin. Bazı
-                  noktalar gerçek bir tehlike içermiyor olabilir.
-                </p>
+                <>
+                  <p className="mb-3 text-xs leading-relaxed text-erd-gray">
+                    Görev kartındaki koşullara göre bu işte <strong>gerçekten var
+                    olan</strong> riskleri seçin. Listedeki bazı gözlemler bu
+                    sahada geçerli değildir — onları seçmek puan düşürür.
+                  </p>
+                  <details className="mb-3 rounded-xl border border-erd-line bg-erd-light/50 px-3.5 py-2.5 text-xs leading-relaxed text-erd-charcoal">
+                    <summary className="cursor-pointer font-semibold text-erd-charcoal">
+                      Saha koşullarını tekrar göster
+                    </summary>
+                    <dl className="mt-2 grid gap-x-4 gap-y-1.5 sm:grid-cols-2">
+                      {(
+                        [
+                          ["Görev", scenario.briefing.gorev],
+                          ["İşletme", scenario.briefing.isletme_faaliyeti],
+                          ["Yüklenici", scenario.briefing.yuklenici_faaliyeti],
+                          ["Hava / ortam", scenario.briefing.hava],
+                          ["İş izni", scenario.briefing.is_izni],
+                          ["Gaz", scenario.briefing.gaz],
+                          ["Sıcaklık", scenario.briefing.sicaklik],
+                          ["Yükseklik / kot", scenario.briefing.yukseklik],
+                          ["Özel durum", scenario.briefing.ozel_not],
+                        ] as const
+                      )
+                        .filter(([, value]) => Boolean(value))
+                        .map(([label, value]) => (
+                          <div key={label}>
+                            <dt className="font-semibold text-erd-gray">{label}</dt>
+                            <dd>{value}</dd>
+                          </div>
+                        ))}
+                    </dl>
+                  </details>
+                </>
               )}
 
               <HazardScene
@@ -273,7 +303,7 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
                     fillAllUsed={usedKeys.has("hazards:all")}
                     categoryPenalty={0}
                     fullPenalty={ALL_ASSIST_PENALTY}
-                    note="Risk noktasına sizin tıklamanız puan düşürmez. HEPSİNİ BELİRLE gerçek riskleri otomatik seçer (−8). İpucu kademeleri ayrıdır (−2 / −3 / −5); risk yardımının tavanı 15 puandır."
+                    note="Doğru seçim puan düşürmez; listede olmayan riski seçmek düşürür. HEPSİNİ BELİRLE gerçek riskleri otomatik seçer (−8). İpucu kademeleri ayrıdır (−2 / −3 / −5); risk yardımının tavanı 15 puandır."
                   />
                 </div>
               )}

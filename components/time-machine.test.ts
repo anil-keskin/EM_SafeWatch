@@ -61,7 +61,7 @@ describe("ilerleme — iki havuz ayrı sayılır", () => {
   const training = trainingScenarios(SCENARIOS);
   const timeMachine = timeMachineScenarios(SCENARIOS);
 
-  it("eğitim havuzunun paydası 30, zaman makinesininki 2'dir", () => {
+  it("eğitim havuzunun paydası oynanabilir senaryo sayısı, zaman makinesininki 2'dir", () => {
     const html =
       render(
         createElement(ProgressBar, {
@@ -78,7 +78,7 @@ describe("ilerleme — iki havuz ayrı sayılır", () => {
         })
       );
     expect(html).toContain("Eğitim Senaryoları");
-    expect(html).toContain("0/30");
+    expect(html).toContain(`0/${trainingScenarios(SCENARIOS).length}`);
     expect(html).toContain("Zaman Makinesi");
     expect(html).toContain("0/2");
   });

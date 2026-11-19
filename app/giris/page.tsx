@@ -8,6 +8,28 @@ import { withBase } from "@/lib/paths";
 
 type Mode = "giris" | "kayit";
 
+/** Supabase hata mesajlarını oyuncunun anlayacağı Türkçeye çevirir. */
+function authErrorMessage(raw: string): string {
+  const m = raw.toLowerCase();
+  if (m.includes("failed to fetch") || m.includes("network") || m.includes("load failed"))
+    return "Giriş sunucusuna ulaşılamadı. Bulut hesabı şu an kapalı olabilir; girişsiz oynamaya devam edebilirsiniz, ilerlemeniz bu tarayıcıda saklanır.";
+  if (m.includes("invalid login credentials"))
+    return "E-posta veya parola hatalı.";
+  if (m.includes("email not confirmed"))
+    return "E-posta adresiniz henüz doğrulanmamış. Gelen kutunuzdaki (ve gereksiz klasöründeki) doğrulama bağlantısına tıklayın.";
+  if (m.includes("already registered") || m.includes("already exists"))
+    return "Bu e-posta ile zaten bir hesap var. \"Giriş Yap\" sekmesini kullanın.";
+  if (m.includes("password should be") || m.includes("weak password"))
+    return "Parola en az 6 karakter olmalı.";
+  if (m.includes("rate limit") || m.includes("too many"))
+    return "Çok fazla deneme yapıldı. Birkaç dakika sonra tekrar deneyin.";
+  if (m.includes("signups not allowed") || m.includes("signup is disabled"))
+    return "Yeni hesap açma şu an kapalı. Yöneticinize başvurun.";
+  if (m.includes("invalid api key") || m.includes("invalid jwt"))
+    return "Uygulamanın bulut anahtarı geçersiz. Yöneticiye bildirin; girişsiz oynamaya devam edebilirsiniz.";
+  return raw;
+}
+
 /**
  * Basit e-posta / parola girişi.
  * Giriş zorunlu değildir: giriş yapmadan da oynanabilir, ilerleme tarayıcıda
@@ -70,19 +92,26 @@ export default function GirisPage() {
         ? `${window.location.origin}${withBase("/giris/")}`
         : undefined;
 
-    const result =
-      mode === "giris"
-        ? await supabase.auth.signInWithPassword({ email, password })
-        : await supabase.auth.signUp({
-            email,
-            password,
-            options: emailRedirectTo ? { emailRedirectTo } : undefined,
-          });
+    let result;
+    try {
+      result =
+        mode === "giris"
+          ? await supabase.auth.signInWithPassword({ email, password })
+          : await supabase.auth.signUp({
+              email,
+              password,
+              options: emailRedirectTo ? { emailRedirectTo } : undefined,
+            });
+    } catch (err) {
+      setBusy(false);
+      setError(authErrorMessage(err instanceof Error ? err.message : String(err)));
+      return;
+    }
 
     setBusy(false);
 
     if (result.error) {
-      setError(result.error.message);
+      setError(authErrorMessage(result.error.message));
       return;
     }
 

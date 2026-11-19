@@ -17,7 +17,12 @@ import {
 } from "@/lib/incident";
 import { emptyScenarioAssist } from "@/lib/assist";
 import { evaluateScenario } from "@/lib/scoring";
-import { timeMachineScenarios, trainingScenarios } from "@/lib/data";
+import {
+  hasPlayableContent,
+  plannedScenarios,
+  timeMachineScenarios,
+  trainingScenarios,
+} from "@/lib/data";
 import type { Scenario, ScenarioAnswers } from "@/lib/types";
 
 const EQUIPMENT_CODES = new Set(EQUIPMENT_ITEMS.map((item) => item.code));
@@ -81,8 +86,11 @@ describe("tarih yardımcıları", () => {
 });
 
 describe("havuz ayrımı", () => {
-  it("eğitim havuzu tam 30 senaryodur", () => {
-    expect(trainingScenarios(SCENARIOS)).toHaveLength(30);
+  it("eğitim müfredatı 30 senaryodur: oynanabilir + hazırlanıyor", () => {
+    expect(
+      trainingScenarios(SCENARIOS).length + plannedScenarios(SCENARIOS).length
+    ).toBe(30);
+    expect(trainingScenarios(SCENARIOS).every(hasPlayableContent)).toBe(true);
   });
 
   it("zaman makinesi havuzu tam 2 senaryodur", () => {
@@ -111,7 +119,7 @@ describe("havuz ayrımı", () => {
     };
     const pool = [...SCENARIOS, hidden].filter(isPublished);
     expect(pool.some((s) => s.slug === "tm-yayinda-degil")).toBe(false);
-    expect(trainingScenarios(pool)).toHaveLength(30);
+    expect(trainingScenarios(pool)).toHaveLength(trainingScenarios(SCENARIOS).length);
     expect(timeMachineScenarios(pool)).toHaveLength(2);
   });
 

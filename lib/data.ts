@@ -60,7 +60,7 @@ function asList(value: unknown): string[] {
   return Array.isArray(parsed) ? parsed.map(String) : [];
 }
 
-function hasPlayableContent(scenario: Pick<Scenario, "briefing" | "hazards">): boolean {
+export function hasPlayableContent(scenario: Pick<Scenario, "briefing" | "hazards">): boolean {
   return Boolean(scenario.briefing?.gorev) || (scenario.hazards?.length ?? 0) > 0;
 }
 
@@ -258,11 +258,18 @@ export function useSafeWatchData(): SafeWatchData {
 }
 
 /**
- * Eğitim havuzu: bölge bazlı sabit müfredat. Sayısı 30'dur ve Zaman Makinesi
- * senaryoları bu sayıyı artırmaz.
+ * Eğitim havuzu: bölge bazlı müfredatın OYNANABİLİR kısmı. İçeriği henüz
+ * yazılmamış (yalnızca başlığı olan) senaryolar sayılmaz; oyuncuya boş ekran
+ * göstermemek için `plannedScenarios` ile ayrıca "Hazırlanıyor" diye listelenir.
+ * Zaman Makinesi senaryoları bu sayıyı artırmaz.
  */
 export function trainingScenarios(scenarios: Scenario[]): Scenario[] {
-  return scenarios.filter((s) => !isTimeMachine(s));
+  return scenarios.filter((s) => !isTimeMachine(s) && hasPlayableContent(s));
+}
+
+/** İçeriği henüz yazılmamış eğitim senaryoları ("Hazırlanıyor"). */
+export function plannedScenarios(scenarios: Scenario[]): Scenario[] {
+  return scenarios.filter((s) => !isTimeMachine(s) && !hasPlayableContent(s));
 }
 
 /** Zaman Makinesi havuzu, kronolojik (en yeni üstte). */
@@ -278,6 +285,13 @@ export function scenariosOfZone(
   zoneId: string
 ): Scenario[] {
   return trainingScenarios(scenarios)
+    .filter((s) => s.zone_id === zoneId)
+    .sort((a, b) => a.order_index - b.order_index);
+}
+
+/** Bölgenin içeriği henüz yazılmamış ("Hazırlanıyor") senaryoları. */
+export function plannedOfZone(scenarios: Scenario[], zoneId: string): Scenario[] {
+  return plannedScenarios(scenarios)
     .filter((s) => s.zone_id === zoneId)
     .sort((a, b) => a.order_index - b.order_index);
 }

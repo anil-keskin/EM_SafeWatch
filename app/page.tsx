@@ -73,7 +73,7 @@ export default function HomePage() {
   // senaryoları bu sayıyı ve ilerleme çubuğunu etkilemez.
   const training = trainingScenarios(scenarios);
   const timeMachine = timeMachineScenarios(scenarios);
-  const total = training.length || 30;
+  const total = training.length;
   const done = completedIn(progress, training);
   const completed = Object.values(progress).filter(
     (entry) => entry.status === "tamamlandi"

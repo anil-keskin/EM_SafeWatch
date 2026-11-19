@@ -15,9 +15,10 @@ interface HazardSceneProps {
 
 /**
  * Tehlike tanıma sahnesi.
- * Oyuncu sahnedeki risk noktalarını işaretler. Konumlar her denemede
- * rastgele dağılır; gerçek/sahte ayrımı değişmez. Etiket, işaretlenene
- * veya değerlendirme açılana kadar gizlenir.
+ * Sahnedeki noktalar numaralıdır ve altında aynı numaralarla "Saha
+ * gözlemleri" listesi bulunur. Oyuncu görev kartındaki koşullara bakarak
+ * hangi gözlemin bu işte GERÇEK risk olduğuna karar verir; körlemesine
+ * tıklama yerine muhakeme ölçülür. Konumlar her denemede rastgele dağılır.
  */
 export default function HazardScene({
   zoneId,
@@ -29,6 +30,7 @@ export default function HazardScene({
   const selectedSet = new Set(selected);
 
   return (
+    <div>
     <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl border border-erd-line bg-erd-charcoal">
       <SceneBackdrop zoneId={zoneId} />
 
@@ -39,7 +41,7 @@ export default function HazardScene({
         </p>
       )}
 
-      {hazards.map((hazard) => {
+      {hazards.map((hazard, index) => {
         const isSelected = selectedSet.has(hazard.code);
         const showTruth = revealed;
         const correct = showTruth && isSelected && hazard.is_real;
@@ -73,12 +75,7 @@ export default function HazardScene({
               ) : isSelected ? (
                 <span className="text-sm font-bold">✓</span>
               ) : (
-                <TriangleAlert
-                  size={20}
-                  strokeWidth={1.8}
-                  fill="currentColor"
-                  fillOpacity={0.35}
-                />
+                <span className="text-sm font-bold">{index + 1}</span>
               )}
             </span>
 
@@ -94,6 +91,49 @@ export default function HazardScene({
           </button>
         );
       })}
+    </div>
+
+      {hazards.length > 0 && (
+        <div className="mt-3">
+          <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-erd-gray">
+            <TriangleAlert size={14} className="text-erd-red" />
+            Saha gözlemleri — bu işte gerçek risk olanları seçin
+          </p>
+          <ul className="grid gap-2 sm:grid-cols-2">
+            {hazards.map((hazard, index) => {
+              const isSelected = selectedSet.has(hazard.code);
+              const correct = revealed && isSelected && hazard.is_real;
+              const wrong = revealed && isSelected && !hazard.is_real;
+              const missed = revealed && !isSelected && hazard.is_real;
+              let tone = "border-erd-line bg-white text-erd-charcoal hover:border-erd-red/40";
+              if (isSelected) tone = "border-erd-red bg-red-50 text-erd-charcoal";
+              if (correct) tone = "border-emerald-500 bg-emerald-50 text-emerald-900";
+              if (wrong) tone = "border-erd-red bg-red-50 text-erd-red";
+              if (missed) tone = "border-dashed border-amber-400 bg-amber-50 text-amber-900";
+              return (
+                <li key={hazard.code}>
+                  <button
+                    type="button"
+                    onClick={() => onToggle(hazard.code)}
+                    disabled={revealed}
+                    aria-pressed={isSelected}
+                    className={`flex w-full items-center gap-2.5 rounded-xl border px-3 py-2.5 text-left text-sm transition-colors ${tone}`}
+                  >
+                    <span
+                      className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${
+                        isSelected ? "bg-erd-red text-white" : "bg-erd-light text-erd-gray"
+                      }`}
+                    >
+                      {isSelected ? "✓" : index + 1}
+                    </span>
+                    <span className="min-w-0 flex-1 font-medium">{hazard.label}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
