@@ -1,0 +1,57 @@
+[
+ {
+  "id": "bas",
+  "name": "Baş Koruma",
+  "order_index": 1
+ },
+ {
+  "id": "goz",
+  "name": "Göz ve Yüz Koruma",
+  "order_index": 2
+ },
+ {
+  "id": "solunum",
+  "name": "Solunum Koruma",
+  "order_index": 3
+ },
+ {
+  "id": "isitme",
+  "name": "İşitme Koruma",
+  "order_index": 4
+ },
+ {
+  "id": "el",
+  "name": "El Koruma",
+  "order_index": 5
+ },
+ {
+  "id": "ayak",
+  "name": "Ayak Koruma",
+  "order_index": 6
+ },
+ {
+  "id": "govde",
+  "name": "Gövde ve Kıyafet",
+  "order_index": 7
+ },
+ {
+  "id": "yuksekte",
+  "name": "Yüksekte Çalışma",
+  "order_index": 8
+ },
+ {
+  "id": "olcum",
+  "name": "Ölçüm ve Tespit",
+  "order_index": 9
+ },
+ {
+  "id": "alan",
+  "name": "Alan Tedbiri (KKD Dışı)",
+  "order_index": 10
+ },
+ {
+  "id": "dokuman",
+  "name": "Doküman ve İzin",
+  "order_index": 11
+ }
+]

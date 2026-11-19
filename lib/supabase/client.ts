@@ -32,8 +32,12 @@ function clean(value: string | undefined): string {
  * createClient bu değere tekrar `rest/v1` ekleyeceği için path bırakılmaz.
  */
 function normalizeProjectUrl(value: string | undefined): string {
-  const trimmed = clean(value);
+  let trimmed = clean(value);
   if (!trimmed) return "";
+  // Panelde sık yapılan hata: adres "https://" olmadan girilir
+  // (ör. Vercel'de "xxxx.supabase.co"). Bu durumda Supabase tamamen
+  // kapalı sayılıyordu; şemayı burada tamamlıyoruz.
+  if (!/^https?:\/\//i.test(trimmed)) trimmed = `https://${trimmed}`;
   try {
     const parsed = new URL(trimmed);
     return parsed.origin;
