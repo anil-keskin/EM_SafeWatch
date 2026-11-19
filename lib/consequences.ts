@@ -147,6 +147,15 @@ export function consequenceChain(
         "Yetki sınırı veya durumun gerektirdiği karar aşıldı; sorumluluk karmaşası ve gecikmeye yol açar.",
     });
   }
+  for (const p of result.dialogue?.picks ?? []) {
+    if (p.verdict === "dogru") continue;
+    links.push({
+      kind: p.verdict === "yetki" ? "yetki" : "kacti",
+      layer: "actions",
+      title: `Saha konuşması · ${p.speaker.split(" · ")[0]}`,
+      outcome: p.feedback.split(". ").slice(0, 2).join(". ").replace(/\.?$/, "."),
+    });
+  }
   for (const code of s.actions.hits) {
     links.push({
       kind: "onlendi",

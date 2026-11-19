@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import AuditReport from "@/components/AuditReport";
 import DefenseLayers from "@/components/DefenseLayers";
+import DialogueSummary from "@/components/DialogueSummary";
 import HazardScene from "@/components/HazardScene";
 import IncidentOutcome from "@/components/IncidentOutcome";
 import ScoreMeter from "@/components/ScoreMeter";
@@ -148,6 +149,8 @@ export default function ResultView({ slug }: { slug: string }) {
         layers={defenseLayers(scenario, result)}
         chain={consequenceChain(scenario, result, equipment, actionLabel)}
       />
+
+      <DialogueSummary dialogue={result.dialogue} />
 
       <div className="sw-card p-4">
         <h2 className="mb-3 text-sm font-bold uppercase tracking-wide text-erd-gray">

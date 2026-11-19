@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
-import { ClipboardList, HardHat, TriangleAlert } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ClipboardList, HardHat, MessagesSquare, TriangleAlert } from "lucide-react";
+import DialogueStage from "@/components/DialogueStage";
+import { buildDialogue, summarizeDialogue, type DialoguePick } from "@/lib/dialogue";
 import BriefingCard from "@/components/BriefingCard";
 import DecisionPanel, {
   decisionTabShort,
@@ -45,7 +47,7 @@ import {
 } from "@/lib/solutions";
 import type { DecisionTab, ScenarioAnswers } from "@/lib/types";
 
-type Step = "brief" | "hazard" | "decide";
+type Step = "brief" | "hazard" | "decide" | "talk";
 
 const EMPTY_ANSWERS: ScenarioAnswers = {
   hazards: [],
@@ -114,14 +116,20 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
     setAnswers((prev) => ({ ...prev, hazards: toggle(prev.hazards, code) }));
   };
 
-  const handleEvaluate = () => {
+  const dialogueRounds = buildDialogue(scenario, equipment);
+
+  const handleEvaluate = (picks: DialoguePick[] = []) => {
     if (!isScenarioScorable(scenario)) return;
-    const result = evaluateScenario(
+    const evaluated = evaluateScenario(
       scenario,
       { ...answers, operator: [] },
       assist,
       equipment
     );
+    const result =
+      picks.length > 0
+        ? { ...evaluated, dialogue: summarizeDialogue(dialogueRounds, picks) }
+        : evaluated;
     recordResult(scenario, result);
     router.push(`/sonuc/${scenario.slug}`);
   };
@@ -233,7 +241,17 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
         </>
       )}
 
-      {step !== "brief" && (
+      {step === "talk" && (
+        <div className="mx-auto max-w-3xl">
+          <DialogueStage
+            rounds={dialogueRounds}
+            onFinish={(picks) => handleEvaluate(picks)}
+            onSkip={() => handleEvaluate()}
+          />
+        </div>
+      )}
+
+      {step !== "brief" && step !== "talk" && (
         <div className="mx-auto max-w-4xl space-y-4">
           {step === "hazard" && (
           <div className="space-y-4">
@@ -423,10 +441,12 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
                   <button
                     type="button"
                     className="sw-btn-primary flex-1 py-2.5 disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
-                    onClick={handleEvaluate}
+                    onClick={() =>
+                      dialogueRounds.length > 0 ? setStep("talk") : handleEvaluate()
+                    }
                     disabled={!scorable}
                   >
-                    Değerlendir
+                    {dialogueRounds.length > 0 ? "Sahada Konuş →" : "Değerlendir"}
                   </button>
                 </div>
               </div>
@@ -449,11 +469,20 @@ function StepBar({
     { id: "brief", label: "1. Görev Kartı", icon: ClipboardList },
     { id: "hazard", label: "2. Tehlike Tanıma", icon: TriangleAlert },
     { id: "decide", label: "3. Hazırlık ve Denetim", icon: HardHat },
+    { id: "talk", label: "4. Saha Diyaloğu", icon: MessagesSquare },
   ];
   const currentIndex = steps.findIndex((s) => s.id === step);
+  const navRef = useRef<HTMLElement>(null);
+
+  // Mobilde aktif adım görünür kalsın (yatay kaydırma, sayfa kaydırılmaz).
+  useEffect(() => {
+    const nav = navRef.current;
+    const active = nav?.querySelector<HTMLElement>("[data-active='true']");
+    if (nav && active) nav.scrollTo({ left: active.offsetLeft - 8, behavior: "smooth" });
+  }, [step]);
 
   return (
-    <nav className="flex gap-1.5 overflow-x-auto">
+    <nav ref={navRef} className="flex gap-1.5 overflow-x-auto">
       {steps.map((s, index) => {
         const active = s.id === step;
         const visited = index <= currentIndex;
@@ -463,6 +492,7 @@ function StepBar({
             key={s.id}
             type="button"
             onClick={() => onStep(s.id)}
+            data-active={active}
             className={`flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
               active
                 ? "bg-erd-red text-white"

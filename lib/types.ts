@@ -239,6 +239,8 @@ export interface ScenarioResult {
   };
   competencyScores: Record<string, number>;
   completedAt: string;
+  /** Saha diyaloğu (yetki sınırı ve iletişim); puan barlarına girmez. */
+  dialogue?: import("@/lib/dialogue").DialogueResult;
 }
 
 export interface ProgressEntry {

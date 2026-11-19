@@ -166,9 +166,24 @@ export default function AuditReport({
           )}
         </ReportBlock>
 
-        <ReportBlock no="5" title="Simülasyon değerlendirmesi">
+        {result.dialogue && result.dialogue.picks.length > 0 && (
+          <ReportBlock no="5" title="Sahada yapılan görüşmeler">
+            <ul className="space-y-1.5 text-xs">
+              {result.dialogue.picks.map((p, i) => (
+                <li key={`${p.roundId}-${i}`}>
+                  <span className="font-semibold">{p.speaker}:</span> &ldquo;{p.line}&rdquo;
+                  <br />
+                  <span className="text-erd-gray">Kontrollük cevabı:</span> {p.answer}
+                </li>
+              ))}
+            </ul>
+          </ReportBlock>
+        )}
+
+        <ReportBlock no={result.dialogue?.picks.length ? "6" : "5"} title="Simülasyon değerlendirmesi">
           <p className="text-xs">
             Teknik doğruluk <strong>%{result.technical}</strong> · Kontrollük davranışı <strong>%{result.behavior}</strong>
+            {result.dialogue ? <> · Saha diyaloğu <strong>{result.dialogue.correct}/{result.dialogue.total}</strong></> : null}
             {" · "}Gözden kaçan: {s.hazards.misses.length} risk, {s.self.misses.length} kişisel KKD, {s.contractor.misses.length} yüklenici eksiği, {s.actions.misses.length} işlem.
           </p>
         </ReportBlock>
