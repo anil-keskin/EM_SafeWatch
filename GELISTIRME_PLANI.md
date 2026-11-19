@@ -6,13 +6,15 @@ Yedek: `Desktop\EMSafe_YEDEK_2026-11-19` klasörü + git etiketi `yedek-2026-11-
 
 | # | Sorun | Durum |
 |---|-------|-------|
-| 1 | **Giriş çalışmıyor:** `.env.local` / `.env.production` içindeki Supabase adresi (`waxigsgov….supabase.co`) artık yok (DNS'te bulunamıyor). Proje silinmiş ya da ücretsiz planda uzun süre duraklatıldığı için kaldırılmış. Kodda hata yok. | Yeni proje gerekli (aşağıda) |
+| 1 | **Giriş çalışmıyordu — iki neden:** (a) Vercel'de `NEXT_PUBLIC_SUPABASE_URL` `https://` olmadan girilmişti, kod Supabase'i kapalı sayıyordu; (b) Supabase projesi duraklatılmıştı (paused). | Düzeltildi: kod adresi tamamlıyor, proje 19.11.2026'da Resume edildi |
 | 2 | Giriş hataları İngilizce/teknik çıkıyordu ("Failed to fetch"). | Düzeltildi: Türkçe, anlaşılır mesajlar |
 | 3 | "30 senaryo" yazıyordu ama 24'ünün içi boş; tıklayınca "görev metni doldurulmamış" ekranı. | Düzeltildi: sayaç yalnızca oynanabilirleri sayar, boşlar "Hazırlanıyor" diye kilitli görünür |
 | 4 | Tehlike tanıma ekranında tüm noktalar aynı üçgen, etiket tıklanınca görünüyordu → oyuncu tanımıyor, körlemesine tıklıyordu. | Düzeltildi: numaralı noktalar + "Saha gözlemleri" listesi; görev kartı aynı ekranda açılabilir |
 | 5 | Repo kökünde eski Netlify/GitHub Pages ayarları ve `1 (9).md`, `pg.html` gibi dosyalar. | Dokunulmadı — Vercel kullanılıyorsa Netlify kısmı temizlenebilir |
 
-## 2. Girişi açmak için (5 dk, sizin yapmanız gereken)
+## 2. (Gerekirse) Yeni Supabase projesi kurmak
+
+Mevcut proje çalışıyor; bu bölüm yalnızca proje kaybolursa içindir. 30 senaryonun tam içeriğinin yedeği `supabase/yedek/*.json` içindedir.
 
 1. supabase.com → **New project** (bölge: Frankfurt).
 2. **SQL Editor → New query** → `supabase/KURULUM_TEK_DOSYA.sql` dosyasının tamamını yapıştır → Run.
