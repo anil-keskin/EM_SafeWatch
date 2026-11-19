@@ -29,6 +29,9 @@ interface EquipmentPickerProps {
   onFillScope: (categoryId: string) => void;
   onFillAll: () => void;
   disabled?: boolean;
+  /** Dışarıdan (karakterin vücuduna tıklanarak) aile seçimi. */
+  focusRequest?: { categoryId: string; nonce: number } | null;
+  onCategoryChange?: (categoryId: string) => void;
 }
 
 const TAB_NOTE: Record<Exclude<DecisionTab, "action" | "operator">, string> = {
@@ -61,6 +64,8 @@ export default function EquipmentPicker({
   onFillScope,
   onFillAll,
   disabled = false,
+  focusRequest,
+  onCategoryChange,
 }: EquipmentPickerProps) {
   const sortedCategories = useMemo(
     () => categories.slice().sort((a, b) => a.order_index - b.order_index),
@@ -70,12 +75,26 @@ export default function EquipmentPicker({
     () => sortedCategories[0]?.id ?? "all"
   );
   const [query, setQuery] = useState("");
+
+  useEffect(() => {
+    if (!focusRequest) return;
+    if (!sortedCategories.some((c) => c.id === focusRequest.categoryId)) return;
+    setActiveCategory(focusRequest.categoryId);
+    setQuery("");
+    setOpenInfo(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focusRequest?.nonce]);
   const [openInfo, setOpenInfo] = useState<string | null>(null);
   useEffect(() => {
     setActiveCategory(sortedCategories[0]?.id ?? "all");
     setQuery("");
     setOpenInfo(null);
   }, [tab]);
+
+  useEffect(() => {
+    onCategoryChange?.(activeCategory);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeCategory]);
 
   const selectedSet = new Set(selected);
   const familyIds = sortedCategories.map((cat) => cat.id);

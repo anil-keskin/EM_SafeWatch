@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import AuditReport from "@/components/AuditReport";
+import DefenseLayers from "@/components/DefenseLayers";
 import HazardScene from "@/components/HazardScene";
 import IncidentOutcome from "@/components/IncidentOutcome";
 import ScoreMeter from "@/components/ScoreMeter";
@@ -14,6 +16,7 @@ import {
   scenariosOfZone,
   timeMachineScenarios,
 } from "@/lib/data";
+import { consequenceChain, defenseLayers } from "@/lib/consequences";
 import { isTimeMachine } from "@/lib/incident";
 import { readHazardLayoutSeed, scatterHazards } from "@/lib/hazard-layout";
 import { zoneGlyph, zoneTone } from "@/lib/icon-theme";
@@ -141,6 +144,11 @@ export default function ResultView({ slug }: { slug: string }) {
         <ScoreBreakdownCard result={result} />
       </div>
 
+      <DefenseLayers
+        layers={defenseLayers(scenario, result)}
+        chain={consequenceChain(scenario, result, equipment, actionLabel)}
+      />
+
       <div className="sw-card p-4">
         <h2 className="mb-3 text-sm font-bold uppercase tracking-wide text-erd-gray">
           Sahne Tekrarı
@@ -232,6 +240,8 @@ export default function ResultView({ slug }: { slug: string }) {
       </div>
 
       {timeMachine && <IncidentOutcome scenario={scenario} />}
+
+      <AuditReport scenario={scenario} zone={zone} result={result} equipment={equipment} />
 
       <div className="flex flex-wrap gap-2">
         {nextScenario ? (

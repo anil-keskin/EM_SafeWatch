@@ -397,6 +397,19 @@ const BADGE_ANCHOR: Record<string, [number, number]> = {
   olcum: [142, 100],
 };
 
+/** Vücut bölgesine tıklayınca açılacak KKD ailesi (sonraki çizilen üsttedir). */
+const HIT_ZONES: { cat: string; label: string; shapes: { x: number; y: number; w: number; h: number }[] }[] = [
+  { cat: "govde", label: "Gövde ve kıyafet", shapes: [{ x: 58, y: 88, w: 84, h: 118 }, { x: 30, y: 100, w: 28, h: 80 }, { x: 142, y: 100, w: 28, h: 80 }] },
+  { cat: "yuksekte", label: "Yüksekte çalışma", shapes: [{ x: 62, y: 164, w: 76, h: 18 }] },
+  { cat: "olcum", label: "Ölçüm ve tespit", shapes: [{ x: 108, y: 98, w: 30, h: 32 }] },
+  { cat: "bas", label: "Baş koruma", shapes: [{ x: 70, y: 10, w: 60, h: 32 }] },
+  { cat: "goz", label: "Göz ve yüz", shapes: [{ x: 76, y: 42, w: 48, h: 16 }] },
+  { cat: "solunum", label: "Solunum", shapes: [{ x: 82, y: 60, w: 36, h: 24 }] },
+  { cat: "isitme", label: "İşitme", shapes: [{ x: 62, y: 42, w: 14, h: 26 }, { x: 124, y: 42, w: 14, h: 26 }] },
+  { cat: "el", label: "El koruma", shapes: [{ x: 22, y: 180, w: 32, h: 34 }, { x: 146, y: 180, w: 32, h: 34 }] },
+  { cat: "ayak", label: "Ayak koruma", shapes: [{ x: 54, y: 290, w: 92, h: 38 }] },
+];
+
 const SLOT_LABEL: Record<string, string> = {
   alan: "Alan tedbiri",
   dokuman: "Doküman",
@@ -409,12 +422,17 @@ export default function WorkerAvatar({
   flagged = [],
   caption,
   tone = "self",
+  onZone,
+  activeZone,
 }: {
   equipment: EquipmentItem[];
   worn: string[];
   flagged?: string[];
   caption: string;
   tone?: Tone;
+  /** Vücut bölgesine tıklanınca ilgili KKD ailesini açar. */
+  onZone?: (categoryId: string) => void;
+  activeZone?: string;
 }) {
   const byCode = new Map(equipment.map((e) => [e.code, e]));
   const catOf = (code: string) => byCode.get(code)?.category_id;
@@ -522,6 +540,30 @@ export default function WorkerAvatar({
           {renderLayer("hat")}
           {renderLayer("top")}
 
+          {/* tıklanabilir vücut bölgeleri */}
+          {onZone &&
+            HIT_ZONES.map((z) => (
+              <g
+                key={`h-${z.cat}`}
+                role="button"
+                tabIndex={0}
+                aria-label={`${z.label} ailesini aç`}
+                className={`wa-hit ${activeZone === z.cat ? "wa-hit-active" : ""}`}
+                onClick={() => onZone(z.cat)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    onZone(z.cat);
+                  }
+                }}
+              >
+                <title>{z.label}</title>
+                {z.shapes.map((r, i) => (
+                  <rect key={i} x={r.x} y={r.y} width={r.w} height={r.h} rx="8" />
+                ))}
+              </g>
+            ))}
+
           {/* eksik rozeti */}
           {badgeCats.map((cat) => {
             const [x, y] = BADGE_ANCHOR[cat] ?? [150, 100];
@@ -534,7 +576,12 @@ export default function WorkerAvatar({
           })}
         </svg>
       </div>
-      <figcaption className="mt-2 hidden text-center text-[11px] font-semibold text-erd-charcoal @2xl:block">{caption}</figcaption>
+      <figcaption className="mt-2 hidden text-center text-[11px] font-semibold text-erd-charcoal @2xl:block">
+        {caption}
+        {onZone && (
+          <span className="mt-0.5 block font-normal text-erd-gray">Vücuda dokunun: o bölgenin KKD&apos;leri açılır</span>
+        )}
+      </figcaption>
       {(extras.length > 0 || flagged.length > 0) && (
         <div className="mt-1.5 flex max-w-[12rem] flex-wrap justify-center gap-1 @max-2xl:hidden">
           {flagged.length > 0 && (

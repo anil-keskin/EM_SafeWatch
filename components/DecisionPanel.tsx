@@ -6,6 +6,7 @@ import EquipmentGlyph from "@/components/EquipmentGlyph";
 import EquipmentPicker from "@/components/EquipmentPicker";
 import WorkerAvatar from "@/components/WorkerAvatar";
 import { FilledIcon } from "@/components/AppIcon";
+import { useState } from "react";
 import { DECISION_TABS } from "@/content/decision-tabs";
 import { tabGlyph } from "@/lib/icon-theme";
 import type {
@@ -84,6 +85,14 @@ export default function DecisionPanel({
 }: DecisionPanelProps) {
   const contractor = actors.find((a) => a.type === "yuklenici");
   const operator = actors.find((a) => a.type === "isletme");
+  const [focus, setFocus] = useState<{ categoryId: string; nonce: number } | null>(null);
+  const [activeCat, setActiveCat] = useState<string>("");
+  const openZone = (categoryId: string) => {
+    setFocus((prev) => ({ categoryId, nonce: (prev?.nonce ?? 0) + 1 }));
+    requestAnimationFrame(() =>
+      document.getElementById("equipment-picker")?.scrollIntoView({ behavior: "smooth", block: "nearest" })
+    );
+  };
 
   return (
     <div id="decision-panel" className="sw-card scroll-mt-[5rem]">
@@ -171,6 +180,8 @@ export default function DecisionPanel({
                   equipment={equipment}
                   worn={answers.self}
                   caption="Siz · Kontrollük"
+                  onZone={openZone}
+                  activeZone={activeCat}
                 />
               ) : (
                 <WorkerAvatar
@@ -179,9 +190,12 @@ export default function DecisionPanel({
                   flagged={answers.contractor}
                   caption={contractor ? `${contractor.employer} çalışanı` : "Müteahhit çalışanı"}
                   tone="contractor"
+                  onZone={openZone}
+                  activeZone={activeCat}
                 />
               )}
             </div>
+          <div id="equipment-picker" className="min-w-0 scroll-mt-32">
           <EquipmentPicker
             tab={activeTab}
             categories={categories}
@@ -193,7 +207,10 @@ export default function DecisionPanel({
             usedKeys={usedKeys}
             onFillScope={(categoryId) => onFillScope(activeTab, categoryId)}
             onFillAll={() => onFillTab(activeTab)}
+            focusRequest={focus}
+            onCategoryChange={setActiveCat}
           />
+          </div>
           </div></div>
         )}
       </div>

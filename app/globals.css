@@ -244,7 +244,33 @@ body {
 .sw-rise { animation: sw-rise 0.5s ease-out both; }
 @keyframes sw-rise { from { transform: translateY(14px); opacity: 0; } to { transform: none; opacity: 1; } }
 
+/* Karakter: tıklanabilir vücut bölgeleri */
+.wa-hit { cursor: pointer; outline: none; }
+.wa-hit rect { fill: transparent; stroke: transparent; stroke-width: 2; stroke-dasharray: 4 3; transition: fill 0.15s, stroke 0.15s; }
+.wa-hit:hover rect, .wa-hit:focus-visible rect { fill: rgba(59, 130, 246, 0.14); stroke: #3b82f6; }
+.wa-hit-active rect { fill: rgba(59, 130, 246, 0.1); stroke: #3b82f6; }
+
+/* Savunma katmanları: tehlike oku */
+svg:not([data-play]) .dl-arrow, svg:not([data-play]) .dl-head, svg:not([data-play]) .sw-pop, svg:not([data-play]) .sw-rise { animation-play-state: paused; }
+.dl-arrow { animation: dl-draw 1.5s cubic-bezier(0.5, 0, 0.3, 1) 0.4s forwards; }
+@keyframes dl-draw { to { stroke-dashoffset: 0; } }
+.dl-head { animation: dl-move 1.5s cubic-bezier(0.5, 0, 0.3, 1) 0.4s forwards; }
+@keyframes dl-move { to { transform: translateX(var(--dl-end)); } }
+
+@media (max-width: 639px) { .dl-label { display: none; } }
+
+/* Saha gözlem tutanağı: yazdırırken yalnızca tutanak görünür */
+@media print {
+  body * { visibility: hidden !important; }
+  .sw-print-area, .sw-print-area * { visibility: visible !important; }
+  .sw-print-area { position: absolute; inset: 0 auto auto 0; width: 100%; box-shadow: none !important; border: 0 !important; }
+  .sw-no-print { display: none !important; }
+  @page { size: A4; margin: 14mm; }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .dl-arrow { animation: none; stroke-dashoffset: 0 !important; }
+  .dl-head { animation: none; transform: translateX(var(--dl-end)); }
   .ph-crane, .ph-smoke, .ph-flicker, .ph-twinkle, .ph-blink, .ph-spark, .ph-belt,
   .ph-ore, .ph-walker, .ph-leg-a, .ph-leg-b, .sw-equip, .sw-flag, .sw-ghost, .sw-pop, .sw-rise {
     animation: none;
