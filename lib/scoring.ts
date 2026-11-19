@@ -1,4 +1,5 @@
 import { matchSelectedToCorrect } from "@/lib/equipment-families";
+import type { DialogueResult } from "@/lib/dialogue";
 import { taskSpecificExtrasForSelf } from "@/lib/equipment-layers";
 import {
   ALL_ASSIST_PENALTY,
@@ -24,6 +25,10 @@ import type {
   ScoreBreakdown,
   SectionResult,
 } from "@/lib/types";
+
+
+/** Saha diyaloğunun Kontrollük Davranışı puanındaki ağırlığı. */
+export const DIALOGUE_WEIGHT = 0.3;
 
 /**
  * SafeWatch puanlama motoru.
@@ -183,7 +188,8 @@ export function evaluateScenario(
   scenario: Scenario,
   answers: ScenarioAnswers,
   assist: ScenarioAssistState = emptyScenarioAssist(),
-  equipment: EquipmentItem[] = []
+  equipment: EquipmentItem[] = [],
+  dialogue?: DialogueResult
 ): ScenarioResult {
   const completedAt = new Date().toISOString();
 
@@ -313,10 +319,19 @@ export function evaluateScenario(
         )
       : 0;
 
-  let behavior = Math.round(
+  const interventionPct =
     (clamp(interventionRaw, 0, SCORE_MAX.intervention) /
       SCORE_MAX.intervention) *
-      100
+    100;
+  // Saha diyaloğu yapıldıysa davranış puanının %30'unu oluşturur.
+  const dialogueScore =
+    dialogue && dialogue.total > 0
+      ? Math.round((dialogue.correct / dialogue.total) * 100)
+      : undefined;
+  let behavior = Math.round(
+    dialogueScore === undefined
+      ? interventionPct
+      : interventionPct * (1 - DIALOGUE_WEIGHT) + dialogueScore * DIALOGUE_WEIGHT
   );
 
   const selfPrepUsed =
@@ -374,6 +389,11 @@ export function evaluateScenario(
     }),
     behaviorCapped,
   });
+  if (dialogue && dialogueScore !== undefined) {
+    behaviorNotes.push(
+      `Saha diyaloğu: ${dialogue.correct}/${dialogue.total} konuşmada doğru yaklaşım. Davranış puanının %${Math.round(DIALOGUE_WEIGHT * 100)}'unu oluşturur.`
+    );
+  }
 
   const breakdown: ScoreBreakdown = {
     riskRaw,
@@ -396,6 +416,7 @@ export function evaluateScenario(
     behaviorCapped,
     technicalNotes,
     behaviorNotes,
+    dialogueScore,
   };
 
   const categorySolutions =
@@ -437,6 +458,7 @@ export function evaluateScenario(
     },
     competencyScores,
     completedAt,
+    ...(dialogue ? { dialogue } : {}),
   };
 }
 

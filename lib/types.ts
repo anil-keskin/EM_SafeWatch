@@ -219,6 +219,8 @@ export interface ScoreBreakdown {
   behaviorCapped: boolean;
   technicalNotes: string[];
   behaviorNotes: string[];
+  /** Saha diyaloğu puanı (0-100); diyalog yapılmadıysa yok. */
+  dialogueScore?: number;
 }
 
 export interface ScenarioResult {

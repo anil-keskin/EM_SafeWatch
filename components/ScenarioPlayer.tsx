@@ -120,16 +120,13 @@ export default function ScenarioPlayer({ slug }: { slug: string }) {
 
   const handleEvaluate = (picks: DialoguePick[] = []) => {
     if (!isScenarioScorable(scenario)) return;
-    const evaluated = evaluateScenario(
+    const result = evaluateScenario(
       scenario,
       { ...answers, operator: [] },
       assist,
-      equipment
+      equipment,
+      picks.length > 0 ? summarizeDialogue(dialogueRounds, picks) : undefined
     );
-    const result =
-      picks.length > 0
-        ? { ...evaluated, dialogue: summarizeDialogue(dialogueRounds, picks) }
-        : evaluated;
     recordResult(scenario, result);
     router.push(`/sonuc/${scenario.slug}`);
   };

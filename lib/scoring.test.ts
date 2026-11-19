@@ -504,3 +504,31 @@ describe("işitme koruyucu: yüksek gürültüde tek yönlü eşdeğerlik", () =
     expect(r.extras).toEqual([]);
   });
 });
+
+describe("saha diyaloğu davranış puanında", () => {
+  const dlg = (correct: number, total: number) => ({ correct, total, picks: [] });
+
+  it("diyalog yoksa davranış yalnızca müdahaleden gelir", () => {
+    const r = evaluateScenario(makeScenario(), { ...EMPTY_ANSWERS, action: ["kayit_al"] }, emptyScenarioAssist(), EQUIPMENT);
+    expect(r.behavior).toBe(100);
+    expect(r.dialogue).toBeUndefined();
+  });
+
+  it("doğru müdahale + yarım diyalog → %70 + %15 = 85", () => {
+    const r = evaluateScenario(makeScenario(), { ...EMPTY_ANSWERS, action: ["kayit_al"] }, emptyScenarioAssist(), EQUIPMENT, dlg(2, 4));
+    expect(r.behavior).toBe(85);
+    expect(r.breakdown?.dialogueScore).toBe(50);
+    expect(r.dialogue?.correct).toBe(2);
+  });
+
+  it("müdahale yok ama diyalog tam → 30", () => {
+    const r = evaluateScenario(makeScenario(), EMPTY_ANSWERS, emptyScenarioAssist(), EQUIPMENT, dlg(3, 3));
+    expect(r.behavior).toBe(30);
+  });
+
+  it("diyalog teknik puanı değiştirmez", () => {
+    const a = evaluateScenario(makeScenario(), EMPTY_ANSWERS, emptyScenarioAssist(), EQUIPMENT);
+    const b = evaluateScenario(makeScenario(), EMPTY_ANSWERS, emptyScenarioAssist(), EQUIPMENT, dlg(0, 4));
+    expect(b.technical).toBe(a.technical);
+  });
+});

@@ -137,7 +137,11 @@ export default function ResultView({ slug }: { slug: string }) {
           />
           <ScoreMeter
             label="Kontrollük Davranışı"
-            hint="Nasıl müdahale etmeliyim? kararı (25 ham puan). Teknik barın kopyası değildir."
+            hint={
+              result.dialogue
+                ? "Müdahale kararı (%70) ve saha diyaloğu (%30). Teknik barın kopyası değildir."
+                : "Nasıl müdahale etmeliyim? kararı (25 ham puan). Teknik barın kopyası değildir."
+            }
             score={result.behavior}
           />
         </div>
@@ -357,6 +361,14 @@ function ScoreBreakdownCard({ result }: { result: ScenarioResult }) {
                 : ""}
             </span>
           </p>
+          {result.dialogue && (
+            <p className="mt-1.5 flex justify-between gap-3 text-xs text-erd-charcoal">
+              <span>Saha diyaloğu</span>
+              <span className="tabular-nums text-erd-gray">
+                {result.dialogue.correct}/{result.dialogue.total} doğru
+              </span>
+            </p>
+          )}
           {behaviorNotes.length > 0 && (
             <ul className="mt-2 space-y-1.5 text-xs leading-snug text-erd-gray">
               {behaviorNotes.map((note) => (
