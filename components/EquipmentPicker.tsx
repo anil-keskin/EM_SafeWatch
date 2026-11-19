@@ -202,48 +202,58 @@ export default function EquipmentPicker({
         <option value="all">Tüm kartlar</option>
       </select>
 
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
         {visible.map((item) => {
           const isSelected = selectedSet.has(item.code);
           const infoOpen = openInfo === item.code;
           const glyph = equipmentGlyph(item.code, item.category_id);
+          const layer = riskLayerLabel(riskLayerFor(item.code, requiredSelf));
           return (
             <div
               key={item.code}
-              className={`relative overflow-hidden rounded-xl border p-2.5 transition-colors ${
+              className={`group relative overflow-hidden rounded-2xl border-2 transition-all duration-200 ${
                 isSelected
-                  ? "border-erd-red bg-red-50/60"
-                  : "border-erd-line bg-white hover:border-erd-gray/40"
+                  ? tab === "contractor"
+                    ? "border-erd-red bg-red-50 shadow-[0_8px_20px_-12px_rgba(225,37,27,0.8)]"
+                    : "border-emerald-500 bg-emerald-50 shadow-[0_8px_20px_-12px_rgba(16,185,129,0.8)]"
+                  : "border-transparent bg-white ring-1 ring-erd-line hover:-translate-y-0.5 hover:shadow-md hover:ring-erd-gray/30"
               }`}
             >
               <IconWatermark icon={glyph.icon} tone={glyph.tone} />
-              <div className="relative flex items-start gap-1">
-                <button
-                  type="button"
-                  disabled={disabled}
-                  onClick={() => handlePick(item.code)}
-                  className="flex min-w-0 flex-1 items-start gap-2.5 text-left disabled:opacity-60"
-                  aria-pressed={isSelected}
-                >
-                  <EquipmentGlyph
-                    code={item.code}
-                    categoryId={item.category_id}
-                    size="sm"
-                  />
-                  <span className="min-w-0 pr-0.5">
-                    <span className="block text-xs font-semibold leading-snug text-erd-charcoal">
-                      {item.name}
+              <button
+                type="button"
+                disabled={disabled}
+                onClick={() => handlePick(item.code)}
+                className="relative flex h-full w-full flex-col items-start gap-2 p-3 pr-9 text-left disabled:opacity-60"
+                aria-pressed={isSelected}
+              >
+                <span className={`transition-transform duration-200 ${isSelected ? "scale-110" : "group-hover:scale-105"}`}>
+                  <EquipmentGlyph code={item.code} categoryId={item.category_id} size="md" />
+                </span>
+                <span className="block text-[13px] font-bold leading-tight text-erd-charcoal">
+                  {item.name}
+                </span>
+                <span className="mt-auto flex flex-wrap gap-1">
+                  {item.standard && item.standard !== "—" && (
+                    <span className="rounded-md bg-erd-charcoal/5 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-erd-gray">
+                      {item.standard}
                     </span>
-                    {item.standard && item.standard !== "—" && (
-                      <span className="mt-0.5 block text-[10px] font-medium uppercase tracking-wide text-erd-gray">
-                        {item.standard}
-                      </span>
-                    )}
-                    <span className="mt-0.5 block text-[10px] font-medium text-erd-gray">
-                      {riskLayerLabel(riskLayerFor(item.code, requiredSelf))}
-                    </span>
+                  )}
+                  <span className="rounded-md bg-erd-charcoal/5 px-1.5 py-0.5 text-[10px] font-medium text-erd-gray">
+                    {layer}
                   </span>
-                </button>
+                </span>
+              </button>
+              {isSelected && (
+                <span
+                  className={`sw-pop pointer-events-none absolute right-9 top-2.5 rounded-full px-2 py-0.5 text-[10px] font-bold text-white ${
+                    tab === "contractor" ? "bg-erd-red" : "bg-emerald-600"
+                  }`}
+                >
+                  {tab === "contractor" ? "! Eksik" : "✓ Takıldı"}
+                </span>
+              )}
+              <div className="absolute right-1.5 top-1.5">
                 <CardHint
                   label={item.name}
                   context={TAB_SELECT_CONTEXT[tab]}

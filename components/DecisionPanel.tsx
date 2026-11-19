@@ -165,7 +165,7 @@ export default function DecisionPanel({
           />
         ) : (
           <div className="@container"><div className="grid gap-4 @2xl:grid-cols-[11rem_minmax(0,1fr)]">
-            <div className="mx-auto w-28 @2xl:sticky @2xl:top-32 @2xl:w-full @2xl:self-start">
+            <div className="fixed bottom-[8.5rem] right-3 z-30 w-[5.5rem] rounded-2xl bg-white/90 p-1 shadow-xl ring-1 ring-erd-line backdrop-blur @2xl:sticky @2xl:bottom-auto @2xl:right-auto @2xl:top-32 @2xl:z-auto @2xl:w-full @2xl:self-start @2xl:bg-transparent @2xl:p-0 @2xl:shadow-none @2xl:ring-0 md:bottom-[7rem]">
               {activeTab === "self" ? (
                 <WorkerAvatar
                   equipment={equipment}

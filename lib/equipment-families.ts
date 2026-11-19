@@ -24,10 +24,17 @@ export function substituteGroup(code: string): string {
   return GROUP_BY_CODE[code] ?? code;
 }
 
+/**
+ * `noSubstitute`: aile eşdeğeri sayılmayacak kodlar. Yüklenici/işletme
+ * sekmesinde kişinin zaten üzerinde olan kart "eksik" diye işaretlenirse
+ * bu bir tespit hatasıdır; aynı aileden başka bir eksiğin yerine geçmez.
+ */
 export function matchSelectedToCorrect(
   selected: string[],
-  correct: string[]
+  correct: string[],
+  noSubstitute: readonly string[] = []
 ): { hits: string[]; misses: string[]; extras: string[] } {
+  const blocked = new Set(noSubstitute);
   const remaining = new Set(selected);
   const hits: string[] = [];
   const misses: string[] = [];
@@ -44,6 +51,7 @@ export function matchSelectedToCorrect(
     const group = substituteGroup(req);
     let found: string | undefined;
     for (const code of remaining) {
+      if (blocked.has(code)) continue;
       if (substituteGroup(code) === group) {
         found = code;
         break;
@@ -62,7 +70,7 @@ export function matchSelectedToCorrect(
   const extras: string[] = [];
   for (const code of remaining) {
     const group = substituteGroup(code);
-    if (satisfiedGroups.has(group)) continue;
+    if (!blocked.has(code) && satisfiedGroups.has(group)) continue;
     extras.push(code);
   }
 

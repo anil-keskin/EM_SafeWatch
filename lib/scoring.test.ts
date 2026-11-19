@@ -469,3 +469,18 @@ describe("doğru cevabı olmayan bölüm puanlanmaz", () => {
     expect(result.breakdown?.contractorRaw).toBe(0);
   });
 });
+
+describe("yüklenici tespitinde aile eşdeğeri", () => {
+  it("kişinin zaten taktığı kartı 'eksik' işaretlemek isabet sayılmaz", async () => {
+    const { matchSelectedToCorrect } = await import("@/lib/equipment-families");
+    // Yüklenici kulak tıkacı takıyor; eksik olan manşonlu kulaklık.
+    const worn = ["kulak_tikaci", "baret_en397"];
+    const wrong = matchSelectedToCorrect(["kulak_tikaci"], ["kulaklik_en352"], worn);
+    expect(wrong.hits).toEqual([]);
+    expect(wrong.extras).toEqual(["kulak_tikaci"]);
+    const right = matchSelectedToCorrect(["kulaklik_en352"], ["kulaklik_en352"], worn);
+    expect(right.hits).toEqual(["kulaklik_en352"]);
+    // Kendi KKD'sinde aile eşdeğeri hâlâ geçerli.
+    expect(matchSelectedToCorrect(["kulak_tikaci"], ["kulaklik_en352"]).hits).toEqual(["kulak_tikaci"]);
+  });
+});

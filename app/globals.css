@@ -231,6 +231,12 @@ body {
 @keyframes sw-equip { from { transform: scale(1.6) translateY(-14px); opacity: 0; } to { transform: none; opacity: 1; } }
 .sw-flag { transform-box: fill-box; transform-origin: center; animation: sw-flag 1.2s ease-in-out infinite; }
 @keyframes sw-flag { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+/* Eksik işaretlenen KKD: olması gereken parçanın kırmızı kesikli hayaleti */
+.sw-ghost { animation: sw-ghost 1.6s ease-in-out infinite; }
+.sw-ghost * { fill: rgba(225, 37, 27, 0.32) !important; stroke: #e1251b !important; stroke-width: 2.5px; stroke-dasharray: 5 3; }
+.sw-ghost line, .sw-ghost path[fill="none"] { fill: none !important; stroke-opacity: 0.55; }
+.sw-ghost text { fill: #e1251b !important; stroke: none !important; }
+@keyframes sw-ghost { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
 
 /* Sonuç: puan sayacı ve rozet */
 .sw-pop { animation: sw-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
@@ -240,7 +246,7 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .ph-crane, .ph-smoke, .ph-flicker, .ph-twinkle, .ph-blink, .ph-spark, .ph-belt,
-  .ph-ore, .ph-walker, .ph-leg-a, .ph-leg-b, .sw-equip, .sw-flag, .sw-pop, .sw-rise {
+  .ph-ore, .ph-walker, .ph-leg-a, .ph-leg-b, .sw-equip, .sw-flag, .sw-ghost, .sw-pop, .sw-rise {
     animation: none;
   }
   .ph-walker { transform: translate(560px, 352px); }

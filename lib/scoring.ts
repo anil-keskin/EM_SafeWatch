@@ -53,9 +53,14 @@ function clamp(value: number, min: number, max: number): number {
 export function scoreSection(
   selected: string[],
   correct: string[],
-  critical: string[] = []
+  critical: string[] = [],
+  noSubstitute: readonly string[] = []
 ): SectionResult {
-  const { hits, misses, extras } = matchSelectedToCorrect(selected, correct);
+  const { hits, misses, extras } = matchSelectedToCorrect(
+    selected,
+    correct,
+    noSubstitute
+  );
   const criticalSet = new Set(critical);
   const criticalExtras = extras.filter((code) => criticalSet.has(code));
   const mildExtras = extras.filter((code) => !criticalSet.has(code));
@@ -220,13 +225,19 @@ export function evaluateScenario(
       ...taskSpecificExtrasForSelf(scenario.required_self),
     ]
   );
+  const wornBy = (type: "yuklenici" | "isletme") =>
+    scenario.actors.find((actor) => actor.type === type)?.current_items ?? [];
   const contractorSection = scoreSection(
     answers.contractor,
-    scenario.contractor_gaps
+    scenario.contractor_gaps,
+    [],
+    wornBy("yuklenici")
   );
   const operatorSection = scoreSection(
     answers.operator,
-    scenario.operator_gaps
+    scenario.operator_gaps,
+    [],
+    wornBy("isletme")
   );
   const actionSection = scoreSection(
     answers.action,
